@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-// 🛡️ Use your custom API config instead of standard axios
-import API from "../api/config.js"; 
-import { AlertCircle, Loader2 } from "lucide-react"; 
+import axios from "axios";
+import { AlertCircle, Loader2 } from "lucide-react"; // Helpful for status icons
 import { useAuth } from "../../context/AuthContext.jsx";
-
+import API from "../api/config.js";
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth(); // 🔐 Get the secure login function from Context
@@ -33,10 +32,7 @@ const Login = () => {
     setError("");
 
     try {
-      /** * 📡 Hit the logincontroller using your central API config.
-       * Since your API config already has the base URL and headers,
-       * we only need to provide the relative path.
-       */
+      // 📡 Hit the logincontroller
       const res = await API.post("/auth/login", {
         email: formData.email,
         password: formData.password
@@ -46,7 +42,8 @@ const Login = () => {
         /**
          * 🛡️ SUPER SECURE UPDATE:
          * We call login() from our Context. 
-         * This keeps the User Profile (including workType) in MEMORY only.
+         * This saves the token to localStorage (for session persistence)
+         * but keeps the User Profile (including workType) in MEMORY only.
          */
         login(res.data.user, res.data.token);
 
