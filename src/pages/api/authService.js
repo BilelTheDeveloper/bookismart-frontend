@@ -1,7 +1,11 @@
 import axios from "axios";
 
+/**
+ * 🚀 PRODUCTION UPDATE:
+ * Switched from localhost to your Render backend.
+ */
 const API = axios.create({
-  baseURL: "http://localhost:5000/api/auth", // Ensure this matches your server port
+  baseURL: "https://bookismart-backend.onrender.com/api/auth", 
 });
 
 export const authService = {
