@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { authService } from "../../api/authService"; // Importing your new clean API file
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import StepThree from "./StepThree";
@@ -8,7 +9,10 @@ import StepFive from "./StepFive";
 
 const JoinAsOwner = () => {
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
+    userId: null, // ✨ Added to track the backend user ID across steps
     profilePic: null,
     businessName: "",
     fullName: "",
@@ -34,14 +38,49 @@ const JoinAsOwner = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (step < 5) {
-      setStep(step + 1);
-    } else {
-      // Final Logic for Submission
-      console.log("Final Registration Data:", formData);
-      setStep(6); // Move to Success Screen
+    setError(""); 
+    setLoading(true);
+
+    try {
+      if (step === 1) {
+        // Step 1: Create Profile & Trigger OTP
+        const response = await authService.submitStepOne(formData);
+        // ✨ Store the userId returned from the backend for the next steps
+        setFormData(prev => ({ ...prev, userId: response.data.userId }));
+        setStep(2);
+      } else if (step === 2) {
+        // Step 2: Verify OTP using userId
+        await authService.verifyOtp(formData.userId, formData.phoneOtp, formData.emailOtp);
+        setStep(3);
+      } else if (step === 3) {
+        // Step 3: Check matching passwords before API call
+        if (formData.password !== formData.confirmPassword) {
+          setError("Passwords do not match!");
+          setLoading(false);
+          return;
+        }
+        await authService.setPassword(formData.userId, formData.password, formData.confirmPassword);
+        setStep(4);
+      } else if (step === 4) {
+        // Step 4: Verification UI moves to final review
+        setStep(5);
+      } else if (step === 5) {
+        // Step 5: Final Submission (Documents + Agreement)
+        // Note: Step 4 documents are sent here to minimize separate API calls
+        await authService.uploadIdentity(formData.userId, formData);
+        await authService.finalizeRegistration(formData.userId, true);
+        
+        console.log("Final Registration Data Successfully Submitted");
+        setStep(6);
+      }
+    } catch (err) {
+      console.error("Signup Error:", err);
+      // Fallback to error message from backend
+      setError(err.response?.data?.error || err.response?.data?.message || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -122,6 +161,13 @@ const JoinAsOwner = () => {
                 <p className="text-slate-500 font-medium mt-2">Let's get your business automated.</p>
               </div>
 
+              {/* Error Alert Box */}
+              {error && (
+                <div className="mb-6 p-4 bg-rose-50 border border-rose-100 text-rose-600 text-xs font-bold rounded-2xl animate-bounce">
+                  ⚠️ {error}
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 
                 {/* Dynamic Step Rendering */}
@@ -133,7 +179,7 @@ const JoinAsOwner = () => {
 
                 {/* Navigation Buttons */}
                 <div className="flex gap-4 pt-4">
-                  {step > 1 && (
+                  {step > 1 && !loading && (
                     <button 
                       type="button" 
                       onClick={() => setStep(step - 1)} 
@@ -144,13 +190,18 @@ const JoinAsOwner = () => {
                   )}
                   <button 
                     type="submit" 
-                    className="flex-[2] bg-slate-900 text-white font-black py-4 rounded-2xl hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200 active:scale-95 text-sm uppercase tracking-widest"
+                    disabled={loading}
+                    className={`flex-[2] bg-slate-900 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-slate-200 active:scale-95 text-sm uppercase tracking-widest ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-600'}`}
                   >
-                    {step === 1 && "Continue to Security 🚀"}
-                    {step === 2 && "Verify Codes →"}
-                    {step === 3 && "Save Password 🔒"}
-                    {step === 4 && "Confirm Identity 🤳"}
-                    {step === 5 && "Submit Application ✅"}
+                    {loading ? "Processing..." : (
+                      <>
+                        {step === 1 && "Continue to Security 🚀"}
+                        {step === 2 && "Verify Codes →"}
+                        {step === 3 && "Save Password 🔒"}
+                        {step === 4 && "Confirm Identity 🤳"}
+                        {step === 5 && "Submit Application ✅"}
+                      </>
+                    )}
                   </button>
                 </div>
 

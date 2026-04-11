@@ -1,8 +1,44 @@
 import React from "react";
 
 const StepOne = ({ formData, handleChange }) => {
-  const categories = ["Barber & Salon", "Health & Medical", "Beauty & Spa", "Consulting", "Fitness & Sports", "Other"];
-  const cities = ["Sousse", "Tunis", "Sfax", "Nabeul", "Monastir", "Bizerte"];
+  const categories = [
+    "Beauty & Barbers",
+    "Health & Medical",
+    "Fitness & Gyms",
+    "Creative & Media",
+    "Car Services",
+    "Maintenance",
+    "Coaching & Tutors",
+    "Consultants",
+    "Events & DJs",
+    "Grooming & Vets"
+];
+  const cities = [
+  "Ariana",
+  "Beja",
+  "Ben Arous",
+  "Bizerte",
+  "Gabes",
+  "Gafsa",
+  "Jendouba",
+  "Kairouan",
+  "Kasserine",
+  "Kebili",
+  "Kef",
+  "Mahdia",
+  "Manouba",
+  "Medenine",
+  "Monastir",
+  "Nabeul",
+  "Sfax",
+  "Sidi Bouzid",
+  "Siliana",
+  "Sousse",
+  "Tataouine",
+  "Tozeur",
+  "Tunis",
+  "Zaghouan"
+];
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">

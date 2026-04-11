@@ -6,13 +6,24 @@ const StepFour = ({ formData, setFormData }) => {
   const [stream, setStream] = useState(null);
   const [cameraActive, setCameraActive] = useState(false);
 
+  // 🛡️ Cleanup: Stop camera when component unmounts
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [stream]);
+
   // 📸 Start Camera automatically on load
   const startCamera = async () => {
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: "user", width: 480, height: 480 } 
       });
-      videoRef.current.srcObject = mediaStream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+      }
       setStream(mediaStream);
       setCameraActive(true);
     } catch (err) {
@@ -38,13 +49,16 @@ const StepFour = ({ formData, setFormData }) => {
   const stopCamera = () => {
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
+      setStream(null);
       setCameraActive(false);
     }
   };
 
   const handleChange = (e) => {
     const { name, files } = e.target;
-    setFormData({ ...formData, [name]: files[0] });
+    if (files && files[0]) {
+      setFormData({ ...formData, [name]: files[0] });
+    }
   };
 
   const FileUploadBox = ({ name, label, icon, currentFile }) => (
@@ -59,7 +73,14 @@ const StepFour = ({ formData, setFormData }) => {
           <span className="text-[9px] font-black uppercase text-slate-500 tracking-tighter text-center">{label}</span>
         </>
       )}
-      <input type="file" name={name} onChange={handleChange} className="hidden" accept="image/*" required />
+      {/* 🛠️ FIXED: Removed 'required' to prevent 'not focusable' browser error */}
+      <input 
+        type="file" 
+        name={name} 
+        onChange={handleChange} 
+        className="hidden" 
+        accept="image/*" 
+      />
     </label>
   );
 
@@ -83,7 +104,7 @@ const StepFour = ({ formData, setFormData }) => {
       <div className="space-y-4">
         <div className="relative group bg-slate-950 rounded-[3rem] overflow-hidden aspect-square max-w-[280px] mx-auto border-4 border-white shadow-2xl shadow-indigo-100/50">
           
-          {/* FACE INDICATOR OVERLAY (The Alert Circle) */}
+          {/* FACE INDICATOR OVERLAY */}
           {!formData.livePhoto && (
              <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
                 <div className="w-48 h-64 border-2 border-dashed border-cyan-400 rounded-[100%] opacity-50 animate-pulse"></div>

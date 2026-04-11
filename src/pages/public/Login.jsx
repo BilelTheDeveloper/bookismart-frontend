@@ -1,12 +1,22 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { AlertCircle, Loader2 } from "lucide-react"; // Helpful for status icons
+import { useAuth } from "../../context/AuthContext.jsx";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth(); // 🔐 Get the secure login function from Context
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     rememberMe: false
   });
+
+  // New states for integration
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -16,10 +26,42 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login attempt:", formData);
-    // Integration logic for authentication goes here
+    setLoading(true);
+    setError("");
+
+    try {
+      // 📡 Hit the logincontroller
+      const res = await axios.post("http://localhost:5000/api/auth/login", {
+        email: formData.email,
+        password: formData.password
+      });
+
+      if (res.data.success) {
+        /**
+         * 🛡️ SUPER SECURE UPDATE:
+         * We call login() from our Context. 
+         * This saves the token to localStorage (for session persistence)
+         * but keeps the User Profile (including workType) in MEMORY only.
+         */
+        login(res.data.user, res.data.token);
+
+        // 🚀 Route based on user role
+        if (res.data.user.role === "admin") {
+          navigate("/admin/dashboard");
+        } else if (res.data.user.role === "owner") {
+          navigate("/merchant");
+        } else {
+          navigate("/");
+        }
+      }
+    } catch (err) {
+      // ⚠️ Handle errors (wrong password, or accountStatus not active)
+      setError(err.response?.data?.error || "Connection failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -80,6 +122,14 @@ const Login = () => {
             <p className="text-slate-500 font-medium mt-2">Enter your credentials to continue.</p>
           </div>
 
+          {/* ❌ Error Alert */}
+          {error && (
+            <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-600 text-sm font-bold animate-in fade-in zoom-in duration-300">
+              <AlertCircle size={18} />
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             
             {/* Email Field */}
@@ -93,7 +143,7 @@ const Login = () => {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="ahmed@example.com" 
-                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all font-bold"
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all font-bold text-slate-900"
                   required
                 />
               </div>
@@ -115,7 +165,7 @@ const Login = () => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••" 
-                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all font-bold"
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all font-bold text-slate-900"
                   required
                 />
               </div>
@@ -139,9 +189,17 @@ const Login = () => {
             {/* Submit Button */}
             <button 
               type="submit" 
-              className="w-full bg-slate-900 text-white font-black py-4 rounded-2xl hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200 active:scale-95 text-sm uppercase tracking-widest mt-4"
+              disabled={loading}
+              className="w-full bg-slate-900 text-white font-black py-4 rounded-2xl hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200 active:scale-95 text-sm uppercase tracking-widest mt-4 flex items-center justify-center gap-2"
             >
-              Access Dashboard 🔓
+              {loading ? (
+                <>
+                  <Loader2 size={18} className="animate-spin text-cyan-300" />
+                  Verifying...
+                </>
+              ) : (
+                "Access Dashboard 🔓"
+              )}
             </button>
 
             {/* Redirect to Join */}
