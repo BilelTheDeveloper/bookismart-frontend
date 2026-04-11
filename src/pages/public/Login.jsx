@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { AlertCircle, Loader2 } from "lucide-react"; // Helpful for status icons
+import { AlertCircle, Loader2 } from "lucide-react"; 
 import { useAuth } from "../../context/AuthContext.jsx";
 import API from "../api/config.js";
+
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth(); // 🔐 Get the secure login function from Context
+  const { login } = useAuth(); 
 
   const [formData, setFormData] = useState({
     email: "",
@@ -14,7 +15,6 @@ const Login = () => {
     rememberMe: false
   });
 
-  // New states for integration
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -32,32 +32,42 @@ const Login = () => {
     setError("");
 
     try {
-      // 📡 Hit the logincontroller
+      // 🔍 Debug: Verify where the request is going
+      console.log("📡 Attempting login to:", API.defaults.baseURL);
+
       const res = await API.post("/auth/login", {
         email: formData.email,
         password: formData.password
       });
 
+      // 📥 Debug: See the full object returned by your Render backend
+      console.log("📥 Server Response:", res.data);
+
       if (res.data.success) {
         /**
-         * 🛡️ SUPER SECURE UPDATE:
-         * We call login() from our Context. 
-         * This saves the token to localStorage (for session persistence)
-         * but keeps the User Profile (including workType) in MEMORY only.
+         * 🛡️ SECURE UPDATE:
+         * We call login() to save the token and keep user in memory.
          */
         login(res.data.user, res.data.token);
 
-        // 🚀 Route based on user role
-        if (res.data.user.role === "admin") {
+        const userRole = res.data.user?.role;
+        console.log("👤 User Role detected:", userRole);
+
+        // 🚀 NAVIGATION LOGIC
+        if (userRole === "admin") {
+          console.log("➡️ Navigating to Admin Dashboard...");
           navigate("/admin/dashboard");
-        } else if (res.data.user.role === "owner") {
+        } else if (userRole === "owner") {
+          console.log("➡️ Navigating to Merchant Hub...");
           navigate("/merchant");
         } else {
+          console.log("⚠️ Role not recognized or missing. Navigating to Home.");
           navigate("/");
         }
       }
     } catch (err) {
-      // ⚠️ Handle errors (wrong password, or accountStatus not active)
+      console.error("🔥 Login Error Object:", err);
+      // ⚠️ Handle specific errors like 401 (Wrong Pass) or 403 (Locked)
       setError(err.response?.data?.error || "Connection failed. Please try again.");
     } finally {
       setLoading(false);
@@ -69,11 +79,9 @@ const Login = () => {
       
       {/* 🌌 LEFT SIDE: The "Control Center" Inspiration */}
       <div className="lg:w-5/12 bg-indigo-600 text-white p-12 lg:p-20 flex flex-col justify-between relative overflow-hidden">
-        {/* Abstract design elements */}
         <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-white opacity-10 rounded-full blur-[80px]" />
         <div className="absolute top-[10%] left-[-5%] w-[300px] h-[300px] bg-cyan-400 opacity-20 rounded-full blur-[100px]" />
         
-        {/* Brand */}
         <Link to="/" className="flex items-center gap-3 group relative z-10">
           <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform">
             <span className="text-indigo-600 font-black text-xl italic">B</span>
@@ -83,7 +91,6 @@ const Login = () => {
           </span>
         </Link>
 
-        {/* Welcome Back Text */}
         <div className="relative z-10 my-20 lg:my-0">
           <span className="text-indigo-100 font-black text-sm uppercase tracking-[0.3em]">Welcome Back</span>
           <h1 className="text-4xl lg:text-6xl font-black mt-4 leading-tight tracking-tighter">
@@ -94,7 +101,6 @@ const Login = () => {
             Log in to access your real-time dashboard, manage staff schedules, and track your Flouci earnings.
           </p>
 
-          {/* Quick Stats/Features for Owners */}
           <div className="mt-12 space-y-8">
             <div className="flex items-center gap-5">
               <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-xl">📈</div>
@@ -107,7 +113,6 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Footer info */}
         <div className="relative z-10 text-indigo-200/50 text-xs font-bold uppercase tracking-widest">
           Secure Enterprise Login v2.0
         </div>
@@ -122,7 +127,6 @@ const Login = () => {
             <p className="text-slate-500 font-medium mt-2">Enter your credentials to continue.</p>
           </div>
 
-          {/* ❌ Error Alert */}
           {error && (
             <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-600 text-sm font-bold animate-in fade-in zoom-in duration-300">
               <AlertCircle size={18} />
@@ -131,8 +135,6 @@ const Login = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            
-            {/* Email Field */}
             <div>
               <label className="text-xs font-black uppercase tracking-widest text-slate-500 block mb-2">Email Address</label>
               <div className="relative">
@@ -149,7 +151,6 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Password Field */}
             <div>
               <div className="flex justify-between items-center mb-2">
                 <label className="text-xs font-black uppercase tracking-widest text-slate-500 block">Password</label>
@@ -171,7 +172,6 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Remember Me Toggle */}
             <div className="flex items-center gap-3">
               <input 
                 type="checkbox" 
@@ -186,7 +186,6 @@ const Login = () => {
               </label>
             </div>
 
-            {/* Submit Button */}
             <button 
               type="submit" 
               disabled={loading}
@@ -202,7 +201,6 @@ const Login = () => {
               )}
             </button>
 
-            {/* Redirect to Join */}
             <div className="pt-8 text-center border-t border-slate-100 mt-8">
               <p className="text-sm font-bold text-slate-400">
                 Don't have a business account?
