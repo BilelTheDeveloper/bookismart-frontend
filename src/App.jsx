@@ -1,8 +1,9 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
-// Theme Context Provider
+// Auth & Theme Context Providers
 import { ThemeProvider } from "./context/ThemeContext";
+import { AuthProvider } from "./context/AuthContext"; // 🔐 Added for Auth synchronization
 
 // Components
 import Navbar from "./components/Navbar";
@@ -28,10 +29,11 @@ import TemplateSetupForm from "./pages/users/TemplateSetupForm";
 
 // Specialized Website Layouts
 import BarberWebsite from "./themes/SmartStyle/Barbershops/Theme1/WebsiteLayout";
-import HairSalonWebsite from "./themes/SmartStyle/HairSalons/Theme1/WebsiteLayout"; // 🛠️ New Import
+import HairSalonWebsite from "./themes/SmartStyle/HairSalons/Theme1/WebsiteLayout"; 
 import MakeupArtistWebsite from "./themes/SmartStyle/MakeupArtists/Theme1/WebsiteLayout";
 import NailSalonWebsite from "./themes/SmartStyle/NailSalons/Theme1/WebsiteLayout";
 import SpaWebsite from "./themes/SmartStyle/Spas/Theme1/WebsiteLayout";
+
 /**
  * LayoutWrapper
  * Conditionally shows Navbar/Footer based on the route.
@@ -58,48 +60,50 @@ const LayoutWrapper = ({ children }) => {
 
 function App() {
   return (
-    <ThemeProvider>
-      <Router>
-        <LayoutWrapper>
-          <Routes>
-            {/* --- Public Routes --- */}
-            <Route path="/" element={<HomeLayout />} />
-            <Route path="/how-it-works" element={<HowItWorksPage />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/professionals" element={<ProfessionalsPage />} />
-            <Route path="/join-as-owner" element={<JoinAsOwner />} />
-            <Route path="/login" element={<LoginPage />} />
+    <AuthProvider> {/* 🛡️ Added this to wrap the entire application */}
+      <ThemeProvider>
+        <Router>
+          <LayoutWrapper>
+            <Routes>
+              {/* --- Public Routes --- */}
+              <Route path="/" element={<HomeLayout />} />
+              <Route path="/how-it-works" element={<HowItWorksPage />} />
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/professionals" element={<ProfessionalsPage />} />
+              <Route path="/join-as-owner" element={<JoinAsOwner />} />
+              <Route path="/login" element={<LoginPage />} />
 
-            {/* --- Admin Routes (Super Admin Overview) --- */}
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/verification" element={<UserVerification />} />
+              {/* --- Admin Routes (Super Admin Overview) --- */}
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/verification" element={<UserVerification />} />
 
-            {/* --- Merchant/Owner Routes (Web Inside Web) --- */}
-            <Route path="/merchant" element={<MainUserPage />}>
-              {/* Default Merchant Dashboard */}
-              <Route index element={<OwnerDashboard />} />
-              
-              {/* Template Management Gallery */}
-              <Route path="templates" element={<TemplateGallery />} />
-              
-              {/* Preview Routes (The Live Website Views) */}
-              <Route path="templates/preview/barbershops" element={<BarberWebsite />} />
-              <Route path="templates/preview/hair-salons" element={<HairSalonWebsite />} /> {/* 🛠️ New Route Added */}
-              <Route path="templates/preview/makeup-artists" element={<MakeupArtistWebsite />} />
-              <Route path="templates/preview/nail-salons" element={<NailSalonWebsite />} />
-              <Route path="templates/preview/spas" element={<SpaWebsite />} />
-              {/* Setup/Customization Route (The Configuration Lab) */}
-              <Route path="templates/setup/:id" element={<TemplateSetupForm />} />
-              
-              {/* Future Merchant Modules */}
-              {/* <Route path="services" element={<MerchantServices />} /> */}
-              {/* <Route path="billing" element={<MerchantBilling />} /> */}
-            </Route>
-
-          </Routes>
-        </LayoutWrapper>
-      </Router>
-    </ThemeProvider>
+              {/* --- Merchant/Owner Routes (Web Inside Web) --- */}
+              <Route path="/merchant" element={<MainUserPage />}>
+                {/* Default Merchant Dashboard */}
+                <Route index element={<OwnerDashboard />} />
+                
+                {/* Template Management Gallery */}
+                <Route path="templates" element={<TemplateGallery />} />
+                
+                {/* Preview Routes (The Live Website Views) */}
+                <Route path="templates/preview/barbershops" element={<BarberWebsite />} />
+                <Route path="templates/preview/hair-salons" element={<HairSalonWebsite />} />
+                <Route path="templates/preview/makeup-artists" element={<MakeupArtistWebsite />} />
+                <Route path="templates/preview/nail-salons" element={<NailSalonWebsite />} />
+                <Route path="templates/preview/spas" element={<SpaWebsite />} />
+                
+                {/* Setup/Customization Route (The Configuration Lab) */}
+                <Route path="templates/setup/:id" element={<TemplateSetupForm />} />
+                
+                {/* Future Merchant Modules */}
+                {/* <Route path="services" element={<MerchantServices />} /> */}
+                {/* <Route path="billing" element={<MerchantBilling />} /> */}
+              </Route>
+            </Routes>
+          </LayoutWrapper>
+        </Router>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 

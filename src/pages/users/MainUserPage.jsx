@@ -1,40 +1,38 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import OwnerSidebar from "../../components/user/OwnerSidebar"; // Reuse your sidebar or create a specific OwnerSidebar
-import { Bell, Search, User, LogOut, LayoutDashboard, Calendar, Settings } from "lucide-react";
+import OwnerSidebar from "../../components/user/OwnerSidebar"; 
+import { Bell, Search, LogOut } from "lucide-react";
+import { useAuth } from "../../context/AuthContext"; // 🔐 Import useAuth
 
 const MainUserPage = () => {
-  const [user, setUser] = useState(null);
+  const { user, logout, loading } = useAuth(); // 👈 Get user & logout from central state
   const navigate = useNavigate();
 
-  const API_URL = "http://localhost:5000";
-
+  /**
+   * 🛡️ PROTECT ROUTE: 
+   * If not loading and no user exists, kick to login.
+   */
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (!savedUser) {
+    if (!loading && !user) {
       navigate("/login");
-    } else {
-      setUser(JSON.parse(savedUser));
     }
-  }, [navigate]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
-  };
+  }, [user, loading, navigate]);
 
   /**
    * 🖼️ CLOUDINARY URL HELPER
-   * Checks if the path is a full Cloudinary URL or a local path
+   * Cleaned to work in production without hardcoded localhost.
    */
   const getProfileImageUrl = (path) => {
-    if (!path) return null;
-    if (path.startsWith("http")) return path; // Use Cloudinary URL directly
-    return `${API_URL}/${path.replace(/\\/g, '/')}`; // Fallback for local storage
+    if (!path) return "https://via.placeholder.com/150"; // Fallback image
+    if (path.startsWith("http")) return path; 
+    // If it's a relative path, we assume it's served from your backend URL
+    return path; 
   };
 
-  if (!user) return null;
+  // While checking auth, show nothing or a loader to prevent "flashing" the login screen
+  if (loading || !user) {
+    return null; 
+  }
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -64,18 +62,23 @@ const MainUserPage = () => {
             <div className="flex items-center gap-4">
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-black text-slate-900 leading-none">{user.fullName}</p>
-                <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mt-1">{user.businessName}</p>
+                <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mt-1">{user.businessName || "Owner Account"}</p>
               </div>
+              
+              {/* Profile Image / Logout Trigger */}
               <button 
-                onClick={handleLogout}
-                className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-white shadow-md hover:scale-105 transition-transform"
+                onClick={logout}
+                title="Click to Logout"
+                className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-white shadow-md hover:scale-105 transition-transform group relative"
               >
-                {/* 🛡️ Updated Cloudinary Logic for Profile Image */}
                 <img 
                   src={getProfileImageUrl(user.profilePicUrl)} 
                   alt="Profile" 
                   className="w-full h-full object-cover" 
                 />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                   <LogOut size={16} className="text-white" />
+                </div>
               </button>
             </div>
           </div>
