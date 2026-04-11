@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../admin/Sidebar";
-import { CheckCircle, XCircle, Eye, ShieldAlert, Clock, User, Mail, Phone, MapPin, Briefcase, Calendar, X } from "lucide-react";
+import { CheckCircle, XCircle, Eye, ShieldAlert, Clock, Mail, Phone, MapPin, Briefcase, Calendar, X } from "lucide-react";
 import axios from "axios";
 
 const UserVerification = () => {
   const [merchants, setMerchants] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [selectedUser, setSelectedUser] = useState(null); // State for the Full Dossier
+  const [selectedUser, setSelectedUser] = useState(null); 
   const [loading, setLoading] = useState(true);
 
-  const API_URL = "http://localhost:5000";
+  // 🚀 PRODUCTION UPDATE: Point to your Render backend
+  const API_URL = "https://bookismart-backend.onrender.com";
 
   // 📡 Fetch Pending Merchants
   const fetchPendingKYC = async () => {
     try {
       setLoading(true);
-      // Fixed URL to match your backend route prefix
+      // Using the production URL for fetching
       const res = await axios.get(`${API_URL}/api/admin/user-verification/pending`);
       setMerchants(res.data);
     } catch (err) {
@@ -32,9 +33,8 @@ const UserVerification = () => {
   // ✅ ❌ Handle Approve/Reject
   const handleAction = async (id, status) => {
     try {
-      // Fixed URL to match your backend route prefix
       await axios.patch(`${API_URL}/api/admin/user-verification/verify/${id}`, { status });
-      setSelectedUser(null); // Close dossier if open
+      setSelectedUser(null); 
       fetchPendingKYC();
       console.log(`User ${id} successfully set to ${status}`);
     } catch (err) {
@@ -43,14 +43,13 @@ const UserVerification = () => {
   };
 
   /**
-   * 🖼️ CLOUDINARY UPDATE:
-   * This helper now detects if the path is a Cloudinary URL or a local file.
-   * Cloudinary URLs start with "http", so we return them as-is.
+   * 🖼️ CLOUDINARY HELPER:
+   * Ensures images load from Cloudinary (http) or production backend.
    */
   const getImgUrl = (path) => {
-    if (!path) return null;
-    if (path.startsWith("http")) return path; // Return Cloudinary URL directly
-    return `${API_URL}/${path.replace(/\\/g, '/')}`; // Fallback for local legacy files
+    if (!path) return "https://via.placeholder.com/150";
+    if (path.startsWith("http")) return path; 
+    return `${API_URL}/${path.replace(/\\/g, '/')}`; 
   };
 
   return (
@@ -102,16 +101,14 @@ const UserVerification = () => {
                     <td className="p-6">
                       <div className="flex gap-2">
                         <button 
-                          onClick={() => setSelectedImage(getImgUrl(user.kyc.idFrontUrl))}
+                          onClick={() => setSelectedImage(getImgUrl(user.kyc?.idFrontUrl))}
                           className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center hover:bg-indigo-50 hover:text-indigo-600 transition-all text-slate-400"
-                          title="View ID Front"
                         >
                           <Eye size={16} />
                         </button>
                         <button 
-                          onClick={() => setSelectedImage(getImgUrl(user.kyc.idBackUrl))}
+                          onClick={() => setSelectedImage(getImgUrl(user.kyc?.idBackUrl))}
                           className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center hover:bg-indigo-50 hover:text-indigo-600 transition-all text-slate-400"
-                          title="View ID Back"
                         >
                           <Eye size={16} />
                         </button>
@@ -121,15 +118,15 @@ const UserVerification = () => {
                     <td className="p-6">
                       <div 
                           className="w-12 h-12 rounded-full border-2 border-white shadow-md overflow-hidden cursor-pointer hover:scale-110 transition-transform bg-slate-200"
-                          onClick={() => setSelectedImage(getImgUrl(user.kyc.livePhotoUrl))}
+                          onClick={() => setSelectedImage(getImgUrl(user.kyc?.livePhotoUrl))}
                       >
-                        <img src={getImgUrl(user.kyc.livePhotoUrl)} alt="Live" className="w-full h-full object-cover" />
+                        <img src={getImgUrl(user.kyc?.livePhotoUrl)} alt="Live" className="w-full h-full object-cover" />
                       </div>
                     </td>
 
                     <td className="p-6">
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-[10px] font-black uppercase tracking-widest">
-                        <Clock size={12} /> {user.kyc.status}
+                        <Clock size={12} /> {user.kyc?.status || 'PENDING'}
                       </span>
                     </td>
 
@@ -168,7 +165,7 @@ const UserVerification = () => {
         {/* 📂 Full User Dossier Modal */}
         {selectedUser && (
           <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-            <div className="w-full max-w-2xl h-full bg-white shadow-2xl overflow-y-auto animate-in slide-in-from-right duration-300 p-10">
+            <div className="w-full max-w-2xl h-full bg-white shadow-2xl overflow-y-auto p-10">
               <div className="flex justify-between items-center mb-10">
                 <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Merchant Dossier</h2>
                 <button onClick={() => setSelectedUser(null)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
@@ -203,7 +200,7 @@ const UserVerification = () => {
                 </div>
                 <div className="space-y-1">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Location</label>
-                  <div className="flex items-center gap-2 text-slate-900 font-bold"><MapPin size={16} className="text-slate-400"/> {selectedUser.ville}, Tunisia</div>
+                  <div className="flex items-center gap-2 text-slate-900 font-bold"><MapPin size={16} className="text-slate-400"/> {selectedUser.city || 'Tunisia'}</div>
                 </div>
                 <div className="space-y-1">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Joined Date</label>
@@ -211,38 +208,38 @@ const UserVerification = () => {
                 </div>
               </div>
 
-              {/* Document Previews in Dossier */}
+              {/* Document Previews */}
               <div className="mb-10">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Verification Documents</label>
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="cursor-pointer group" onClick={() => setSelectedImage(getImgUrl(selectedUser.kyc.idFrontUrl))}>
+                  <div className="cursor-pointer group" onClick={() => setSelectedImage(getImgUrl(selectedUser.kyc?.idFrontUrl))}>
                     <p className="text-[8px] font-bold text-slate-400 mb-2 text-center uppercase">CIN Front</p>
-                    <img src={getImgUrl(selectedUser.kyc.idFrontUrl)} className="rounded-xl border group-hover:border-indigo-500 transition-colors" alt="Front" />
+                    <img src={getImgUrl(selectedUser.kyc?.idFrontUrl)} className="rounded-xl border group-hover:border-indigo-500 transition-colors" alt="Front" />
                   </div>
-                  <div className="cursor-pointer group" onClick={() => setSelectedImage(getImgUrl(selectedUser.kyc.idBackUrl))}>
+                  <div className="cursor-pointer group" onClick={() => setSelectedImage(getImgUrl(selectedUser.kyc?.idBackUrl))}>
                     <p className="text-[8px] font-bold text-slate-400 mb-2 text-center uppercase">CIN Back</p>
-                    <img src={getImgUrl(selectedUser.kyc.idBackUrl)} className="rounded-xl border group-hover:border-indigo-500 transition-colors" alt="Back" />
+                    <img src={getImgUrl(selectedUser.kyc?.idBackUrl)} className="rounded-xl border group-hover:border-indigo-500 transition-colors" alt="Back" />
                   </div>
-                  <div className="cursor-pointer group" onClick={() => setSelectedImage(getImgUrl(selectedUser.kyc.livePhotoUrl))}>
+                  <div className="cursor-pointer group" onClick={() => setSelectedImage(getImgUrl(selectedUser.kyc?.livePhotoUrl))}>
                     <p className="text-[8px] font-bold text-slate-400 mb-2 text-center uppercase">Live Selfie</p>
-                    <img src={getImgUrl(selectedUser.kyc.livePhotoUrl)} className="rounded-xl border group-hover:border-indigo-500 transition-colors" alt="Selfie" />
+                    <img src={getImgUrl(selectedUser.kyc?.livePhotoUrl)} className="rounded-xl border group-hover:border-indigo-500 transition-colors" alt="Selfie" />
                   </div>
                 </div>
               </div>
 
-              {/* Action Buttons in Dossier */}
+              {/* Action Buttons */}
               <div className="flex gap-4 sticky bottom-0 bg-white pt-6 border-t border-slate-100">
                 <button 
                   onClick={() => handleAction(selectedUser._id, 'rejected')}
                   className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-rose-50 text-rose-600 font-black uppercase text-xs tracking-widest hover:bg-rose-600 hover:text-white transition-all"
                 >
-                  <XCircle size={18} /> Reject Merchant
+                  <XCircle size={18} /> Reject
                 </button>
                 <button 
                   onClick={() => handleAction(selectedUser._id, 'verified')}
-                  className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-emerald-500 text-white font-black uppercase text-xs tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-200"
+                  className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-emerald-500 text-white font-black uppercase text-xs tracking-widest hover:bg-emerald-600 transition-all shadow-lg"
                 >
-                  <CheckCircle size={18} /> Approve Merchant
+                  <CheckCircle size={18} /> Approve
                 </button>
               </div>
             </div>
