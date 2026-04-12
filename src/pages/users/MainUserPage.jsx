@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import OwnerSidebar from "../../components/user/OwnerSidebar"; 
-import { Bell, Search, LogOut, Menu } from "lucide-react"; // Added Menu icon for future mobile toggle
+import { Bell, Search, LogOut } from "lucide-react";
 import { useAuth } from "../../context/AuthContext"; // 🔐 Import useAuth
 
 const MainUserPage = () => {
@@ -36,21 +36,20 @@ const MainUserPage = () => {
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      {/* 🚀 Sidebar Left - Hidden on mobile, flex on medium screens and up */}
-      <div className="hidden md:flex">
-        <OwnerSidebar />
-      </div>
+      {/* 🚀 Sidebar Left 
+          Note: Responsive handling (hiding/showing) is now managed internally 
+          by the OwnerSidebar component's fixed/sticky logic.
+      */}
+      <OwnerSidebar />
 
       <div className="flex-1 flex flex-col min-w-0">
         {/* 🎩 Top Navigation Bar */}
         <header className="h-20 bg-white border-b border-slate-100 flex items-center justify-between px-4 md:px-10 sticky top-0 z-30">
           
-          {/* Mobile Menu Button - visible only on small screens */}
-          <button className="md:hidden p-2 text-slate-600">
-             <Menu size={24} />
-          </button>
+          {/* Spacer for Mobile: This makes room for the floating menu button inside OwnerSidebar */}
+          <div className="w-12 lg:hidden"></div>
 
-          {/* Search Bar - Responsive width */}
+          {/* Search Bar - Responsive width & Hidden on very small mobile */}
           <div className="hidden sm:flex items-center gap-4 bg-slate-50 px-5 py-2.5 rounded-2xl border border-slate-100 w-full max-w-[180px] md:max-w-96">
             <Search size={18} className="text-slate-400 shrink-0" />
             <input 
@@ -60,8 +59,8 @@ const MainUserPage = () => {
             />
           </div>
 
-          <div className="flex items-center gap-3 md:gap-6 ml-auto md:ml-0">
-            {/* Notifications - Hidden on very small screens to save space */}
+          <div className="flex items-center gap-3 md:gap-6 ml-auto lg:ml-0">
+            {/* Notifications */}
             <button className="relative w-10 h-10 md:w-12 md:h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition-all">
               <Bell size={20} />
               <span className="absolute top-2.5 right-2.5 md:top-3 md:right-3 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
@@ -97,7 +96,7 @@ const MainUserPage = () => {
         </header>
 
         {/* 🎭 Page Content Injector - Responsive Padding */}
-        <main className="p-4 md:p-10">
+        <main className="p-4 md:p-10 flex-1">
           <Outlet />
         </main>
       </div>
