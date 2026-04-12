@@ -18,7 +18,7 @@ const Footer = () => {
                 <span className="font-black text-xl">B</span>
               </div>
               <span className="text-2xl font-black tracking-tighter italic">
-                Booki<span className="text-indigo-500">Smart</span>
+                Book<span className="text-indigo-500">ify</span>
               </span>
             </div>
             <p className="text-slate-400 font-medium leading-relaxed max-w-xs">

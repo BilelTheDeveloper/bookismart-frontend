@@ -96,7 +96,7 @@ const JoinAsOwner = () => {
             <span className="text-white font-black text-xl italic">B</span>
           </div>
           <span className="text-2xl font-black tracking-tighter">
-            Booki<span className="text-indigo-500">smart</span>
+            Book<span className="text-indigo-500">ify</span>
           </span>
         </Link>
 

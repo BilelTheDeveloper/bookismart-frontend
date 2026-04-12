@@ -45,7 +45,7 @@ const Navbar = () => {
           <span className={`text-2xl font-bold tracking-tight transition-colors duration-300 ${
             useDarkUI ? "text-slate-900" : "text-white"
           }`}>
-            Booki<span className="text-indigo-500">smart</span>
+            Book<span className="text-indigo-500">iify</span>
           </span>
         </Link>
 

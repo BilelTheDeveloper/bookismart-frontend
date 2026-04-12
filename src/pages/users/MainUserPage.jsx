@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import OwnerSidebar from "../../components/user/OwnerSidebar"; 
-import { Bell, Search, LogOut } from "lucide-react";
+import { Bell, Search, LogOut, Menu } from "lucide-react"; // Added Menu icon for future mobile toggle
 import { useAuth } from "../../context/AuthContext"; // 🔐 Import useAuth
 
 const MainUserPage = () => {
@@ -36,40 +36,52 @@ const MainUserPage = () => {
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      {/* 🚀 Sidebar Left */}
-      <OwnerSidebar />
+      {/* 🚀 Sidebar Left - Hidden on mobile, flex on medium screens and up */}
+      <div className="hidden md:flex">
+        <OwnerSidebar />
+      </div>
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* 🎩 Top Navigation Bar */}
-        <header className="h-20 bg-white border-b border-slate-100 flex items-center justify-between px-10 sticky top-0 z-30">
-          <div className="flex items-center gap-4 bg-slate-50 px-5 py-2.5 rounded-2xl border border-slate-100 w-96">
-            <Search size={18} className="text-slate-400" />
+        <header className="h-20 bg-white border-b border-slate-100 flex items-center justify-between px-4 md:px-10 sticky top-0 z-30">
+          
+          {/* Mobile Menu Button - visible only on small screens */}
+          <button className="md:hidden p-2 text-slate-600">
+             <Menu size={24} />
+          </button>
+
+          {/* Search Bar - Responsive width */}
+          <div className="hidden sm:flex items-center gap-4 bg-slate-50 px-5 py-2.5 rounded-2xl border border-slate-100 w-full max-w-[180px] md:max-w-96">
+            <Search size={18} className="text-slate-400 shrink-0" />
             <input 
               type="text" 
-              placeholder="Search bookings or clients..." 
+              placeholder="Search..." 
               className="bg-transparent border-none outline-none text-sm font-bold w-full text-slate-600"
             />
           </div>
 
-          <div className="flex items-center gap-6">
-            <button className="relative w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition-all">
+          <div className="flex items-center gap-3 md:gap-6 ml-auto md:ml-0">
+            {/* Notifications - Hidden on very small screens to save space */}
+            <button className="relative w-10 h-10 md:w-12 md:h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition-all">
               <Bell size={20} />
-              <span className="absolute top-3 right-3 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
+              <span className="absolute top-2.5 right-2.5 md:top-3 md:right-3 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
             </button>
 
-            <div className="h-10 w-[1px] bg-slate-100 mx-2"></div>
+            <div className="h-8 md:h-10 w-[1px] bg-slate-100 mx-1 md:mx-2"></div>
 
-            <div className="flex items-center gap-4">
-              <div className="text-right hidden sm:block">
+            <div className="flex items-center gap-2 md:gap-4">
+              <div className="text-right hidden lg:block">
                 <p className="text-sm font-black text-slate-900 leading-none">{user.fullName}</p>
-                <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mt-1">{user.businessName || "Owner Account"}</p>
+                <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mt-1">
+                  {user.businessName || "Owner Account"}
+                </p>
               </div>
               
               {/* Profile Image / Logout Trigger */}
               <button 
                 onClick={logout}
                 title="Click to Logout"
-                className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-white shadow-md hover:scale-105 transition-transform group relative"
+                className="w-10 h-10 md:w-12 md:h-12 rounded-2xl overflow-hidden border-2 border-white shadow-md hover:scale-105 transition-transform group relative shrink-0"
               >
                 <img 
                   src={getProfileImageUrl(user.profilePicUrl)} 
@@ -84,8 +96,8 @@ const MainUserPage = () => {
           </div>
         </header>
 
-        {/* 🎭 Page Content Injector */}
-        <main className="p-10">
+        {/* 🎭 Page Content Injector - Responsive Padding */}
+        <main className="p-4 md:p-10">
           <Outlet />
         </main>
       </div>

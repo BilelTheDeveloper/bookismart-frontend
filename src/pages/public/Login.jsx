@@ -87,7 +87,7 @@ const Login = () => {
             <span className="text-indigo-600 font-black text-xl italic">B</span>
           </div>
           <span className="text-2xl font-black tracking-tighter">
-            Booki<span className="text-cyan-300">smart</span>
+            Book<span className="text-cyan-300">ify</span>
           </span>
         </Link>
 
