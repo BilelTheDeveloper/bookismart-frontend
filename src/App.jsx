@@ -24,7 +24,7 @@ import UserVerification from "./pages/admin/UserVerification";
 // Merchant/User Pages
 import MainUserPage from "./pages/users/MainUserPage";
 import OwnerDashboard from "./pages/users/OwnerDashboard";
-import TemplateGallery from "./themes/SmartStyle/TemplateGallery";
+import TemplateGallery from "./pages/users/TemplateGallery";
 import TemplateSetupForm from "./pages/users/TemplateSetupForm"; 
 
 // Specialized Website Layouts

@@ -3,8 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Save, ArrowLeft, PenTool, Image as ImageIcon, 
   Plus, Trash2, Eye, EyeOff, X, Camera, 
-  Upload, Link as LinkIcon, Clock, MapPin, Phone,
-  Instagram, Facebook, Twitter, Globe
+  Upload, Link as LinkIcon, Clock, MapPin, Phone , Globe
 } from 'lucide-react';
 
 // Import all theme layouts
