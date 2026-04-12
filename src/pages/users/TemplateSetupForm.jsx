@@ -283,11 +283,11 @@ const TemplateSetupForm = () => {
             </div>
             <div className="space-y-6">
                 <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-2"><Instagram size={12}/> Instagram Username</label>
+                    <label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-2"> Instagram Username</label>
                     <input name="contact.socials.instagram" value={merchantData.contact.socials.instagram} onChange={handleChange} className="w-full bg-slate-50 rounded-xl p-4 text-xs font-bold" placeholder="@username" />
                 </div>
                 <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-2"><Facebook size={12}/> Facebook Page Link</label>
+                    <label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-2">Facebook Page Link</label>
                     <input name="contact.socials.facebook" value={merchantData.contact.socials.facebook} onChange={handleChange} className="w-full bg-slate-50 rounded-xl p-4 text-xs font-bold" placeholder="facebook.com/page" />
                 </div>
             </div>
