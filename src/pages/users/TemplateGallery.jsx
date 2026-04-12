@@ -6,7 +6,8 @@ const templates = [
   { 
     id: 'barbershops', 
     name: 'Elite Barber', 
-    category: 'barbershop', // Match with your DB workType
+    // We use an array for category to match both 'barbershop' or 'barbershops'
+    category: ['barbershop', 'barbershops'], 
     themePath: 'barbershops', 
     icon: Scissors, 
     img: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=500', 
@@ -15,7 +16,7 @@ const templates = [
   { 
     id: 'hair-salons', 
     name: 'Vogue Salon', 
-    category: 'hair-salon', // Match with your DB workType
+    category: ['hair-salon', 'hair-salons'], 
     themePath: 'hair-salons',
     icon: Wind, 
     img: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=500', 
@@ -24,7 +25,7 @@ const templates = [
   { 
     id: 'spas', 
     name: 'Zen Retreat', 
-    category: 'spa', // Match with your DB workType
+    category: ['spa', 'spas'], 
     themePath: 'spas',
     icon: Flower2, 
     img: 'https://images.unsplash.com/photo-1540555700478-4be289fbecee?q=80&w=500', 
@@ -33,7 +34,7 @@ const templates = [
   { 
     id: 'nail-salons', 
     name: 'Gloss & Glam', 
-    category: 'nail-salon', // Match with your DB workType
+    category: ['nail-salon', 'nail-salons'], 
     themePath: 'nail-salons',
     icon: Sparkles, 
     img: 'https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=500', 
@@ -42,7 +43,7 @@ const templates = [
   { 
     id: 'makeup-artists', 
     name: 'Pro Visuals', 
-    category: 'makeup-artist', // Match with your DB workType
+    category: ['makeup-artist', 'makeup-artists'], 
     themePath: 'makeup-artists',
     icon: Paintbrush, 
     img: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=500', 
@@ -54,12 +55,20 @@ const TemplateGallery = () => {
   const navigate = useNavigate();
   const savedUser = JSON.parse(localStorage.getItem("user") || "{}");
   
-  // 🔍 Extract the user's category (workType)
-  const userCategory = savedUser?.workType?.toLowerCase(); 
+  // 🔍 Extract the user's category (workType) - added .trim() to prevent hidden space issues
+  const userCategory = savedUser?.workType?.toLowerCase().trim(); 
   const currentActive = savedUser?.workType;
 
-  // 🛡️ Filter Logic: Only show templates that match the merchant's category
-  const filteredTemplates = templates.filter(tpl => tpl.category === userCategory);
+  // 🛡️ Improved Filter Logic: Checks if userCategory is inside the template's category array
+  const filteredTemplates = templates.filter(tpl => {
+    if (Array.isArray(tpl.category)) {
+        return tpl.category.includes(userCategory);
+    }
+    return tpl.category === userCategory;
+  });
+
+  // Debugging log - remove this once you see it working in the console
+  console.log("DEBUG: Current User Category in Storage:", userCategory);
 
   return (
     <div className="p-10 bg-white min-h-screen">
@@ -136,7 +145,10 @@ const TemplateGallery = () => {
             <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Custom Theme Required</h3>
             <p className="text-slate-500 max-w-xs mt-2 font-medium">
               We haven't launched a specialized template for <b>{userCategory || "your category"}</b> yet. 
-              Contact support to request a custom layout!
+              <br />
+              <span className="text-[10px] text-slate-400 mt-2 block">
+                (Current System Search: "{userCategory}")
+              </span>
             </p>
           </div>
         )}
