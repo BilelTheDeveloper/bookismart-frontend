@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react'; 
 import { useParams, useNavigate } from 'react-router-dom';
+import API from "../api/config"; // Adjust this path to your config file
 import { 
   Save, ArrowLeft, PenTool, Image as ImageIcon, 
   Plus, Trash2, Eye, EyeOff, X, Camera, 
@@ -24,7 +25,7 @@ const TemplateSetupForm = () => {
   // 1. Model-Compliant State Structure
   const [merchantData, setMerchantData] = useState({
     name: "",
-    slug: "", // Added for URL identification
+    slug: "", 
     hero: {
       title: "",
       slogan: "",
@@ -52,7 +53,6 @@ const TemplateSetupForm = () => {
         tiktok: ""
       }
     },
-    // Added 7-day business hours structure
     businessHours: [
       { day: 'Monday', open: '09:00', close: '19:00', isClosed: false },
       { day: 'Tuesday', open: '09:00', close: '19:00', isClosed: false },
@@ -64,12 +64,27 @@ const TemplateSetupForm = () => {
     ]
   });
 
+  // --- UPDATED: Fetch using API instance ---
+  useEffect(() => {
+    const fetchMySite = async () => {
+      try {
+        const res = await API.get('/merchant/website/my-site');
+        if (res.data) {
+          setMerchantData(res.data);
+        }
+      } catch (err) {
+        console.log("No existing site found, starting fresh.");
+      }
+    };
+    fetchMySite();
+  }, []);
+
   // --- Handlers ---
   const handleChange = (e) => {
     const { name, value } = e.target;
     const keys = name.split('.');
     
-    if (keys.length === 3) { // Handle contact.socials.instagram
+    if (keys.length === 3) { 
         setMerchantData(prev => ({
             ...prev,
             [keys[0]]: {
@@ -77,7 +92,7 @@ const TemplateSetupForm = () => {
                 [keys[1]]: { ...prev[keys[0]][keys[1]], [keys[2]]: value }
             }
         }));
-    } else if (keys.length === 2) { // Handle hero.title
+    } else if (keys.length === 2) { 
         setMerchantData(prev => ({
             ...prev,
             [keys[0]]: { ...prev[keys[0]], [keys[1]]: value }
@@ -115,11 +130,26 @@ const TemplateSetupForm = () => {
     setMerchantData({ ...merchantData, services: newServices });
   };
 
+  // --- UPDATED: Save using API instance ---
   const handleSave = async () => {
     setIsSaving(true);
-    // Logic: Send 'merchantData' + 'id' (category) + 'templateId' to your Render API
-    console.log("Saving to DB:", merchantData);
-    setTimeout(() => setIsSaving(false), 2000); // Simulate network
+    try {
+      const payload = {
+        ...merchantData,
+        category: id, 
+        templateId: `${id?.toUpperCase()}_THEME_01` 
+      };
+
+      const response = await API.post('/merchant/website/save', payload);
+
+      console.log("Success:", response.data);
+      alert("Website configuration saved and sent for admin review!");
+    } catch (error) {
+      console.error("Save Error:", error.response?.data || error.message);
+      alert("Failed to save. Please check your connection.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const renderLivePreview = () => {

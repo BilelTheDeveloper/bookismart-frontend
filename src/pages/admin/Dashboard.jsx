@@ -11,7 +11,9 @@ import {
   ShieldAlert, 
   Activity,
   Globe,
-  Zap
+  Zap,
+  ShieldCheck,
+  Layout
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -29,9 +31,9 @@ const Dashboard = () => {
     { 
       id: 1, 
       type: 'kyc', 
-      title: 'Pending Verifications', 
+      title: 'Merchant Identities', 
       desc: '14 merchants are waiting for CIN/Business approval.', 
-      action: 'Review Now', 
+      action: 'Review KYC', 
       path: '/admin/verification', 
       icon: <ShieldAlert className="text-amber-600" />, 
       bg: 'bg-amber-50',
@@ -39,12 +41,12 @@ const Dashboard = () => {
     },
     { 
       id: 2, 
-      type: 'payment', 
-      title: 'Flouci Node Status', 
-      desc: 'Tunis region payment gateways are performing optimally.', 
-      action: 'Check Logs', 
-      path: '/admin/settings', 
-      icon: <Zap className="text-indigo-600" />, 
+      type: 'web', 
+      title: 'Website Deployments', 
+      desc: '8 websites are pending final security & domain audit.', 
+      action: 'Verify Sites', 
+      path: '/admin/web-verification', 
+      icon: <Layout className="text-indigo-600" />, 
       bg: 'bg-indigo-50',
       border: 'border-indigo-100'
     },
@@ -52,7 +54,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex min-h-screen bg-[#F8FAFC]">
-      <Sidebar />
+      
       
       <main className="flex-1 p-10 overflow-y-auto">
         {/* --- Advanced Header --- */}
@@ -150,7 +152,7 @@ const Dashboard = () => {
                     {alert.icon}
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-black text-slate-900 text-sm">{alert.title}</h4>
+                    <h4 className="font-black text-slate-900 text-sm uppercase tracking-tight">{alert.title}</h4>
                     <p className="text-slate-500 text-[11px] font-medium leading-relaxed mt-1">{alert.desc}</p>
                     <button 
                       onClick={() => navigate(alert.path)}
@@ -169,7 +171,7 @@ const Dashboard = () => {
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h4 className="font-black text-2xl tracking-tighter">99.98%</h4>
-                    <p className="text-slate-400 text-[9px] font-black uppercase tracking-[0.2em]">API Uptime Ratio</p>
+                    <p className="text-slate-400 text-[9px] font-black uppercase tracking-[0.2em]">Deployment Uptime</p>
                   </div>
                   <Zap size={20} className="text-amber-400 animate-pulse" />
                 </div>
@@ -185,7 +187,7 @@ const Dashboard = () => {
                     </div>
                   ))}
                 </div>
-                <p className="text-[9px] font-bold text-slate-500 italic">Global cluster: Northern Africa (Tunis)</p>
+                <p className="text-[9px] font-bold text-slate-500 italic">Core Region: Tunis North (Bookify Gateway)</p>
               </div>
               <Activity size={140} className="absolute -right-8 -bottom-8 text-white/[0.03] group-hover:text-white/[0.05] transition-all duration-1000" />
             </div>

@@ -8,6 +8,7 @@ import {
   Settings, 
   LogOut, 
   ShieldCheck,
+  Globe,
   Menu,
   X
 } from 'lucide-react';
@@ -32,6 +33,11 @@ const Sidebar = () => {
       icon: <ShieldCheck size={20} />, 
       label: 'KYC Verification', 
       path: '/admin/verification' 
+    },
+    { 
+      icon: <Globe size={20} />, 
+      label: 'Web Verification', 
+      path: '/admin/web-verification' 
     },
     { 
       icon: <CalendarCheck size={20} />, 

@@ -8,6 +8,7 @@ import { AuthProvider } from "./context/AuthContext"; // 🔐 Added for Auth syn
 // Components
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import Sidebar from "./pages/admin/Sidebar"; // ⬅️ Imported Sidebar to use in Layout
 
 // Public Pages
 import HomeLayout from "./pages/public/Home/HomeLayout";
@@ -20,6 +21,7 @@ import LoginPage from "./pages/public/Login";
 // Admin Pages (Super Admin)
 import AdminDashboard from "./pages/admin/Dashboard";
 import UserVerification from "./pages/admin/UserVerification";
+import WebVerification from "./pages/admin/WebVerification"; // 🌐 New: Website KYC Verification
 
 // Merchant/User Pages
 import MainUserPage from "./pages/users/MainUserPage";
@@ -47,6 +49,19 @@ const LayoutWrapper = ({ children }) => {
   
   const isDashboardLayout = isAdminPath || isMerchantPath;
 
+  // If it's an Admin route, we wrap it in the Sidebar layout
+  if (isAdminPath) {
+    return (
+      <div className="flex min-h-screen bg-[#F8FAFC]">
+        <Sidebar /> {/* ⬅️ Sidebar is now global for all /admin routes */}
+        <main className="flex-1 overflow-y-auto">
+          {children}
+        </main>
+      </div>
+    );
+  }
+
+  // Standard layout for Public and Merchant pages
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {!isDashboardLayout && <Navbar />}
@@ -76,6 +91,7 @@ function App() {
               {/* --- Admin Routes (Super Admin Overview) --- */}
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/verification" element={<UserVerification />} />
+              <Route path="/admin/web-verification" element={<WebVerification />} /> {/* ✅ Added Web KYC Route */}
 
               {/* --- Merchant/Owner Routes (Web Inside Web) --- */}
               <Route path="/merchant" element={<MainUserPage />}>
@@ -94,10 +110,6 @@ function App() {
                 
                 {/* Setup/Customization Route (The Configuration Lab) */}
                 <Route path="templates/setup/:id" element={<TemplateSetupForm />} />
-                
-                {/* Future Merchant Modules */}
-                {/* <Route path="services" element={<MerchantServices />} /> */}
-                {/* <Route path="billing" element={<MerchantBilling />} /> */}
               </Route>
             </Routes>
           </LayoutWrapper>
