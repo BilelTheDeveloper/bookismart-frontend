@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import API from '../api/axiosConfig'; // Ensure this points to your axios instance
+import API from '../api/config'; // Ensure this points to your axios instance
 import { 
   CheckCircle2, 
   XCircle, 
