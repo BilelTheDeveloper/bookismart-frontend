@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import API from '../api/config'; // Adjust this path to where your API config file is located
+import API from '../api/axiosConfig'; // Ensure this points to your axios instance
 import { 
   CheckCircle2, 
   XCircle, 
@@ -19,11 +19,10 @@ const WebVerification = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  // --- FETCH DATA FROM BACKEND ---
-  // Using the API instance handles the Base URL and Auth headers automatically
   const fetchVerifications = async () => {
     setIsLoading(true);
     try {
+      // ✅ Matches server.js mount: app.use('/api/admin/websites', ...)
       const res = await API.get('/admin/websites/pending');
       setVerifications(res.data);
     } catch (err) {
@@ -37,19 +36,17 @@ const WebVerification = () => {
     fetchVerifications();
   }, []);
 
-  // --- HANDLE APPROVE / REJECT ---
   const handleAction = async (id, newStatus) => {
     try {
       const rejectionReason = newStatus === 'rejected' ? prompt("Enter rejection reason:") : "";
-      
       if (newStatus === 'rejected' && rejectionReason === null) return; 
 
-      await API.patch(`/admin/websites/verify/${id}`, {
+      // ✅ FIX: Matches backend route: router.patch('/status/:id', ...)
+      await API.patch(`/admin/websites/status/${id}`, {
         status: newStatus,
         rejectionReason
       });
 
-      // Refresh list after action
       fetchVerifications();
     } catch (err) {
       console.error("Action failed:", err);
@@ -57,15 +54,14 @@ const WebVerification = () => {
     }
   };
 
-  // Filter logic for the search bar
+  // ✅ Updated filter to look into ownerId for businessName
   const filteredData = verifications.filter(v => 
-    v.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    v.ownerId?.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
     v.slug?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="p-8 bg-slate-50 min-h-screen font-sans">
-      {/* --- HEADER --- */}
       <header className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <div className="flex items-center gap-2 mb-2">
@@ -94,7 +90,6 @@ const WebVerification = () => {
         </div>
       </header>
 
-      {/* --- STATS SUMMARY --- */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Pending Requests</p>
@@ -106,11 +101,13 @@ const WebVerification = () => {
         </div>
         <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Platform Status</p>
-          <p className="text-3xl font-black text-emerald-500 flex items-center gap-2">Active <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse" /></p>
+          <p className="text-3xl font-black text-emerald-500 flex items-center gap-2">
+            Active 
+            <span className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse inline-block" />
+          </p>
         </div>
       </div>
 
-      {/* --- VERIFICATION TABLE --- */}
       <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -128,11 +125,18 @@ const WebVerification = () => {
                 <tr key={item._id} className="hover:bg-slate-50/30 transition-colors group">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500 font-bold group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors">
-                        {item.name?.charAt(0) || "B"}
+                      {/* Using profilePicUrl from User model if available */}
+                      <div className="w-12 h-12 rounded-2xl bg-slate-100 overflow-hidden flex items-center justify-center text-slate-500 font-bold group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors">
+                        {item.ownerId?.profilePicUrl ? (
+                          <img src={item.ownerId.profilePicUrl} alt="Logo" className="w-full h-full object-cover" />
+                        ) : (
+                          item.ownerId?.businessName?.charAt(0) || "B"
+                        )}
                       </div>
                       <div>
-                        <p className="font-black text-slate-900 text-sm uppercase tracking-tight">{item.name}</p>
+                        <p className="font-black text-slate-900 text-sm uppercase tracking-tight">
+                          {item.ownerId?.businessName || "Unknown Shop"}
+                        </p>
                         <p className="text-[10px] font-bold text-slate-400 uppercase">{item.category}</p>
                       </div>
                     </div>
@@ -149,7 +153,7 @@ const WebVerification = () => {
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-2 text-slate-500">
                       <Clock size={14} />
-                      <span className="text-xs font-medium">{new Date(item.lastUpdated).toLocaleDateString()}</span>
+                      <span className="text-xs font-medium">{item.lastUpdated ? new Date(item.lastUpdated).toLocaleDateString() : 'N/A'}</span>
                     </div>
                   </td>
                   <td className="px-8 py-6">
@@ -167,7 +171,7 @@ const WebVerification = () => {
                       </span>
                     )}
                   </td>
-                  <td className="px-8 py-6">
+                  <td className="px-8 py-6 text-right">
                     <div className="flex justify-end gap-2">
                       {item.verificationStatus === 'pending' ? (
                         <>
@@ -207,14 +211,6 @@ const WebVerification = () => {
               )}
             </tbody>
           </table>
-        </div>
-        
-        <div className="p-6 bg-slate-50/50 border-t border-slate-100 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
-          <p>Showing {filteredData.length} records</p>
-          <div className="flex gap-2">
-            <button className="px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Prev</button>
-            <button className="px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next</button>
-          </div>
         </div>
       </div>
     </div>
