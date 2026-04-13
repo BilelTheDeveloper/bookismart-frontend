@@ -1,170 +1,228 @@
 import React, { useState } from 'react';
 import { 
-  Paintbrush, 
-  Clock, 
-  MapPin, 
-  Phone, 
-  ChevronRight, 
-  Maximize, 
-  Minimize,
-  Sparkles,
-  Camera,
-  Heart
+  Paintbrush, Clock, MapPin, Phone, ChevronRight, 
+  Maximize, Minimize, Sparkles, Star, CheckCircle2 
 } from 'lucide-react';
 
 const MakeupArtistWebsite = ({ merchantData }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Default data for Makeup Artist
-  const data = merchantData || {
-    name: "Pro Visuals",
-    slogan: "Unveiling Your Most Radiant Self",
-    heroImage: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=1920",
-    about: "Specializing in bridal, editorial, and red-carpet glamour. With over 8 years of experience in the beauty industry, I bring a meticulous eye for detail and a passion for artistic expression to every face.",
-    services: [
-      { name: "Bridal Glamour", price: "350 TND", desc: "Full luxury application, trial session, and touch-up kit." },
-      { name: "Editorial / Photo", price: "200 TND", desc: "High-definition makeup for studio lighting and film." },
-      { name: "Private Masterclass", price: "150 TND", desc: "Learn professional techniques in a 1-on-1 personalized session." }
+  // 1. MASTER DATA MERGE (Unified naming with all templates)
+  const data = {
+    name: merchantData?.name || "Pro Visuals",
+    slogan: merchantData?.hero?.slogan || "Unveiling Your Most Radiant Self",
+    heroTitle: merchantData?.hero?.title || "Face Design",
+    heroImage: merchantData?.hero?.backgroundImage || "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=1920",
+    aboutTitle: merchantData?.about?.title || "The Artistry",
+    aboutText: merchantData?.about?.text || "Specializing in bridal, editorial, and red-carpet glamour. I bring a meticulous eye for detail and a passion for artistic expression to every face.",
+    aboutImage: merchantData?.about?.image || "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800",
+    showAbout: merchantData?.about?.show ?? true,
+    services: merchantData?.services?.length > 0 ? merchantData.services : [
+      { title: "Bridal Glamour", price: "350", description: "Full luxury application and trial session." },
+      { title: "Editorial Look", price: "200", description: "High-definition makeup for studio lighting." }
     ],
-    phone: "+216 55 000 000",
-    address: "Berges du Lac, Tunis"
+    gallery: merchantData?.gallery?.images || [],
+    showGallery: merchantData?.gallery?.show ?? true,
+    contact: {
+      phone: merchantData?.contact?.phone || "+216 55 000 000",
+      address: merchantData?.contact?.address || "Berges du Lac, Tunis",
+      socials: merchantData?.contact?.socials || {}
+    },
+    hours: merchantData?.businessHours || []
   };
 
+  // Custom Brand SVGs (Solves the Lucide export error)
+  const InstagramIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+  );
+
+  const FacebookIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+  );
+
   const WebsiteContent = (
-    <div className={`bg-[#050505] text-white font-sans selection:bg-violet-500 overflow-y-scroll scroll-smooth h-full no-scrollbar`} style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
-      <style>
-        {`
-          .no-scrollbar::-webkit-scrollbar { display: none; }
-          @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;900&display=swap');
-          .font-sync { font-family: 'Syncopate', sans-serif; }
-          .font-inter { font-family: 'Inter', sans-serif; }
-        `}
-      </style>
+    <div className="bg-[#050505] text-white font-sans selection:bg-violet-500/30 overflow-y-auto h-full no-scrollbar scroll-smooth">
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@300;900&display=swap');
+        .font-sync { font-family: 'Syncopate', sans-serif; }
+      `}</style>
       
-      {/* --- MINIMAL NAVBAR --- */}
-      <nav className={`${isFullscreen ? 'fixed' : 'sticky'} top-0 w-full z-50 bg-black/60 backdrop-blur-xl border-b border-white/5`}>
-        <div className="max-w-7xl mx-auto px-8 h-20 flex justify-between items-center">
+      {/* --- RESPONSIVE NAVBAR --- */}
+      <nav className="sticky top-0 w-full z-50 bg-black/60 backdrop-blur-xl border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 h-20 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Paintbrush className="text-violet-500" size={20} />
-            <span className="text-sm font-sync font-bold tracking-[0.4em] uppercase">{data.name}</span>
+            <span className="text-[10px] md:text-sm font-sync tracking-[0.4em] uppercase">{data.name}</span>
           </div>
-          <div className="hidden md:flex gap-10 text-[9px] font-bold uppercase tracking-[0.3em] text-white/50">
-            <a href="#work" className="hover:text-violet-400 transition-colors">Portfolio</a>
-            <a href="#rates" className="hover:text-violet-400 transition-colors">Rates</a>
+          <div className="hidden lg:flex gap-10 text-[9px] font-bold uppercase tracking-[0.3em] text-white/40">
+            {data.showAbout && <a href="#about" className="hover:text-violet-400 transition-colors">Philosophy</a>}
+            <a href="#services" className="hover:text-violet-400 transition-colors">Rates</a>
+            {data.showGallery && <a href="#gallery" className="hover:text-violet-400 transition-colors">Portfolio</a>}
             <a href="#contact" className="hover:text-violet-400 transition-colors">Contact</a>
           </div>
-          <button className="border border-white/20 hover:bg-white hover:text-black px-6 py-2 rounded-full text-[9px] font-bold uppercase tracking-widest transition-all">
+          <button className="bg-white text-black px-6 py-2.5 rounded-full text-[9px] font-bold uppercase tracking-widest hover:bg-violet-600 hover:text-white transition-all transform active:scale-95 shadow-xl shadow-white/5">
             Book Session
           </button>
         </div>
       </nav>
 
       {/* --- EDITORIAL HERO --- */}
-      <section className="relative h-screen flex flex-col justify-center px-8 overflow-hidden">
-        <div className="absolute top-0 right-0 w-full md:w-2/3 h-full z-0 opacity-60">
-           <img 
-              src={data.heroImage} 
-              className="w-full h-full object-cover"
-              alt="Model Makeup"
-           />
-           <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/40 to-transparent"></div>
+      <section className="relative min-h-screen flex flex-col justify-center px-6 md:px-12 overflow-hidden">
+        <div className="absolute top-0 right-0 w-full md:w-2/3 h-full z-0">
+           <img src={data.heroImage} className="w-full h-full object-cover opacity-50" alt="Hero" />
+           <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/60 to-transparent"></div>
            <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent"></div>
         </div>
 
-        <div className="relative z-10 max-w-4xl space-y-6">
+        <div className="relative z-10 max-w-4xl space-y-8 animate-in fade-in slide-in-from-left duration-1000">
           <div className="flex items-center gap-3 text-violet-500">
             <div className="w-12 h-[1px] bg-violet-500"></div>
-            <span className="text-[10px] font-sync tracking-[0.5em] uppercase">Artistry & Grace</span>
+            <span className="text-[10px] font-sync tracking-[0.5em] uppercase">Master Artist</span>
           </div>
-          <h1 className="text-6xl md:text-9xl font-inter font-black uppercase leading-[0.85] tracking-tighter">
-            Face <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-fuchsia-400">Design</span>
+          <h1 className="text-6xl md:text-[120px] font-black uppercase leading-[0.85] tracking-tighter">
+            {data.heroTitle.split(' ')[0]} <br /> 
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-fuchsia-400">
+              {data.heroTitle.split(' ').slice(1).join(' ') || "Artistry"}
+            </span>
           </h1>
           <p className="text-lg text-white/40 max-w-md font-light leading-relaxed">
             {data.slogan}
           </p>
-          <div className="pt-6">
-            <button className="bg-violet-600 text-white px-10 py-5 rounded-sm font-sync text-[10px] tracking-widest uppercase hover:bg-violet-700 transition-all shadow-2xl shadow-violet-900/20">
-              View Portfolio
-            </button>
+          <div className="flex flex-col sm:flex-row gap-4 pt-4">
+             <button className="bg-violet-600 text-white px-10 py-5 rounded-sm font-sync text-[9px] tracking-widest uppercase hover:bg-white hover:text-black transition-all shadow-2xl shadow-violet-900/40">
+               Schedule Session
+             </button>
+             <button className="border border-white/10 text-white px-10 py-5 rounded-sm font-sync text-[9px] tracking-widest uppercase hover:bg-white/5 transition-all">
+               View Gallery
+             </button>
           </div>
         </div>
       </section>
 
       {/* --- SERVICES / RATES --- */}
-      <section id="rates" className="py-32 px-8 bg-white text-black">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-20">
-          <div className="md:w-1/3">
-            <h2 className="text-4xl font-inter font-black uppercase tracking-tighter sticky top-32">Services <br /> & Investment</h2>
+      <section id="services" className="py-32 px-6 bg-white text-black rounded-t-[3rem] md:rounded-t-[5rem] relative z-20">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-20">
+          <div className="lg:w-1/3">
+            <div className="sticky top-32 space-y-4">
+              <span className="text-violet-600 font-bold uppercase tracking-widest text-[10px]">Investment</span>
+              <h2 className="text-5xl font-black uppercase tracking-tighter leading-none">Services <br/> & Rates</h2>
+            </div>
           </div>
-          <div className="md:w-2/3 space-y-12">
+          <div className="lg:w-2/3 space-y-12">
             {data.services.map((service, index) => (
-              <div key={index} className="group border-b border-black/5 pb-10 flex flex-col gap-4">
+              <div key={index} className="group border-b border-black/5 pb-10 flex flex-col gap-4 hover:border-violet-500 transition-colors">
                 <div className="flex justify-between items-end">
-                    <span className="text-3xl font-inter font-black italic text-black/10 group-hover:text-violet-500/20 transition-colors">0{index + 1}</span>
-                    <span className="text-xl font-bold font-inter">{service.price}</span>
+                    <span className="text-3xl font-black italic text-black/5 group-hover:text-violet-500/20 transition-colors">0{index + 1}</span>
+                    <span className="text-2xl font-black text-violet-600">{service.price} <span className="text-[10px] uppercase text-black/30 ml-1">tnd</span></span>
                 </div>
-                <h3 className="text-2xl font-inter font-black uppercase tracking-tight">{service.name}</h3>
-                <p className="text-black/50 font-inter text-sm max-w-xl">{service.desc}</p>
+                <h3 className="text-2xl font-black uppercase tracking-tight">{service.title}</h3>
+                <p className="text-black/50 text-sm max-w-xl leading-relaxed">{service.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* --- FOOTER --- */}
-      <footer id="contact" className="py-24 border-t border-white/5 bg-[#050505] text-center px-8">
-        <div className="max-w-7xl mx-auto flex flex-col items-center gap-10">
-            <div className="flex items-center gap-4">
-                <Paintbrush className="text-violet-500" />
-                <span className="text-xl font-sync font-bold tracking-[0.6em] uppercase">{data.name}</span>
-            </div>
-            <div className="flex gap-12 text-white/30">
-                <Camera size={20} className="hover:text-white cursor-pointer transition-colors" />
-                <Phone size={20} className="hover:text-white cursor-pointer transition-colors" />
-                <MapPin size={20} className="hover:text-white cursor-pointer transition-colors" />
-            </div>
-            <div className="pt-10 border-t border-white/5 w-full flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] font-sync text-white/20 tracking-widest">
-                <p>© 2026 {data.name.toUpperCase()} STUDIO</p>
-                <p>POWERED BY BOOKISMART TUNISIA</p>
-            </div>
+      {/* --- GALLERY SECTION --- */}
+      {data.showGallery && (
+        <section id="gallery" className="py-32 px-6 bg-[#0a0a0a]">
+           <div className="max-w-7xl mx-auto text-center mb-20">
+              <span className="text-violet-500 font-bold uppercase tracking-widest text-[10px]">The Portfolio</span>
+              <h2 className="text-4xl md:text-7xl font-black uppercase tracking-tighter mt-4">Selected Work</h2>
+           </div>
+           <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {data.gallery.map((img, i) => img && (
+                <div key={i} className="aspect-[3/4] rounded-2xl overflow-hidden group relative">
+                   <img src={img} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000" alt="Work" />
+                   <div className="absolute inset-0 bg-violet-600/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <CheckCircle2 className="text-white" size={30} />
+                   </div>
+                </div>
+              ))}
+           </div>
+        </section>
+      )}
+
+      {/* --- CONTACT & FOOTER --- */}
+      <footer id="contact" className="pt-32 pb-12 px-6 border-t border-white/5 bg-[#050505]">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-20 mb-32">
+           <div className="space-y-8 text-center lg:text-left flex flex-col items-center lg:items-start">
+              <div className="flex items-center gap-3">
+                 <Paintbrush className="text-violet-500" size={24} />
+                 <span className="text-xl font-sync tracking-[0.4em] uppercase">{data.name}</span>
+              </div>
+              <p className="text-white/30 max-w-xs leading-loose text-sm">{data.slogan}</p>
+              <div className="flex gap-4">
+                  <a href="#" className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-violet-600 transition-all text-white/40 hover:text-white"><InstagramIcon /></a>
+                  <a href="#" className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-violet-600 transition-all text-white/40 hover:text-white"><FacebookIcon /></a>
+              </div>
+           </div>
+           
+           <div className="space-y-8 text-center lg:text-left">
+              <h4 className="font-bold uppercase tracking-widest text-[10px] text-violet-500">Studio Location</h4>
+              <div className="space-y-6">
+                 <div className="flex items-start gap-4 justify-center lg:justify-start">
+                   <MapPin className="text-violet-500" size={20} />
+                   <p className="text-white/60 font-medium">{data.contact.address}</p>
+                 </div>
+                 <div className="flex items-start gap-4 justify-center lg:justify-start text-2xl font-black">
+                   <Phone className="text-violet-500" size={20} />
+                   <p>{data.contact.phone}</p>
+                 </div>
+              </div>
+           </div>
+
+           <div className="space-y-8">
+              <h4 className="font-bold uppercase tracking-widest text-[10px] text-violet-500">Working Hours</h4>
+              <div className="space-y-3">
+                 {data.hours.slice(0, 7).map((h, i) => (
+                    <div key={i} className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-white/20 border-b border-white/5 pb-2">
+                        <span>{h.day}</span>
+                        <span className={h.isClosed ? 'text-violet-400' : 'text-white'}>{h.isClosed ? 'Closed' : `${h.open} - ${h.close}`}</span>
+                    </div>
+                 ))}
+              </div>
+           </div>
+        </div>
+        <div className="max-w-7xl mx-auto pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] font-sync text-white/10 tracking-[0.4em]">
+           <p>© 2026 {data.name.toUpperCase()} STUDIO</p>
+           <p>POWERED BY BOOKISMART TUNISIA</p>
         </div>
       </footer>
     </div>
   );
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative h-full bg-[#050505]">
       {!isFullscreen && (
         <div className="p-4 bg-white border-b border-slate-100 flex justify-between items-center z-50">
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-            Previewing: <span className="text-violet-600">{data.name}</span>
-          </p>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-violet-600 animate-pulse" />
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              High-Fidelity Preview: <span className="text-slate-900">{data.name}</span>
+            </p>
+          </div>
           <button 
             onClick={() => setIsFullscreen(true)}
             className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-violet-600 transition-all shadow-xl shadow-slate-200"
           >
-            <Maximize size={14} /> Full Window Preview
+            <Maximize size={14} /> Full View
           </button>
         </div>
       )}
 
-      {isFullscreen ? (
-        <div className="fixed inset-0 z-[9999] bg-black animate-in fade-in duration-500">
+      <div className={`${isFullscreen ? 'fixed inset-0 z-[9999]' : 'h-full'} animate-in fade-in duration-700`}>
+        {isFullscreen && (
           <button 
             onClick={() => setIsFullscreen(false)}
-            className="fixed top-6 right-6 z-[10000] bg-white/10 hover:bg-violet-600 p-4 rounded-full text-white transition-all backdrop-blur-md border border-white/10"
+            className="fixed top-8 right-8 z-[10000] bg-white text-black p-5 rounded-full shadow-2xl hover:bg-violet-600 hover:text-white transition-all scale-110 active:scale-95"
           >
-            <Minimize size={20} />
+            <Minimize size={24} />
           </button>
-          {WebsiteContent}
-        </div>
-      ) : (
-        <div className="p-10 bg-slate-100 min-h-screen">
-          <div className="max-w-6xl mx-auto rounded-[3rem] overflow-hidden shadow-2xl border-[12px] border-slate-900 h-[80vh] bg-[#050505]">
-            {WebsiteContent}
-          </div>
-        </div>
-      )}
+        )}
+        {WebsiteContent}
+      </div>
     </div>
   );
 };
