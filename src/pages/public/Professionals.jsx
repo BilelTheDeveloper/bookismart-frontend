@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import API from "../api/config"
+import API from "../api/config";
 import { Search, MapPin, Loader2, LayoutGrid } from "lucide-react";
 
 const ProfessionalsPage = () => {
@@ -14,6 +14,7 @@ const ProfessionalsPage = () => {
     const fetchPros = async () => {
       try {
         setLoading(true);
+        // This endpoint must be registered in your backend routes
         const res = await API.get("/admin/websites/approved");
         setProfessionals(res.data);
       } catch (err) {
@@ -27,12 +28,17 @@ const ProfessionalsPage = () => {
 
   const filteredPros = professionals.filter((p) => {
     const matchesCategory = activeCategory === "All" || p.category === activeCategory;
-    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Logic fix: searching by businessName from the ownerId object
+    const bizName = p.ownerId?.businessName || "";
+    const matchesSearch = bizName.toLowerCase().includes(searchTerm.toLowerCase());
+    
     return matchesCategory && matchesSearch;
   });
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* --- HERO SECTION --- */}
       <section className="pt-40 pb-20 bg-white border-b border-slate-200">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl">
@@ -80,6 +86,7 @@ const ProfessionalsPage = () => {
         </div>
       </section>
 
+      {/* --- RESULTS GRID --- */}
       <main className="py-20 container mx-auto px-6">
         {loading ? (
           <div className="flex flex-col items-center py-20">
@@ -88,47 +95,54 @@ const ProfessionalsPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {filteredPros.map((pro) => (
-              <div key={pro._id} className="bg-white rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group">
-                <div className="relative h-60 overflow-hidden">
-                  <img 
-                    src={pro.image || `https://source.unsplash.com/featured/?${pro.category}`} 
-                    alt={pro.name} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute top-4 left-4 bg-white/90 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-900 shadow-sm">
-                    {pro.category}
-                  </div>
-                </div>
-
-                <div className="p-8">
-                  <h3 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors truncate">
-                    {pro.name}
-                  </h3>
-                  <p className="text-slate-400 font-bold text-sm mt-2 flex items-center gap-2 uppercase tracking-tighter">
-                    <MapPin size={14} className="text-indigo-500" /> {pro.location || "Tunisia"}
-                  </p>
-
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-                      Verified
-                    </span>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-                      {pro.slug}.bookify.tn
-                    </span>
+            {filteredPros.length > 0 ? (
+              filteredPros.map((pro) => (
+                <div key={pro._id} className="bg-white rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group">
+                  <div className="relative h-60 overflow-hidden bg-slate-200">
+                    <img 
+                      // Using the heroImage from the website model
+                      src={pro.heroImage || `https://images.unsplash.com/photo-1521791136064-7986c2959443?q=80&w=800&auto=format&fit=crop`} 
+                      alt={pro.ownerId?.businessName} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute top-4 left-4 bg-white/90 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-900 shadow-sm">
+                      {pro.category}
+                    </div>
                   </div>
 
-                  <a 
-                    href={`https://${pro.slug}.bookify.tn`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-8 w-full block py-4 bg-slate-50 text-slate-900 text-center font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-slate-900 hover:text-white transition-all"
-                  >
-                    View Website & Book
-                  </a>
+                  <div className="p-8">
+                    <h3 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors truncate">
+                      {pro.ownerId?.businessName || "Service Provider"}
+                    </h3>
+                    <p className="text-slate-400 font-bold text-sm mt-2 flex items-center gap-2 uppercase tracking-tighter">
+                      <MapPin size={14} className="text-indigo-500" /> {pro.ownerId?.city || "Tunisia"}
+                    </p>
+
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100">
+                        Verified
+                      </span>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+                        {pro.slug}.bookify.tn
+                      </span>
+                    </div>
+
+                    <a 
+                      href={`https://${pro.slug}.bookify.tn`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-8 w-full block py-4 bg-slate-50 text-slate-900 text-center font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-slate-900 hover:text-white transition-all"
+                    >
+                      View Website & Book
+                    </a>
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-20">
+                <p className="text-slate-400 font-bold uppercase tracking-widest">No matching experts found.</p>
               </div>
-            ))}
+            )}
           </div>
         )}
       </main>
