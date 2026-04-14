@@ -4,31 +4,37 @@ import {
   Maximize, Minimize, Star, CheckCircle2 
 } from 'lucide-react';
 
-// ✅ Changed prop name to 'data' to match your MerchantPublicProfile container
 const BarberWebsite = ({ data: merchantData }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // 1. MASTER DATA MERGE
-  // This logic now correctly pulls from your database structure
+  // 1. MASTER DATA MERGE - Synchronized with WebsiteSchema.js
   const data = {
-    // Falls back to ownerId.businessName if siteTitle isn't set
-    name: merchantData?.siteTitle || merchantData?.ownerId?.businessName || "The Classic Cut",
+    // Falls back to ownerId.businessName if siteTitle isn't used
+    name: merchantData?.ownerId?.businessName || merchantData?.hero?.title || "The Classic Cut",
     slogan: merchantData?.hero?.slogan || "Precision Grooming for the Modern Man",
-    heroTitle: merchantData?.hero?.title || merchantData?.siteTitle || "Masterful Grooming",
-    heroImage: merchantData?.heroImage || merchantData?.hero?.backgroundImage || "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=1920",
+    heroTitle: merchantData?.hero?.title || "Masterful Grooming",
+    heroImage: merchantData?.hero?.backgroundImage || "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=1920",
+    
+    // About Section
     aboutTitle: merchantData?.about?.title || "Crafting Confidence",
-    aboutText: merchantData?.aboutText || merchantData?.about?.text || "Experience the pinnacle of Tunisian barbering. We combine heritage techniques with modern style to ensure every gentleman leaves looking his best.",
-    aboutImage: merchantData?.aboutImage || merchantData?.about?.image || "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=800",
+    aboutText: merchantData?.about?.text || "Experience the pinnacle of grooming. We combine heritage techniques with modern style to ensure every gentleman leaves looking his best.",
+    aboutImage: merchantData?.about?.image || "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=800",
     showAbout: merchantData?.about?.show ?? true,
+    
+    // Services Section
     services: merchantData?.services?.length > 0 ? merchantData.services : [
       { title: "Executive Haircut", price: "30", description: "Consultation, precision cut, and hot towel finish." },
       { title: "Beard Sculpture", price: "20", description: "Razor lining, trim, and premium oil treatment." }
     ],
-    gallery: merchantData?.galleryImages || merchantData?.gallery?.images || [],
-    showGallery: merchantData?.showGallery ?? true,
+    
+    // Gallery Section
+    gallery: merchantData?.gallery?.images || [],
+    showGallery: merchantData?.gallery?.show ?? true,
+    
+    // Contact & Footer
     contact: {
-      phone: merchantData?.ownerId?.phone || merchantData?.contact?.phone || "+216 22 000 000",
-      address: merchantData?.ownerId?.city || merchantData?.contact?.address || "Tunisia",
+      phone: merchantData?.contact?.phone || merchantData?.ownerId?.phone || "+216 22 000 000",
+      address: merchantData?.contact?.address || merchantData?.ownerId?.city || "Tunis, Tunisia",
       socials: merchantData?.contact?.socials || {}
     },
     hours: merchantData?.businessHours || []
@@ -51,7 +57,7 @@ const BarberWebsite = ({ data: merchantData }) => {
       <nav className="sticky top-0 w-full z-50 bg-black/90 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 md:px-12 h-20 md:h-24 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className="bg-rose-600 p-2 rounded-lg">
+            <div className="bg-rose-600 p-2 rounded-lg shadow-lg shadow-rose-600/20">
                 <Scissors className="text-white" size={20} />
             </div>
             <span className="text-xl md:text-2xl font-black uppercase tracking-tighter leading-none">
@@ -78,29 +84,29 @@ const BarberWebsite = ({ data: merchantData }) => {
         </div>
         <div className="relative z-10 text-center px-6 max-w-5xl">
           <span className="text-rose-500 font-black uppercase tracking-[0.5em] text-[10px] mb-4 block animate-pulse">Established Professional</span>
-          <h1 className="text-5xl md:text-[120px] font-black uppercase tracking-tighter leading-[0.85] mb-8 animate-in fade-in slide-in-from-bottom-12 duration-1000">
+          <h1 className="text-5xl md:text-[100px] font-black uppercase tracking-tighter leading-[0.85] mb-8 animate-in fade-in slide-in-from-bottom-12 duration-1000">
             {data.heroTitle}
           </h1>
           <p className="text-base md:text-xl text-slate-300 font-medium tracking-wide max-w-2xl mx-auto mb-12">
             {data.slogan}
           </p>
           <div className="flex flex-col sm:flex-row gap-5 justify-center">
-             <button className="bg-white text-black px-12 py-5 rounded-full font-black uppercase tracking-widest text-xs hover:bg-rose-600 hover:text-white transition-all transform hover:scale-105">
-               Secure Appointment
+             <button className="bg-white text-black px-12 py-5 rounded-full font-black uppercase tracking-widest text-xs hover:bg-rose-600 hover:text-white transition-all transform hover:scale-105 shadow-2xl">
+                Secure Appointment
              </button>
-             <button className="border border-white/20 backdrop-blur-md px-12 py-5 rounded-full font-black uppercase tracking-widest text-xs hover:bg-white/10 transition-all">
-               View Rituals
-             </button>
+             <a href="#services" className="border border-white/20 backdrop-blur-md px-12 py-5 rounded-full font-black uppercase tracking-widest text-xs hover:bg-white/10 transition-all text-center">
+                View Rituals
+             </a>
           </div>
         </div>
       </section>
 
       {/* --- ABOUT SECTION --- */}
       {data.showAbout && (
-        <section id="about" className="py-32 px-6 bg-white text-black rounded-t-[3rem] md:rounded-t-[5rem] -mt-12 relative z-20">
+        <section id="about" className="py-32 px-6 bg-white text-black rounded-t-[3rem] md:rounded-t-[5rem] -mt-12 relative z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.2)]">
           <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div className="relative group order-2 lg:order-1">
-              <div className="absolute -inset-4 bg-rose-500/10 rounded-[3rem]"></div>
+              <div className="absolute -inset-4 bg-rose-500/10 rounded-[3rem] group-hover:-inset-2 transition-all duration-500"></div>
               <img src={data.aboutImage} className="relative rounded-[2.5rem] shadow-2xl z-10 w-full h-[600px] object-cover" alt="About" />
             </div>
             <div className="space-y-8 order-1 lg:order-2">
@@ -130,20 +136,17 @@ const BarberWebsite = ({ data: merchantData }) => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {data.services.map((service, index) => (
-            <div key={index} className="bg-white/5 p-10 rounded-[2.5rem] border border-white/5 hover:border-rose-500/50 transition-all group">
+            <div key={index} className="bg-white/5 p-10 rounded-[2.5rem] border border-white/5 hover:border-rose-500/50 transition-all group backdrop-blur-sm">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-2xl font-black uppercase tracking-tight group-hover:text-rose-500 transition-colors">{service.title}</h3>
                 <div className="h-[1px] flex-grow mx-6 bg-white/10 group-hover:bg-rose-500/30"></div>
-                <span className="text-2xl font-black text-rose-500">{service.price} <span className="text-[10px] opacity-50 uppercase tracking-tighter ml-1">tnd</span></span>
+                <span className="text-2xl font-black text-rose-500 whitespace-nowrap">
+                    {service.price} <span className="text-[10px] opacity-50 uppercase tracking-tighter ml-1">tnd</span>
+                </span>
               </div>
               <p className="text-slate-400 leading-relaxed text-sm">{service.description}</p>
             </div>
           ))}
-        </div>
-        <div className="mt-20 text-center">
-            <button className="bg-rose-600 text-white px-12 py-5 rounded-full font-black uppercase tracking-widest text-xs hover:bg-rose-700 transition-all shadow-2xl shadow-rose-900/40">
-                Book Service Online
-            </button>
         </div>
       </section>
 
@@ -175,12 +178,16 @@ const BarberWebsite = ({ data: merchantData }) => {
               </div>
               <p className="text-slate-500 max-w-xs leading-loose font-medium">{data.slogan}</p>
               <div className="flex gap-4">
-                  <a href={`https://instagram.com/${data.contact.socials.instagram}`} className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-rose-600 transition-all hover:text-white text-slate-400">
-                    <InstagramIcon />
-                  </a>
-                  <a href={data.contact.socials.facebook} className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-rose-600 transition-all hover:text-white text-slate-400">
-                    <FacebookIcon />
-                  </a>
+                  {data.contact.socials.instagram && (
+                    <a href={`https://instagram.com/${data.contact.socials.instagram}`} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-rose-600 transition-all hover:text-white text-slate-400">
+                        <InstagramIcon />
+                    </a>
+                  )}
+                  {data.contact.socials.facebook && (
+                    <a href={data.contact.socials.facebook} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-rose-600 transition-all hover:text-white text-slate-400">
+                        <FacebookIcon />
+                    </a>
+                  )}
               </div>
            </div>
            
@@ -207,7 +214,7 @@ const BarberWebsite = ({ data: merchantData }) => {
                         <span>{h.isClosed ? 'Closed' : `${h.open} - ${h.close}`}</span>
                     </div>
                  )) : (
-                   <p className="text-slate-500 text-[10px] uppercase font-black">Hours not specified</p>
+                    <p className="text-slate-500 text-[10px] font-black uppercase italic">Contact for hours</p>
                  )}
               </div>
            </div>
@@ -226,7 +233,7 @@ const BarberWebsite = ({ data: merchantData }) => {
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Live Site: <span className="text-slate-900">{data.name}</span>
+              High-Fidelity Preview: <span className="text-slate-900">{data.name}</span>
             </p>
           </div>
           <button 

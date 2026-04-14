@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 // Auth & Theme Context Providers
@@ -17,6 +17,7 @@ import ServicesPage from "./pages/public/Services";
 import ProfessionalsPage from "./pages/public/Professionals";
 import JoinAsOwner from "./pages/public/signup/JoinAsOwner";
 import LoginPage from "./pages/public/Login";
+
 // ✅ New: The Public Website Container
 import MerchantPublicProfile from "./pages/public/MerchantPublicProfile";
 
@@ -39,41 +40,56 @@ import NailSalonWebsite from "./themes/SmartStyle/NailSalons/Theme1/WebsiteLayou
 import SpaWebsite from "./themes/SmartStyle/Spas/Theme1/WebsiteLayout";
 
 /**
+ * ScrollToTop Component
+ * Ensures every navigation resets the scroll position.
+ */
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
+
+/**
  * LayoutWrapper
- * Conditionally shows Navbar/Footer based on the route.
- * Admin, Merchant, and Public Profiles get a clean UI.
+ * Dynamically handles layout visibility based on the URL path.
  */
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
   
   const isAdminPath = location.pathname.startsWith("/admin");
   const isMerchantPath = location.pathname.startsWith("/merchant");
-  // ✅ Check if we are on a public merchant profile page
   const isPublicProfile = location.pathname.startsWith("/p/"); 
+  const isAuthPath = location.pathname === "/login" || location.pathname === "/join-as-owner";
   
-  // Dashboard layout includes Admin, Merchant, and the standalone Public Profiles
-  const isDashboardLayout = isAdminPath || isMerchantPath || isPublicProfile;
+  // Dashboard/Clean View: No Navbar/Footer for Admin, Merchant Dashboard, or Public Profiles
+  const isCleanLayout = isAdminPath || isMerchantPath || isPublicProfile || isAuthPath;
 
-  // If it's an Admin route, we wrap it in the Sidebar layout
+  // --- ADMIN LAYOUT ---
   if (isAdminPath) {
     return (
       <div className="flex min-h-screen bg-[#F8FAFC]">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto h-screen no-scrollbar">
           {children}
         </main>
       </div>
     );
   }
 
-  // Standard layout for Public pages, but hides Navbar/Footer for Merchant & Profile paths
+  // --- PUBLIC & PROFILE LAYOUT ---
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      {!isDashboardLayout && <Navbar />}
-      <main className="flex-grow">
+    <div className="min-h-screen flex flex-col bg-white overflow-x-hidden">
+      {/* Hide platform Navbar on Merchant Profiles and Auth pages */}
+      {!isCleanLayout && <Navbar />}
+      
+      <main className={`flex-grow ${isPublicProfile ? 'w-full h-full' : ''}`}>
         {children}
       </main>
-      {!isDashboardLayout && <Footer />}
+
+      {/* Hide platform Footer on Merchant Profiles and Auth pages */}
+      {!isCleanLayout && <Footer />}
     </div>
   );
 };
@@ -83,6 +99,7 @@ function App() {
     <AuthProvider>
       <ThemeProvider>
         <Router>
+          <ScrollToTop /> {/* ✅ Added: Vital for UX between home and profiles */}
           <LayoutWrapper>
             <Routes>
               {/* --- Public Routes --- */}
@@ -93,20 +110,20 @@ function App() {
               <Route path="/join-as-owner" element={<JoinAsOwner />} />
               <Route path="/login" element={<LoginPage />} />
 
-              {/* ✅ New Public Route: The Merchant's Personal Site/Bio-link */}
+              {/* ✅ Correct dynamic path for Public Profiles */}
               <Route path="/p/:slug" element={<MerchantPublicProfile />} />
 
-              {/* --- Admin Routes (Super Admin Overview) --- */}
+              {/* --- Admin Routes --- */}
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/verification" element={<UserVerification />} />
               <Route path="/admin/web-verification" element={<WebVerification />} />
 
-              {/* --- Merchant/Owner Routes (Web Inside Web) --- */}
+              {/* --- Merchant/Owner Dashboard --- */}
               <Route path="/merchant" element={<MainUserPage />}>
                 <Route index element={<OwnerDashboard />} />
                 <Route path="templates" element={<TemplateGallery />} />
                 
-                {/* Preview Routes */}
+                {/* Preview Routes (Static context) */}
                 <Route path="templates/preview/barbershops" element={<BarberWebsite />} />
                 <Route path="templates/preview/hair-salons" element={<HairSalonWebsite />} />
                 <Route path="templates/preview/makeup-artists" element={<MakeupArtistWebsite />} />
