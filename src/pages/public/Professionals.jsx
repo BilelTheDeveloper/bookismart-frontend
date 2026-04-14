@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom"; // ✅ Added Link for internal routing
 import API from "../api/config";
 import { Search, MapPin, Loader2, LayoutGrid } from "lucide-react";
 
@@ -14,7 +15,6 @@ const ProfessionalsPage = () => {
     const fetchPros = async () => {
       try {
         setLoading(true);
-        // This endpoint must be registered in your backend routes
         const res = await API.get("/admin/websites/approved");
         setProfessionals(res.data);
       } catch (err) {
@@ -28,11 +28,8 @@ const ProfessionalsPage = () => {
 
   const filteredPros = professionals.filter((p) => {
     const matchesCategory = activeCategory === "All" || p.category === activeCategory;
-    
-    // Logic fix: searching by businessName from the ownerId object
     const bizName = p.ownerId?.businessName || "";
     const matchesSearch = bizName.toLowerCase().includes(searchTerm.toLowerCase());
-    
     return matchesCategory && matchesSearch;
   });
 
@@ -100,7 +97,6 @@ const ProfessionalsPage = () => {
                 <div key={pro._id} className="bg-white rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group">
                   <div className="relative h-60 overflow-hidden bg-slate-200">
                     <img 
-                      // Using the heroImage from the website model
                       src={pro.heroImage || `https://images.unsplash.com/photo-1521791136064-7986c2959443?q=80&w=800&auto=format&fit=crop`} 
                       alt={pro.ownerId?.businessName} 
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
@@ -123,18 +119,18 @@ const ProfessionalsPage = () => {
                         Verified
                       </span>
                       <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-                        {pro.slug}.bookify.tn
+                        {/* ✅ Visual Link Fix: Shows clean path instead of subdomain */}
+                        bookify.tn/p/{pro.slug}
                       </span>
                     </div>
 
-                    <a 
-                      href={`https://${pro.slug}.bookify.tn`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    {/* ✅ Logic Fix: Use <Link> to the new profile path */}
+                    <Link 
+                      to={`/p/${pro.slug}`}
                       className="mt-8 w-full block py-4 bg-slate-50 text-slate-900 text-center font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-slate-900 hover:text-white transition-all"
                     >
                       View Website & Book
-                    </a>
+                    </Link>
                   </div>
                 </div>
               ))
