@@ -4,34 +4,37 @@ import {
   Maximize, Minimize, Star, CheckCircle2 
 } from 'lucide-react';
 
-const BarberWebsite = ({ merchantData }) => {
+// ✅ Changed prop name to 'data' to match your MerchantPublicProfile container
+const BarberWebsite = ({ data: merchantData }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // 1. MASTER DATA MERGE
+  // This logic now correctly pulls from your database structure
   const data = {
-    name: merchantData?.name || "The Classic Cut",
+    // Falls back to ownerId.businessName if siteTitle isn't set
+    name: merchantData?.siteTitle || merchantData?.ownerId?.businessName || "The Classic Cut",
     slogan: merchantData?.hero?.slogan || "Precision Grooming for the Modern Man",
-    heroTitle: merchantData?.hero?.title || "Masterful Grooming",
-    heroImage: merchantData?.hero?.backgroundImage || "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=1920",
+    heroTitle: merchantData?.hero?.title || merchantData?.siteTitle || "Masterful Grooming",
+    heroImage: merchantData?.heroImage || merchantData?.hero?.backgroundImage || "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=1920",
     aboutTitle: merchantData?.about?.title || "Crafting Confidence",
-    aboutText: merchantData?.about?.text || "Experience the pinnacle of Tunisian barbering. We combine heritage techniques with modern style to ensure every gentleman leaves looking his best.",
-    aboutImage: merchantData?.about?.image || "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=800",
+    aboutText: merchantData?.aboutText || merchantData?.about?.text || "Experience the pinnacle of Tunisian barbering. We combine heritage techniques with modern style to ensure every gentleman leaves looking his best.",
+    aboutImage: merchantData?.aboutImage || merchantData?.about?.image || "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=800",
     showAbout: merchantData?.about?.show ?? true,
     services: merchantData?.services?.length > 0 ? merchantData.services : [
       { title: "Executive Haircut", price: "30", description: "Consultation, precision cut, and hot towel finish." },
       { title: "Beard Sculpture", price: "20", description: "Razor lining, trim, and premium oil treatment." }
     ],
-    gallery: merchantData?.gallery?.images || [],
-    showGallery: merchantData?.gallery?.show ?? true,
+    gallery: merchantData?.galleryImages || merchantData?.gallery?.images || [],
+    showGallery: merchantData?.showGallery ?? true,
     contact: {
-      phone: merchantData?.contact?.phone || "+216 22 000 000",
-      address: merchantData?.contact?.address || "Tunis, Tunisia",
+      phone: merchantData?.ownerId?.phone || merchantData?.contact?.phone || "+216 22 000 000",
+      address: merchantData?.ownerId?.city || merchantData?.contact?.address || "Tunisia",
       socials: merchantData?.contact?.socials || {}
     },
     hours: merchantData?.businessHours || []
   };
 
-  // SVG Components for Brands (Fixes the Lucide Export Error)
+  // SVG Components for Brands
   const InstagramIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
   );
@@ -76,7 +79,7 @@ const BarberWebsite = ({ merchantData }) => {
         <div className="relative z-10 text-center px-6 max-w-5xl">
           <span className="text-rose-500 font-black uppercase tracking-[0.5em] text-[10px] mb-4 block animate-pulse">Established Professional</span>
           <h1 className="text-5xl md:text-[120px] font-black uppercase tracking-tighter leading-[0.85] mb-8 animate-in fade-in slide-in-from-bottom-12 duration-1000">
-            {data.heroTitle || data.name}
+            {data.heroTitle}
           </h1>
           <p className="text-base md:text-xl text-slate-300 font-medium tracking-wide max-w-2xl mx-auto mb-12">
             {data.slogan}
@@ -145,7 +148,7 @@ const BarberWebsite = ({ merchantData }) => {
       </section>
 
       {/* --- GALLERY SECTION --- */}
-      {data.showGallery && (
+      {data.showGallery && data.gallery.length > 0 && (
         <section id="gallery" className="py-32 px-6 bg-white rounded-[3rem] md:rounded-[5rem]">
            <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-6">
               {data.gallery.map((img, i) => img && (
@@ -198,12 +201,14 @@ const BarberWebsite = ({ merchantData }) => {
            <div className="space-y-10">
               <h4 className="font-black uppercase tracking-widest text-[10px] text-rose-500">Availability</h4>
               <div className="grid grid-cols-1 gap-4">
-                 {data.hours.slice(0, 7).map((h, i) => (
+                 {data.hours.length > 0 ? data.hours.slice(0, 7).map((h, i) => (
                     <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest pb-2 border-b border-white/5">
                         <span className="text-slate-500">{h.day}</span>
                         <span>{h.isClosed ? 'Closed' : `${h.open} - ${h.close}`}</span>
                     </div>
-                 ))}
+                 )) : (
+                   <p className="text-slate-500 text-[10px] uppercase font-black">Hours not specified</p>
+                 )}
               </div>
            </div>
         </div>
@@ -221,7 +226,7 @@ const BarberWebsite = ({ merchantData }) => {
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-              High-Fidelity Preview: <span className="text-slate-900">{data.name}</span>
+              Live Site: <span className="text-slate-900">{data.name}</span>
             </p>
           </div>
           <button 
