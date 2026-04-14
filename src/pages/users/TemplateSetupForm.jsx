@@ -22,6 +22,13 @@ const TemplateSetupForm = () => {
   const fileInputRef = useRef(null);
   const aboutFileRef = useRef(null);
 
+  // ✅ New State to hold actual File objects for Cloudinary
+  const [files, setFiles] = useState({
+    heroImage: null,
+    aboutImage: null,
+    galleryImages: []
+  });
+
   // 1. Model-Compliant State Structure
   const [merchantData, setMerchantData] = useState({
     name: "",
@@ -108,18 +115,29 @@ const TemplateSetupForm = () => {
     setMerchantData({ ...merchantData, businessHours: newHours });
   };
 
+  // ✅ UPDATED: Captures both preview blob and actual file object
   const handleFileUpload = (e, type, index = null) => {
     const file = e.target.files[0];
     if (file) {
       const fakeUrl = URL.createObjectURL(file); 
+      
       if (type === 'gallery') {
         const newImages = [...merchantData.gallery.images];
         newImages[index] = fakeUrl;
         setMerchantData({ ...merchantData, gallery: { ...merchantData.gallery, images: newImages } });
+        
+        // Save file for upload
+        const newFileArray = [...files.galleryImages];
+        newFileArray[index] = file;
+        setFiles(prev => ({ ...prev, galleryImages: newFileArray }));
+
       } else if (type === 'hero') {
         setMerchantData({ ...merchantData, hero: { ...merchantData.hero, backgroundImage: fakeUrl } });
+        setFiles(prev => ({ ...prev, heroImage: file }));
+
       } else if (type === 'about') {
         setMerchantData({ ...merchantData, about: { ...merchantData.about, image: fakeUrl } });
+        setFiles(prev => ({ ...prev, aboutImage: file }));
       }
     }
   };
@@ -130,20 +148,44 @@ const TemplateSetupForm = () => {
     setMerchantData({ ...merchantData, services: newServices });
   };
 
-  // --- UPDATED: Save using API instance ---
+  // ✅ UPDATED: Now uses FormData for Cloudinary compatibility
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const payload = {
+      const formData = new FormData();
+
+      // 1. Prepare text data
+      const dataPayload = {
         ...merchantData,
         category: id, 
         templateId: `${id?.toUpperCase()}_THEME_01` 
       };
 
-      const response = await API.post('/merchant/website/save', payload);
+      // 2. Append JSON data as a string (your backend controller parses this)
+      formData.append('data', JSON.stringify(dataPayload));
+
+      // 3. Append Image Files
+      if (files.heroImage) formData.append('heroImage', files.heroImage);
+      if (files.aboutImage) formData.append('aboutImage', files.aboutImage);
+      
+      // 4. Append Gallery Images
+      files.galleryImages.forEach((imgFile) => {
+        if (imgFile) formData.append('galleryImages', imgFile);
+      });
+
+      // 5. Send to API with multipart/form-data headers
+      const response = await API.post('/merchant/website/save', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
 
       console.log("Success:", response.data);
       alert("Website configuration saved and sent for admin review!");
+      
+      // Update local state with the new Cloudinary URLs returned from backend
+      if (response.data.website) {
+        setMerchantData(response.data.website);
+      }
+
     } catch (error) {
       console.error("Save Error:", error.response?.data || error.message);
       alert("Failed to save. Please check your connection.");
