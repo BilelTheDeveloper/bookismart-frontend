@@ -67,33 +67,50 @@ const MerchantPublicProfile = () => {
   }
 
   /**
-   * ✅ DYNAMIC THEME ENGINE
-   * Directly injects the 'websiteData' into the chosen theme.
+   * ✅ DYNAMIC THEME ENGINE (PRO UPDATED)
+   * This logic ensures the correct template is rendered by checking
+   * multiple possible data identifiers (templateId or category).
    */
   const renderTheme = () => {
     const themeProps = { data: websiteData };
     
-    switch (websiteData.templateId) {
-      case "BARBER_THEME_01":
+    // Normalize identifiers for safety
+    const templateId = websiteData.templateId?.toUpperCase() || "";
+    const category = websiteData.ownerId?.category?.toLowerCase() || websiteData.category?.toLowerCase() || "";
+
+    // 1. Check by Template ID first
+    if (templateId === "BARBER_THEME_01") return <BarberWebsite {...themeProps} />;
+    if (templateId === "HAIR_THEME_01") return <HairSalonWebsite {...themeProps} />;
+    if (templateId === "MAKEUP_THEME_01") return <MakeupArtistWebsite {...themeProps} />;
+    if (templateId === "NAIL_THEME_01") return <NailSalonWebsite {...themeProps} />;
+    if (templateId === "SPA_THEME_01") return <SpaWebsite {...themeProps} />;
+
+    // 2. Fallback check by Category (If templateId isn't matching perfectly)
+    switch (category) {
+      case "barbershops":
+      case "barber":
         return <BarberWebsite {...themeProps} />;
-      case "HAIR_THEME_01":
+      case "hair-salons":
+      case "hair":
         return <HairSalonWebsite {...themeProps} />;
-      case "MAKEUP_THEME_01":
+      case "makeup-artists":
+      case "makeup":
         return <MakeupArtistWebsite {...themeProps} />;
-      case "NAIL_THEME_01":
+      case "nail-salons":
+      case "nails":
         return <NailSalonWebsite {...themeProps} />;
-      case "SPA_THEME_01":
+      case "spas":
+      case "spa":
         return <SpaWebsite {...themeProps} />;
       default:
+        // Absolute fallback
         return <BarberWebsite {...themeProps} />;
     }
   };
 
   return (
     <div className="w-full min-h-screen bg-white overflow-x-hidden">
-      {/* THEME RENDER 
-         This takes 100% width and height. No margins, no padding.
-      */}
+      {/* THEME RENDER */}
       {renderTheme()}
       
       {/* ULTRA SUBTLE BRANDING FOOTER */}
