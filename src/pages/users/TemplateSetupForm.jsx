@@ -14,6 +14,10 @@ import MakeupArtistWebsite from "../../themes/SmartStyle/MakeupArtists/Theme1/We
 import NailSalonWebsite from "../../themes/SmartStyle/NailSalons/Theme1/WebsiteLayout";
 import SpaWebsite from "../../themes/SmartStyle/Spas/Theme1/WebsiteLayout";
 
+// Add these to your existing imports
+import OpticianWebsite from "../../themes/SmartDoc/Opticians/OpticianWebsite";
+import GeneralDoctorWebsite from "../../themes/SmartDoc/GeneralDoctors/GeneralDoctorWebsite";
+import PhysioWebsite from "../../themes/SmartDoc/Physiotherapists/PhysioWebsite";
 const TemplateSetupForm = () => {
   const { id } = useParams(); // This is our 'category'
   const navigate = useNavigate();
@@ -200,7 +204,12 @@ const TemplateSetupForm = () => {
       'hair-salons': HairSalonWebsite,
       'makeup-artists': MakeupArtistWebsite,
       'nail-salons': NailSalonWebsite,
-      'spas': SpaWebsite
+      'spas': SpaWebsite,
+
+      'opticians': 'Medical & Health',
+      'opticians': 'Medical & Health', // Added this just in case of typos
+      'general-doctors': 'Medical & Health',
+      'physiotherapists': 'Medical & Health'
     };
     const SelectedTheme = components[id] || BarberWebsite;
     return <SelectedTheme merchantData={merchantData} />;

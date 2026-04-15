@@ -4,8 +4,8 @@ import {
   Calendar, Clock, User, Phone, Mail, FileText, 
   ChevronRight, CheckCircle, ArrowLeft, Loader2 
 } from 'lucide-react';
-import API from "../api/config"; // Ensure this path is correct for your project
-import { CATEGORY_THEMES } from '../../config/ThemeConfig'; // Ensure this path is correct
+import API from "../api/config"; 
+import { CATEGORY_THEMES } from '../../config/ThemeConfig'; 
 
 const BookingPage = ({ websiteData: propData, onBack }) => {
   const { slug } = useParams();
@@ -35,9 +35,43 @@ const BookingPage = ({ websiteData: propData, onBack }) => {
     fetchMerchantData();
   }, [slug, websiteData]);
 
-  // Identify Theme
-  const categoryId = websiteData?.ownerId?.category || 1;
-  const theme = CATEGORY_THEMES[categoryId] || CATEGORY_THEMES[1];
+  /**
+   * 🛡️ THEME RESOLUTION LOGIC
+   * Maps string categories from DB to Numeric IDs in ThemeConfig
+   */
+  const getTheme = () => {
+    if (!websiteData) return CATEGORY_THEMES[1];
+
+    const categoryMap = {
+      "barbershops": 1,
+      "spas": 1,
+      "beauty": 1,
+      "medical": 2,
+      "health": 2,
+      "gyms": 3,
+      "fitness": 3,
+      "creative": 4,
+      "photography": 4,
+      "auto": 5,
+      "repairs": 5,
+      "maintenance": 6,
+      "home": 6,
+      "education": 7,
+      "coaching": 7,
+      "consultants": 8,
+      "legal": 8,
+      "events": 9,
+      "entertainment": 9,
+      "grooming": 10,
+      "pets": 10
+    };
+
+    const dbCategory = websiteData.category?.toLowerCase() || "";
+    const themeId = categoryMap[dbCategory] || 1;
+    return CATEGORY_THEMES[themeId];
+  };
+
+  const theme = getTheme();
   const { terminology } = theme;
 
   // --- 2. FORM STATE ---
@@ -84,7 +118,6 @@ const BookingPage = ({ websiteData: propData, onBack }) => {
     };
 
     try {
-      // ✅ Real API call
       await API.post('/bookings/create', bookingPayload);
       setStep(4); 
     } catch (err) {
@@ -126,7 +159,7 @@ const BookingPage = ({ websiteData: propData, onBack }) => {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-white font-sans selection:bg-rose-100">
+    <div className={`flex flex-col lg:flex-row min-h-screen bg-white font-sans selection:${theme.lightAccent}`}>
       
       {/* --- LEFT SIDE: HERO & BRANDING --- */}
       <div className="relative lg:w-5/12 w-full min-h-[40vh] lg:min-h-screen flex flex-col justify-between p-12 overflow-hidden bg-slate-900">
@@ -146,14 +179,14 @@ const BookingPage = ({ websiteData: propData, onBack }) => {
           </button>
           
           <div className="space-y-4">
-            <div className={`w-12 h-12 ${theme.accent} rounded-2xl flex items-center justify-center shadow-2xl`}>
-              <theme.icon className="text-white" size={24} />
+            <div className={`w-14 h-14 ${theme.accent} rounded-2xl flex items-center justify-center shadow-2xl`}>
+              <theme.icon className="text-white" size={28} />
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">
-              Book your <br />
+              {websiteData?.hero?.title || "Book your"} <br />
               <span className={theme.textAccent}>{terminology.service}</span>
             </h1>
-            <p className="text-white/50 font-medium max-w-sm">
+            <p className="text-white/60 font-medium max-w-sm">
               {websiteData?.hero?.slogan || "Experience the pinnacle of professional care and style."}
             </p>
           </div>
@@ -161,7 +194,11 @@ const BookingPage = ({ websiteData: propData, onBack }) => {
 
         <div className="relative z-10 pt-12 border-t border-white/10">
           <p className="text-white font-bold text-lg">{websiteData?.ownerId?.businessName}</p>
-          <p className="text-white/40 text-xs uppercase tracking-widest mt-1">{theme.category}</p>
+          <div className="flex items-center gap-2 mt-1">
+             <p className="text-white/40 text-xs uppercase tracking-widest">{theme.category}</p>
+             <div className={`w-1 h-1 rounded-full ${theme.accent}`}></div>
+             <p className="text-white/40 text-xs uppercase tracking-widest">{theme.title}</p>
+          </div>
         </div>
       </div>
 
@@ -195,10 +232,10 @@ const BookingPage = ({ websiteData: propData, onBack }) => {
                   >
                     <div>
                       <h4 className="font-bold text-slate-900 text-lg">{s.title}</h4>
-                      <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mt-1">{s.duration || 30} Minutes</p>
+                      <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mt-1">Estimated Duration: {s.duration || 30} MIN</p>
                     </div>
                     <div className="text-right">
-                      <p className={`text-xl font-black ${theme.textAccent}`}>{s.price} <span className="text-[10px] opacity-50">TND</span></p>
+                      <p className={`text-xl font-black ${theme.textAccent}`}>{s.price} <span className="text-[10px] opacity-50 font-bold">TND</span></p>
                       <div className={`mt-2 opacity-0 group-hover:opacity-100 transition-opacity ${theme.textAccent}`}>
                         <ChevronRight size={20} />
                       </div>
@@ -213,12 +250,12 @@ const BookingPage = ({ websiteData: propData, onBack }) => {
           {step === 2 && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-500 space-y-8">
               <div className="space-y-2">
-                <h2 className="text-3xl font-black text-slate-900 tracking-tight">When should we expect you?</h2>
+                <h2 className="text-3xl font-black text-slate-900 tracking-tight">Schedule your {terminology.service}</h2>
                 <p className="text-slate-500 font-medium">Select your preferred date and time slot.</p>
               </div>
               <div className="space-y-6">
                 <div className="relative">
-                  <Calendar className="absolute left-4 top-4 text-slate-400" size={20} />
+                  <Calendar className={`absolute left-4 top-4 ${theme.textAccent}`} size={20} />
                   <input 
                     type="date" 
                     min={new Date().toISOString().split('T')[0]}
@@ -248,7 +285,7 @@ const BookingPage = ({ websiteData: propData, onBack }) => {
                     disabled={!formData.appointmentDate || !formData.timeSlot}
                     onClick={() => setStep(3)}
                     className={`flex-[2] py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] transition-all
-                        ${(!formData.appointmentDate || !formData.timeSlot) ? 'bg-slate-100 text-slate-300' : `${theme.accent} text-white shadow-2xl shadow-rose-200 hover:scale-[1.02]`}`}
+                        ${(!formData.appointmentDate || !formData.timeSlot) ? 'bg-slate-100 text-slate-300' : `${theme.accent} text-white shadow-2xl hover:scale-[1.02]`}`}
                     >
                     Continue to Details
                     </button>
@@ -261,7 +298,7 @@ const BookingPage = ({ websiteData: propData, onBack }) => {
           {step === 3 && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-500 space-y-8">
               <div className="space-y-2">
-                <h2 className="text-3xl font-black text-slate-900 tracking-tight">Final Details</h2>
+                <h2 className="text-3xl font-black text-slate-900 tracking-tight">{terminology.client} Details</h2>
                 <p className="text-slate-500 font-medium">We'll send a confirmation to your contact info.</p>
               </div>
               <div className="space-y-4">
@@ -296,7 +333,7 @@ const BookingPage = ({ websiteData: propData, onBack }) => {
                   <div className="relative">
                     <FileText className="absolute left-4 top-4 text-slate-300" size={18} />
                     <textarea 
-                      placeholder="Special notes or requests..." 
+                      placeholder={`Special notes or requests for your ${terminology.service}...`}
                       rows="3"
                       value={formData.notes}
                       className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 font-medium"
@@ -315,7 +352,7 @@ const BookingPage = ({ websiteData: propData, onBack }) => {
                     className={`flex-[2] py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-3 transition-all
                         ${(isSubmitting || !formData.customerName || !formData.customerEmail || !formData.customerPhone) ? 'bg-slate-200 text-slate-400' : `${theme.accent} text-white shadow-2xl hover:scale-[1.02]`}`}
                     >
-                    {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : `Confirm ${terminology.service} Booking`}
+                    {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : `Confirm ${terminology.service}`}
                     </button>
                 </div>
               </div>
@@ -325,8 +362,8 @@ const BookingPage = ({ websiteData: propData, onBack }) => {
           {/* STEP 4: SUCCESS STATE */}
           {step === 4 && (
             <div className="animate-in zoom-in duration-700 text-center space-y-6">
-              <div className="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center mx-auto">
-                <CheckCircle size={48} className="text-emerald-500" />
+              <div className={`w-24 h-24 ${theme.lightAccent} rounded-full flex items-center justify-center mx-auto`}>
+                <CheckCircle size={48} className={theme.textAccent} />
               </div>
               <div>
                 <h2 className="text-4xl font-black text-slate-900">It's Official!</h2>
@@ -338,7 +375,7 @@ const BookingPage = ({ websiteData: propData, onBack }) => {
                   <span className="font-bold text-slate-900">{formData.service?.title}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-50 pb-4">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Merchant</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Business</span>
                   <span className="font-bold text-slate-900">{websiteData?.ownerId?.businessName}</span>
                 </div>
                 <div className="flex justify-between">
@@ -350,7 +387,7 @@ const BookingPage = ({ websiteData: propData, onBack }) => {
                 onClick={handleBackNavigation}
                 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 hover:text-slate-900 transition-colors"
               >
-                Back to Sanctuary
+                Back to Site
               </button>
             </div>
           )}
