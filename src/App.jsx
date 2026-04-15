@@ -18,8 +18,9 @@ import ProfessionalsPage from "./pages/public/Professionals";
 import JoinAsOwner from "./pages/public/signup/JoinAsOwner";
 import LoginPage from "./pages/public/Login";
 
-// ✅ New: The Public Website Container
+// ✅ New: The Public Website Container & Booking Page
 import MerchantPublicProfile from "./pages/public/MerchantPublicProfile";
+import BookingPage from "./pages/public/BookingPage"; 
 
 // Admin Pages (Super Admin)
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -61,10 +62,11 @@ const LayoutWrapper = ({ children }) => {
   const isAdminPath = location.pathname.startsWith("/admin");
   const isMerchantPath = location.pathname.startsWith("/merchant");
   const isPublicProfile = location.pathname.startsWith("/p/"); 
+  const isBookingPath = location.pathname.startsWith("/book/"); // ✅ Added for clean booking view
   const isAuthPath = location.pathname === "/login" || location.pathname === "/join-as-owner";
   
-  // Dashboard/Clean View: No Navbar/Footer for Admin, Merchant Dashboard, or Public Profiles
-  const isCleanLayout = isAdminPath || isMerchantPath || isPublicProfile || isAuthPath;
+  // Dashboard/Clean View: No Navbar/Footer for Admin, Merchant Dashboard, Public Profiles, or Bookings
+  const isCleanLayout = isAdminPath || isMerchantPath || isPublicProfile || isBookingPath || isAuthPath;
 
   // --- ADMIN LAYOUT ---
   if (isAdminPath) {
@@ -81,14 +83,14 @@ const LayoutWrapper = ({ children }) => {
   // --- PUBLIC & PROFILE LAYOUT ---
   return (
     <div className="min-h-screen flex flex-col bg-white overflow-x-hidden">
-      {/* Hide platform Navbar on Merchant Profiles and Auth pages */}
+      {/* Hide platform Navbar on Merchant Profiles, Booking pages, and Auth pages */}
       {!isCleanLayout && <Navbar />}
       
-      <main className={`flex-grow ${isPublicProfile ? 'w-full h-full' : ''}`}>
+      <main className={`flex-grow ${(isPublicProfile || isBookingPath) ? 'w-full h-full' : ''}`}>
         {children}
       </main>
 
-      {/* Hide platform Footer on Merchant Profiles and Auth pages */}
+      {/* Hide platform Footer on Merchant Profiles, Booking pages, and Auth pages */}
       {!isCleanLayout && <Footer />}
     </div>
   );
@@ -112,6 +114,9 @@ function App() {
 
               {/* ✅ Correct dynamic path for Public Profiles */}
               <Route path="/p/:slug" element={<MerchantPublicProfile />} />
+              
+              {/* ✅ New: Dynamic path for Bookings */}
+              <Route path="/book/:slug" element={<BookingPage />} />
 
               {/* --- Admin Routes --- */}
               <Route path="/admin" element={<AdminDashboard />} />
