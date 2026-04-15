@@ -33,16 +33,21 @@ import OwnerDashboard from "./pages/users/OwnerDashboard";
 import TemplateGallery from "./pages/users/TemplateGallery";
 import TemplateSetupForm from "./pages/users/TemplateSetupForm"; 
 
-// Specialized Website Layouts
+// Specialized Website Layouts - Beauty & Wellness
 import BarberWebsite from "./themes/SmartStyle/Barbershops/Theme1/WebsiteLayout";
 import HairSalonWebsite from "./themes/SmartStyle/HairSalons/Theme1/WebsiteLayout"; 
 import MakeupArtistWebsite from "./themes/SmartStyle/MakeupArtists/Theme1/WebsiteLayout";
 import NailSalonWebsite from "./themes/SmartStyle/NailSalons/Theme1/WebsiteLayout";
 import SpaWebsite from "./themes/SmartStyle/Spas/Theme1/WebsiteLayout";
 
+// ✅ NEW: Specialized Website Layouts - Medical & Health
+import Dentist from "./themes/SmartDoc/Dentists/DentistWebsite";
+import GeneralDoctorWebsite from "./themes/SmartDoc/GeneralDoctors/GeneralDoctorWebsite";
+import OpticianWebsite from "./themes/SmartDoc/Opticians/OpticianWebsite";
+import PhysioWebsite from "./themes/SmartDoc/Physiotherapists/PhysioWebsite";
+
 /**
  * ScrollToTop Component
- * Ensures every navigation resets the scroll position.
  */
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -62,13 +67,11 @@ const LayoutWrapper = ({ children }) => {
   const isAdminPath = location.pathname.startsWith("/admin");
   const isMerchantPath = location.pathname.startsWith("/merchant");
   const isPublicProfile = location.pathname.startsWith("/p/"); 
-  const isBookingPath = location.pathname.startsWith("/book/"); // ✅ Added for clean booking view
+  const isBookingPath = location.pathname.startsWith("/book/"); 
   const isAuthPath = location.pathname === "/login" || location.pathname === "/join-as-owner";
   
-  // Dashboard/Clean View: No Navbar/Footer for Admin, Merchant Dashboard, Public Profiles, or Bookings
   const isCleanLayout = isAdminPath || isMerchantPath || isPublicProfile || isBookingPath || isAuthPath;
 
-  // --- ADMIN LAYOUT ---
   if (isAdminPath) {
     return (
       <div className="flex min-h-screen bg-[#F8FAFC]">
@@ -80,17 +83,12 @@ const LayoutWrapper = ({ children }) => {
     );
   }
 
-  // --- PUBLIC & PROFILE LAYOUT ---
   return (
     <div className="min-h-screen flex flex-col bg-white overflow-x-hidden">
-      {/* Hide platform Navbar on Merchant Profiles, Booking pages, and Auth pages */}
       {!isCleanLayout && <Navbar />}
-      
       <main className={`flex-grow ${(isPublicProfile || isBookingPath) ? 'w-full h-full' : ''}`}>
         {children}
       </main>
-
-      {/* Hide platform Footer on Merchant Profiles, Booking pages, and Auth pages */}
       {!isCleanLayout && <Footer />}
     </div>
   );
@@ -101,7 +99,7 @@ function App() {
     <AuthProvider>
       <ThemeProvider>
         <Router>
-          <ScrollToTop /> {/* ✅ Added: Vital for UX between home and profiles */}
+          <ScrollToTop /> 
           <LayoutWrapper>
             <Routes>
               {/* --- Public Routes --- */}
@@ -112,10 +110,7 @@ function App() {
               <Route path="/join-as-owner" element={<JoinAsOwner />} />
               <Route path="/login" element={<LoginPage />} />
 
-              {/* ✅ Correct dynamic path for Public Profiles */}
               <Route path="/p/:slug" element={<MerchantPublicProfile />} />
-              
-              {/* ✅ New: Dynamic path for Bookings */}
               <Route path="/book/:slug" element={<BookingPage />} />
 
               {/* --- Admin Routes --- */}
@@ -128,12 +123,18 @@ function App() {
                 <Route index element={<OwnerDashboard />} />
                 <Route path="templates" element={<TemplateGallery />} />
                 
-                {/* Preview Routes (Static context) */}
+                {/* --- Beauty & Wellness Preview Routes --- */}
                 <Route path="templates/preview/barbershops" element={<BarberWebsite />} />
                 <Route path="templates/preview/hair-salons" element={<HairSalonWebsite />} />
                 <Route path="templates/preview/makeup-artists" element={<MakeupArtistWebsite />} />
                 <Route path="templates/preview/nail-salons" element={<NailSalonWebsite />} />
                 <Route path="templates/preview/spas" element={<SpaWebsite />} />
+
+                {/* ✅ NEW: Medical & Health Preview Routes --- */}
+                <Route path="templates/preview/general-doctors" element={<GeneralDoctorWebsite />} />
+                <Route path="templates/preview/opticians" element={<OpticianWebsite />} />
+                <Route path="templates/preview/physiotherapists" element={<PhysioWebsite />} />
+       
                 
                 <Route path="templates/setup/:id" element={<TemplateSetupForm />} />
               </Route>

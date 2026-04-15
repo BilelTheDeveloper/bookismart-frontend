@@ -6,6 +6,7 @@ import StepTwo from "./StepTwo";
 import StepThree from "./StepThree";
 import StepFour from "./StepFour";
 import StepFive from "./StepFive";
+import Navbar from "../../../components/Navbar.jsx";
 
 const JoinAsOwner = () => {
   const [step, setStep] = useState(1);
@@ -86,7 +87,7 @@ const JoinAsOwner = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col lg:flex-row pt-20 lg:pt-0">
-      
+      <Navbar/>
       {/* 🌌 LEFT SIDE: Marketing & Trust */}
       <div className="lg:w-5/12 bg-slate-950 text-white p-12 lg:p-20 flex flex-col justify-between relative overflow-hidden">
         <div className="absolute top-[-20%] left-[-20%] w-[500px] h-[500px] bg-indigo-600 rounded-full blur-[120px] opacity-30" />

@@ -4,7 +4,7 @@ import axios from "axios";
 import { AlertCircle, Loader2 } from "lucide-react"; 
 import { useAuth } from "../../context/AuthContext.jsx";
 import API from "../api/config.js";
-
+import Navbar from "../../components/Navbar.jsx";
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth(); 
@@ -76,6 +76,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col lg:flex-row pt-20 lg:pt-0">
+      <Navbar />
       
       {/* 🌌 LEFT SIDE: The "Control Center" Inspiration */}
       <div className="lg:w-5/12 bg-indigo-600 text-white p-12 lg:p-20 flex flex-col justify-between relative overflow-hidden">
