@@ -1,61 +1,129 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Calendar, Clock, User, Phone, Mail, FileText, 
   ChevronRight, CheckCircle, ArrowLeft, Loader2 
 } from 'lucide-react';
-import { CATEGORY_THEMES } from '../../config/ThemeConfig'; // Adjust path
+import API from "../api/config"; // Ensure this path is correct for your project
+import { CATEGORY_THEMES } from '../../config/ThemeConfig'; // Ensure this path is correct
 
-const BookingPage = ({ websiteData, onBack }) => {
-  // 1. Identify Theme based on Category ID
+const BookingPage = ({ websiteData: propData, onBack }) => {
+  const { slug } = useParams();
+  const navigate = useNavigate();
+
+  // --- 1. DATA INITIALIZATION ---
+  const [websiteData, setWebsiteData] = useState(propData || null);
+  const [loading, setLoading] = useState(!propData);
+  const [error, setError] = useState(null);
+
+  // Fetch data if accessed via URL slug instead of props
+  useEffect(() => {
+    const fetchMerchantData = async () => {
+      if (!websiteData && slug) {
+        try {
+          setLoading(true);
+          const response = await API.get(`/public/website/${slug}`);
+          setWebsiteData(response.data);
+        } catch (err) {
+          console.error("Booking Fetch Error:", err);
+          setError("Business not found or connection failed.");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    fetchMerchantData();
+  }, [slug, websiteData]);
+
+  // Identify Theme
   const categoryId = websiteData?.ownerId?.category || 1;
   const theme = CATEGORY_THEMES[categoryId] || CATEGORY_THEMES[1];
   const { terminology } = theme;
 
-  // 2. Form State mapping to Mongoose Model
+  // --- 2. FORM STATE ---
   const [formData, setFormData] = useState({
     customerName: '',
     customerEmail: '',
     customerPhone: '',
-    service: null, // Selected service object
+    service: null,
     appointmentDate: '',
     timeSlot: '',
     notes: ''
   });
 
-  const [step, setStep] = useState(1); // 1: Service, 2: Date/Time, 3: Details
+  const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Constants for Demo (In real app, fetch available slots)
   const timeSlots = ["09:00", "10:00", "11:00", "14:00", "15:30", "17:00"];
 
+  // --- 3. SUBMISSION LOGIC ---
   const handleBooking = async () => {
+    if (!formData.service || !formData.appointmentDate || !formData.timeSlot) {
+        alert("Please complete all selection steps.");
+        return;
+    }
+
     setIsSubmitting(true);
     
-    // Prepare data for backend
     const bookingPayload = {
       ownerId: websiteData.ownerId._id,
       merchantId: websiteData._id,
-      ...formData,
+      customerName: formData.customerName,
+      customerEmail: formData.customerEmail,
+      customerPhone: formData.customerPhone,
       service: {
         title: formData.service.title,
         price: formData.service.price,
         duration: formData.service.duration || 30
       },
       dateString: formData.appointmentDate,
+      timeSlot: formData.timeSlot,
       dayOfWeek: new Date(formData.appointmentDate).toLocaleDateString('en-US', { weekday: 'long' }),
+      notes: formData.notes,
       status: 'pending'
     };
 
     try {
-      console.log("Submitting Booking:", bookingPayload);
-      // await API.post('/bookings', bookingPayload);
-      setStep(4); // Success State
+      // ✅ Real API call
+      await API.post('/bookings/create', bookingPayload);
+      setStep(4); 
     } catch (err) {
-      alert("Booking failed. Please try again.");
+      console.error("Booking Error:", err);
+      alert(err.response?.data?.message || "Booking failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const handleBackNavigation = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      navigate(-1);
+    }
+  };
+
+  // --- 4. RENDER GUARDS ---
+  if (loading) {
+    return (
+      <div className="h-screen w-full flex flex-col items-center justify-center bg-[#fdfcf9]">
+        <Loader2 className="animate-spin text-slate-900 mb-4" size={40} />
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Loading Sanctuary...</p>
+      </div>
+    );
+  }
+
+  if (error || !websiteData) {
+    return (
+      <div className="h-screen w-full flex flex-col items-center justify-center bg-[#fdfcf9] p-6 text-center">
+        <h2 className="text-2xl font-black text-slate-900 mb-2">Oops!</h2>
+        <p className="text-slate-500 mb-6">{error || "We couldn't find this business."}</p>
+        <button onClick={() => navigate('/')} className="bg-slate-900 text-white px-8 py-3 rounded-full font-bold uppercase text-[10px] tracking-widest">
+          Go Back Home
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-white font-sans selection:bg-rose-100">
@@ -72,7 +140,7 @@ const BookingPage = ({ websiteData, onBack }) => {
         </div>
 
         <div className="relative z-10">
-          <button onClick={onBack} className="flex items-center gap-2 text-white/60 hover:text-white transition-colors mb-12 group">
+          <button onClick={handleBackNavigation} className="flex items-center gap-2 text-white/60 hover:text-white transition-colors mb-12 group">
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
             <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Return to Site</span>
           </button>
@@ -117,7 +185,7 @@ const BookingPage = ({ websiteData, onBack }) => {
                 <h2 className="text-3xl font-black text-slate-900 tracking-tight">Select a {terminology.service}</h2>
                 <p className="text-slate-500 font-medium">Choose the ritual that suits your needs today.</p>
               </div>
-              <div className="grid gap-4">
+              <div className="grid gap-4 max-h-[50vh] overflow-y-auto pr-2 no-scrollbar">
                 {websiteData?.services?.map((s, idx) => (
                   <button 
                     key={idx}
@@ -153,6 +221,8 @@ const BookingPage = ({ websiteData, onBack }) => {
                   <Calendar className="absolute left-4 top-4 text-slate-400" size={20} />
                   <input 
                     type="date" 
+                    min={new Date().toISOString().split('T')[0]}
+                    value={formData.appointmentDate}
                     onChange={(e) => setFormData({...formData, appointmentDate: e.target.value})}
                     className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white border border-slate-100 font-bold focus:outline-none focus:ring-2 focus:ring-slate-900"
                   />
@@ -169,14 +239,20 @@ const BookingPage = ({ websiteData, onBack }) => {
                     </button>
                   ))}
                 </div>
-                <button 
-                  disabled={!formData.appointmentDate || !formData.timeSlot}
-                  onClick={() => setStep(3)}
-                  className={`w-full py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] transition-all
-                    ${(!formData.appointmentDate || !formData.timeSlot) ? 'bg-slate-100 text-slate-300' : `${theme.accent} text-white shadow-2xl shadow-rose-200 hover:scale-[1.02]`}`}
-                >
-                  Continue to Details
-                </button>
+                
+                <div className="flex gap-4 pt-4">
+                    <button onClick={() => setStep(1)} className="flex-1 py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] bg-white border border-slate-100 text-slate-400 hover:bg-slate-50 transition-all">
+                        Back
+                    </button>
+                    <button 
+                    disabled={!formData.appointmentDate || !formData.timeSlot}
+                    onClick={() => setStep(3)}
+                    className={`flex-[2] py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] transition-all
+                        ${(!formData.appointmentDate || !formData.timeSlot) ? 'bg-slate-100 text-slate-300' : `${theme.accent} text-white shadow-2xl shadow-rose-200 hover:scale-[1.02]`}`}
+                    >
+                    Continue to Details
+                    </button>
+                </div>
               </div>
             </div>
           )}
@@ -194,6 +270,7 @@ const BookingPage = ({ websiteData, onBack }) => {
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
                     <input 
                       type="text" placeholder="Full Name" 
+                      value={formData.customerName}
                       className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 font-medium"
                       onChange={(e) => setFormData({...formData, customerName: e.target.value})}
                     />
@@ -202,6 +279,7 @@ const BookingPage = ({ websiteData, onBack }) => {
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
                     <input 
                       type="email" placeholder="Email Address" 
+                      value={formData.customerEmail}
                       className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 font-medium"
                       onChange={(e) => setFormData({...formData, customerEmail: e.target.value})}
                     />
@@ -210,6 +288,7 @@ const BookingPage = ({ websiteData, onBack }) => {
                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
                     <input 
                       type="tel" placeholder="Phone Number" 
+                      value={formData.customerPhone}
                       className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 font-medium"
                       onChange={(e) => setFormData({...formData, customerPhone: e.target.value})}
                     />
@@ -219,20 +298,26 @@ const BookingPage = ({ websiteData, onBack }) => {
                     <textarea 
                       placeholder="Special notes or requests..." 
                       rows="3"
+                      value={formData.notes}
                       className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 font-medium"
                       onChange={(e) => setFormData({...formData, notes: e.target.value})}
                     />
                   </div>
                 </div>
 
-                <button 
-                  onClick={handleBooking}
-                  disabled={isSubmitting || !formData.customerName || !formData.customerEmail}
-                  className={`w-full py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-3 transition-all
-                    ${isSubmitting ? 'bg-slate-400' : `${theme.accent} text-white shadow-2xl hover:scale-[1.02]`}`}
-                >
-                  {isSubmitting ? <Loader2 className="animate-spin" /> : 'Confirm Ritual Booking'}
-                </button>
+                <div className="flex gap-4 pt-4">
+                    <button onClick={() => setStep(2)} className="flex-1 py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] bg-white border border-slate-100 text-slate-400 hover:bg-slate-50 transition-all">
+                        Back
+                    </button>
+                    <button 
+                    onClick={handleBooking}
+                    disabled={isSubmitting || !formData.customerName || !formData.customerEmail || !formData.customerPhone}
+                    className={`flex-[2] py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-3 transition-all
+                        ${(isSubmitting || !formData.customerName || !formData.customerEmail || !formData.customerPhone) ? 'bg-slate-200 text-slate-400' : `${theme.accent} text-white shadow-2xl hover:scale-[1.02]`}`}
+                    >
+                    {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : `Confirm ${terminology.service} Booking`}
+                    </button>
+                </div>
               </div>
             </div>
           )}
@@ -262,7 +347,7 @@ const BookingPage = ({ websiteData, onBack }) => {
                 </div>
               </div>
               <button 
-                onClick={onBack}
+                onClick={handleBackNavigation}
                 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 hover:text-slate-900 transition-colors"
               >
                 Back to Sanctuary
