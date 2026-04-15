@@ -4,34 +4,42 @@ import {
   Maximize, Minimize, Star, CheckCircle2 
 } from 'lucide-react';
 
-const NailSalonWebsite = ({ merchantData }) => {
+const NailSalonWebsite = ({ data: merchantData }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // 1. MASTER DATA MERGE (Unified naming with master template protocol)
+  // 1. MASTER DATA MERGE (Synchronized with global template protocol)
   const data = {
-    name: merchantData?.name || "Gloss & Glam",
+    name: merchantData?.ownerId?.businessName || merchantData?.hero?.title || "Gloss & Glam",
     slogan: merchantData?.hero?.slogan || "Precision Artistry for Your Fingertips",
     heroTitle: merchantData?.hero?.title || "Spring Glow",
     heroImage: merchantData?.hero?.backgroundImage || "https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=1920",
+    
+    // About Section
     aboutTitle: merchantData?.about?.title || "The Sanctuary",
-    aboutText: merchantData?.about?.text || "Step into a world of color and care. We specialize in luxury manicures, long-lasting extensions, and custom nail art.",
+    aboutText: merchantData?.about?.text || "Step into a world of color and care. We specialize in luxury manicures, long-lasting extensions, and custom nail art designed to reflect your unique style.",
     aboutImage: merchantData?.about?.image || "https://images.unsplash.com/photo-1604654894610-df490c81726a?q=80&w=800",
     showAbout: merchantData?.about?.show ?? true,
+    
+    // Services Section
     services: merchantData?.services?.length > 0 ? merchantData.services : [
       { title: "Signature Gel Mani", price: "45", description: "Long-lasting shine with luxury cuticle care." },
       { title: "Apres Gel-X", price: "90", description: "Perfect length with zero natural nail damage." }
     ],
+    
+    // Gallery Section
     gallery: merchantData?.gallery?.images || [],
     showGallery: merchantData?.gallery?.show ?? true,
+    
+    // Contact & Footer
     contact: {
-      phone: merchantData?.contact?.phone || "+216 22 123 456",
-      address: merchantData?.contact?.address || "Ennasr 2, Tunis",
+      phone: merchantData?.contact?.phone || merchantData?.ownerId?.phone || "+216 22 123 456",
+      address: merchantData?.contact?.address || merchantData?.ownerId?.city || "Ennasr 2, Tunis",
       socials: merchantData?.contact?.socials || {}
     },
     hours: merchantData?.businessHours || []
   };
 
-  // Custom Brand SVGs (Bypasses Lucide Export Errors)
+  // Custom Brand SVGs
   const InstagramIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
   );
@@ -72,7 +80,7 @@ const NailSalonWebsite = ({ merchantData }) => {
 
       {/* --- PREMIUM HERO --- */}
       <section className="relative min-h-[85vh] flex items-center px-6 md:px-12 bg-gradient-to-b from-pink-50/40 to-white overflow-hidden">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center py-20">
           <div className="space-y-8 animate-in fade-in slide-in-from-left duration-1000">
             <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-pink-100 shadow-sm">
                 <Star className="text-pink-400" size={12} fill="currentColor" />
@@ -140,13 +148,13 @@ const NailSalonWebsite = ({ merchantData }) => {
       </section>
 
       {/* --- GALLERY --- */}
-      {data.showGallery && (
+      {data.showGallery && data.gallery.length > 0 && (
         <section id="gallery" className="py-32 px-6 max-w-7xl mx-auto">
            <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
               {data.gallery.map((img, i) => img && (
                 <div key={i} className="rounded-3xl overflow-hidden group relative shadow-lg">
                    <img src={img} className="w-full h-auto object-cover group-hover:scale-110 transition-all duration-700" alt="Work" />
-                   <div className="absolute inset-0 bg-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                   <div className="absolute inset-0 bg-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
                         <CheckCircle2 className="text-white" size={32} />
                    </div>
                 </div>
@@ -161,12 +169,20 @@ const NailSalonWebsite = ({ merchantData }) => {
            <div className="space-y-8 text-center lg:text-left">
               <div className="flex items-center justify-center lg:justify-start gap-3">
                  <Sparkles className="text-pink-400" size={24} />
-                 <span className="text-3xl font-mont font-black tracking-tighter uppercase">{data.name}</span>
+                 <span className="text-3xl font-mont font-black tracking-tighter uppercase leading-none">{data.name}</span>
               </div>
               <p className="text-slate-400 max-w-xs mx-auto lg:mx-0 leading-loose font-quick">{data.slogan}</p>
               <div className="flex justify-center lg:justify-start gap-4">
-                  <a href="#" className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center hover:bg-pink-500 transition-all text-white"><InstagramIcon /></a>
-                  <a href="#" className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center hover:bg-pink-500 transition-all text-white"><FacebookIcon /></a>
+                  {data.contact.socials.instagram && (
+                    <a href={`https://instagram.com/${data.contact.socials.instagram}`} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center hover:bg-pink-500 transition-all text-white">
+                      <InstagramIcon />
+                    </a>
+                  )}
+                  {data.contact.socials.facebook && (
+                    <a href={data.contact.socials.facebook} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center hover:bg-pink-500 transition-all text-white">
+                      <FacebookIcon />
+                    </a>
+                  )}
               </div>
            </div>
            
@@ -175,7 +191,7 @@ const NailSalonWebsite = ({ merchantData }) => {
               <div className="space-y-6">
                  <div className="flex items-center gap-4 justify-center lg:justify-start">
                    <MapPin className="text-pink-400" size={20} />
-                   <p className="text-slate-300 font-quick font-bold">{data.contact.address}</p>
+                   <p className="text-slate-300 font-quick font-bold uppercase text-[11px] tracking-widest">{data.contact.address}</p>
                  </div>
                  <div className="flex items-center gap-4 justify-center lg:justify-start">
                    <Phone className="text-pink-400" size={20} />
@@ -187,27 +203,29 @@ const NailSalonWebsite = ({ merchantData }) => {
            <div className="space-y-8">
               <h4 className="font-mont font-black uppercase tracking-widest text-[10px] text-pink-400">Open Hours</h4>
               <div className="space-y-3">
-                 {data.hours.slice(0, 7).map((h, i) => (
+                 {data.hours.length > 0 ? data.hours.slice(0, 7).map((h, i) => (
                     <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-500 border-b border-white/5 pb-2">
                         <span>{h.day}</span>
                         <span className={h.isClosed ? 'text-pink-400' : 'text-white'}>{h.isClosed ? 'Closed' : `${h.open} - ${h.close}`}</span>
                     </div>
-                 ))}
+                 )) : (
+                    <p className="text-slate-500 text-[10px] font-black uppercase italic">Contact for hours</p>
+                 )}
               </div>
            </div>
         </div>
         <div className="max-w-7xl mx-auto pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 opacity-30 text-[9px] font-black uppercase tracking-[0.4em]">
-           <p>© 2026 {data.name} — Bookismart Tunisia</p>
-           <button onClick={() => window.scrollTo(0,0)} className="hover:text-pink-400">Top ↑</button>
+           <p>© 2026 {data.name} — BOOKISMART TUNISIA</p>
+           <button onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} className="hover:text-pink-400 transition-colors">Top ↑</button>
         </div>
       </footer>
     </div>
   );
 
   return (
-    <div className="relative h-full bg-[#fafafa]">
+    <div className="relative h-full bg-[#fafafa] rounded-[2rem] overflow-hidden">
       {!isFullscreen && (
-        <div className="p-4 bg-white border-b border-slate-100 flex justify-between items-center z-50">
+        <div className="p-4 bg-white border-b border-slate-100 flex justify-between items-center relative z-[60]">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">

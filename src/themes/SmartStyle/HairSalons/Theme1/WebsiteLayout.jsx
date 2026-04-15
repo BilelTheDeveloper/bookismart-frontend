@@ -4,34 +4,42 @@ import {
   Maximize, Minimize, Sparkles, Star, CheckCircle2 
 } from 'lucide-react';
 
-const HairSalonWebsite = ({ merchantData }) => {
+const HairSalonWebsite = ({ data: merchantData }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // 1. MASTER DATA MERGE (Unified naming with Barber template)
+  // 1. MASTER DATA MERGE - Synchronized with your global schema
   const data = {
-    name: merchantData?.name || "Vogue Salon",
+    name: merchantData?.ownerId?.businessName || merchantData?.hero?.title || "Vogue Salon",
     slogan: merchantData?.hero?.slogan || "Excellence in Hair Artistry & Care",
     heroTitle: merchantData?.hero?.title || "Luxury Hair Artistry",
     heroImage: merchantData?.hero?.backgroundImage || "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1920",
+    
+    // About Section
     aboutTitle: merchantData?.about?.title || "Our Essence",
     aboutText: merchantData?.about?.text || "Our salon is a sanctuary of beauty and relaxation. Our expert stylists are dedicated to creating the perfect look that reflects your unique personality.",
     aboutImage: merchantData?.about?.image || "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=800",
     showAbout: merchantData?.about?.show ?? true,
+    
+    // Services Section
     services: merchantData?.services?.length > 0 ? merchantData.services : [
       { title: "Balayage & Color", price: "180", description: "Hand-painted highlights for a natural look." },
       { title: "Designer Haircut", price: "65", description: "Includes luxury wash and scalp massage." }
     ],
+    
+    // Gallery Section
     gallery: merchantData?.gallery?.images || [],
     showGallery: merchantData?.gallery?.show ?? true,
+    
+    // Contact & Footer
     contact: {
-      phone: merchantData?.contact?.phone || "+216 71 000 000",
-      address: merchantData?.contact?.address || "La Marsa, Tunis",
+      phone: merchantData?.contact?.phone || merchantData?.ownerId?.phone || "+216 71 000 000",
+      address: merchantData?.contact?.address || merchantData?.ownerId?.city || "La Marsa, Tunis",
       socials: merchantData?.contact?.socials || {}
     },
     hours: merchantData?.businessHours || []
   };
 
-  // Custom Brand SVGs (Prevents Lucide Export Errors)
+  // Custom Brand SVGs
   const InstagramIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
   );
@@ -51,7 +59,9 @@ const HairSalonWebsite = ({ merchantData }) => {
             <div className="bg-rose-400 p-2 rounded-full">
                 <Wind className="text-white" size={18} />
             </div>
-            <span className="text-xl md:text-2xl font-black tracking-tighter text-slate-800 uppercase">{data.name}</span>
+            <span className="text-xl md:text-2xl font-black tracking-tighter text-slate-800 uppercase leading-none">
+              {data.name}
+            </span>
           </div>
           <div className="hidden lg:flex gap-10 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">
             {data.showAbout && <a href="#about" className="hover:text-rose-400 transition-colors">Story</a>}
@@ -59,7 +69,7 @@ const HairSalonWebsite = ({ merchantData }) => {
             {data.showGallery && <a href="#gallery" className="hover:text-rose-400 transition-colors">Gallery</a>}
             <a href="#contact" className="hover:text-rose-400 transition-colors">Contact</a>
           </div>
-          <button className="bg-slate-900 hover:bg-rose-400 text-white px-6 md:px-8 py-3 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-rose-100 transform hover:scale-105">
+          <button className="bg-slate-900 hover:bg-rose-400 text-white px-6 md:px-8 py-3 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-rose-100 transform hover:scale-105 active:scale-95">
             Book Appointment
           </button>
         </div>
@@ -75,7 +85,9 @@ const HairSalonWebsite = ({ merchantData }) => {
             </div>
             <h1 className="text-6xl md:text-[100px] font-black text-slate-900 leading-[0.85] tracking-tighter">
               {data.heroTitle.split(' ')[0]} <br/> 
-              <span className="italic font-light text-rose-300">{data.heroTitle.split(' ').slice(1).join(' ') || "Experience"}</span>
+              <span className="italic font-light text-rose-300">
+                {data.heroTitle.split(' ').slice(1).join(' ') || "Experience"}
+              </span>
             </h1>
             <p className="text-lg text-slate-500 max-w-md font-sans leading-relaxed">
               {data.slogan}
@@ -84,9 +96,9 @@ const HairSalonWebsite = ({ merchantData }) => {
                <button className="bg-rose-400 text-white px-10 py-5 rounded-full font-bold uppercase tracking-widest text-[10px] hover:bg-slate-900 transition-all shadow-xl shadow-rose-200">
                  Reserve Seat
                </button>
-               <button className="border border-slate-200 text-slate-900 px-10 py-5 rounded-full font-bold uppercase tracking-widest text-[10px] hover:bg-slate-50 transition-all">
+               <a href="#services" className="border border-slate-200 text-slate-900 px-10 py-5 rounded-full font-bold uppercase tracking-widest text-[10px] hover:bg-slate-50 transition-all text-center">
                  Our Rituals
-               </button>
+               </a>
             </div>
           </div>
           <div className="relative hidden lg:block h-[700px]">
@@ -121,7 +133,7 @@ const HairSalonWebsite = ({ merchantData }) => {
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-24">
             <span className="text-rose-400 font-black uppercase tracking-[0.4em] text-xs">The Menu</span>
-            <h2 className="text-5xl md:text-8xl font-black tracking-tighter mt-4">Premium Care</h2>
+            <h2 className="text-5xl md:text-8xl font-black tracking-tighter mt-4 uppercase">Premium Care</h2>
           </div>
           <div className="grid grid-cols-1 gap-12">
             {data.services.map((service, index) => (
@@ -131,7 +143,9 @@ const HairSalonWebsite = ({ merchantData }) => {
                   <p className="text-slate-400 font-sans text-sm italic">{service.description}</p>
                 </div>
                 <div className="flex items-center gap-4 mt-4 md:mt-0">
-                  <span className="text-3xl font-black text-rose-400">{service.price} <span className="text-[10px] uppercase tracking-tighter text-white opacity-40 ml-1">tnd</span></span>
+                  <span className="text-3xl font-black text-rose-400">
+                    {service.price} <span className="text-[10px] uppercase tracking-tighter text-white opacity-40 ml-1">tnd</span>
+                  </span>
                   <button className="bg-white/5 hover:bg-rose-400 p-3 rounded-full transition-all group-hover:translate-x-2">
                     <ChevronRight size={18} />
                   </button>
@@ -143,7 +157,7 @@ const HairSalonWebsite = ({ merchantData }) => {
       </section>
 
       {/* --- GALLERY SECTION --- */}
-      {data.showGallery && (
+      {data.showGallery && data.gallery.length > 0 && (
         <section id="gallery" className="py-32 px-6 max-w-7xl mx-auto">
            <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
               {data.gallery.map((img, i) => img && (
@@ -168,8 +182,16 @@ const HairSalonWebsite = ({ merchantData }) => {
               </div>
               <p className="text-slate-400 max-w-xs leading-loose font-sans">{data.slogan}</p>
               <div className="flex gap-4">
-                  <a href="#" className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center hover:bg-rose-400 hover:text-white transition-all text-slate-400"><InstagramIcon /></a>
-                  <a href="#" className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center hover:bg-rose-400 hover:text-white transition-all text-slate-400"><FacebookIcon /></a>
+                  {data.contact.socials.instagram && (
+                    <a href={`https://instagram.com/${data.contact.socials.instagram}`} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center hover:bg-rose-400 hover:text-white transition-all text-slate-400">
+                      <InstagramIcon />
+                    </a>
+                  )}
+                  {data.contact.socials.facebook && (
+                    <a href={data.contact.socials.facebook} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center hover:bg-rose-400 hover:text-white transition-all text-slate-400">
+                      <FacebookIcon />
+                    </a>
+                  )}
               </div>
            </div>
            
@@ -178,7 +200,7 @@ const HairSalonWebsite = ({ merchantData }) => {
               <div className="space-y-6">
                  <div className="flex items-start gap-4 justify-center md:justify-start">
                    <MapPin className="text-rose-400" size={20} />
-                   <p className="text-slate-600 font-bold font-sans">{data.contact.address}</p>
+                   <p className="text-slate-600 font-bold font-sans uppercase text-sm tracking-wide">{data.contact.address}</p>
                  </div>
                  <div className="flex items-start gap-4 justify-center md:justify-start">
                    <Phone className="text-rose-400" size={20} />
@@ -190,17 +212,19 @@ const HairSalonWebsite = ({ merchantData }) => {
            <div className="space-y-8">
               <h4 className="font-black uppercase tracking-widest text-[10px] text-rose-400">Opening Hours</h4>
               <div className="space-y-3">
-                 {data.hours.slice(0, 7).map((h, i) => (
+                 {data.hours.length > 0 ? data.hours.slice(0, 7).map((h, i) => (
                     <div key={i} className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-500 border-b border-rose-50 pb-2">
                         <span>{h.day}</span>
                         <span className={h.isClosed ? 'text-rose-300' : 'text-slate-900'}>{h.isClosed ? 'Closed' : `${h.open} - ${h.close}`}</span>
                     </div>
-                 ))}
+                 )) : (
+                    <p className="text-slate-400 text-[10px] font-bold uppercase italic">Contact for scheduling</p>
+                 )}
               </div>
            </div>
         </div>
         <div className="max-w-7xl mx-auto pt-12 border-t border-rose-100 flex flex-col md:flex-row justify-between items-center gap-6 opacity-40">
-           <p className="text-[10px] font-bold uppercase tracking-widest">© 2026 {data.name} — Powered by Bookismart</p>
+           <p className="text-[10px] font-bold uppercase tracking-widest">© 2026 {data.name} — Luxury Hair Experience</p>
            <button onClick={() => window.scrollTo(0,0)} className="text-[10px] font-bold uppercase tracking-widest hover:text-rose-400">Back to top ↑</button>
         </div>
       </footer>
@@ -208,9 +232,9 @@ const HairSalonWebsite = ({ merchantData }) => {
   );
 
   return (
-    <div className="relative h-full bg-[#fafafa]">
+    <div className="relative h-full bg-[#fafafa] rounded-[2rem] overflow-hidden">
       {!isFullscreen && (
-        <div className="p-4 bg-white border-b border-slate-100 flex justify-between items-center z-50">
+        <div className="p-4 bg-white border-b border-slate-100 flex justify-between items-center relative z-[60]">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">

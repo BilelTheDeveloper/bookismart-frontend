@@ -4,34 +4,42 @@ import {
   Maximize, Minimize, Sparkles, Star, CheckCircle2 
 } from 'lucide-react';
 
-const MakeupArtistWebsite = ({ merchantData }) => {
+const MakeupArtistWebsite = ({ data: merchantData }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // 1. MASTER DATA MERGE (Unified naming with all templates)
+  // 1. MASTER DATA MERGE - Synchronized with your global schema
   const data = {
-    name: merchantData?.name || "Pro Visuals",
+    name: merchantData?.ownerId?.businessName || merchantData?.hero?.title || "Pro Visuals",
     slogan: merchantData?.hero?.slogan || "Unveiling Your Most Radiant Self",
     heroTitle: merchantData?.hero?.title || "Face Design",
     heroImage: merchantData?.hero?.backgroundImage || "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=1920",
+    
+    // About Section
     aboutTitle: merchantData?.about?.title || "The Artistry",
     aboutText: merchantData?.about?.text || "Specializing in bridal, editorial, and red-carpet glamour. I bring a meticulous eye for detail and a passion for artistic expression to every face.",
     aboutImage: merchantData?.about?.image || "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800",
     showAbout: merchantData?.about?.show ?? true,
+    
+    // Services Section
     services: merchantData?.services?.length > 0 ? merchantData.services : [
       { title: "Bridal Glamour", price: "350", description: "Full luxury application and trial session." },
       { title: "Editorial Look", price: "200", description: "High-definition makeup for studio lighting." }
     ],
+    
+    // Gallery Section
     gallery: merchantData?.gallery?.images || [],
     showGallery: merchantData?.gallery?.show ?? true,
+    
+    // Contact & Footer
     contact: {
-      phone: merchantData?.contact?.phone || "+216 55 000 000",
-      address: merchantData?.contact?.address || "Berges du Lac, Tunis",
+      phone: merchantData?.contact?.phone || merchantData?.ownerId?.phone || "+216 55 000 000",
+      address: merchantData?.contact?.address || merchantData?.ownerId?.city || "Berges du Lac, Tunis",
       socials: merchantData?.contact?.socials || {}
     },
     hours: merchantData?.businessHours || []
   };
 
-  // Custom Brand SVGs (Solves the Lucide export error)
+  // Custom Brand SVGs
   const InstagramIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
   );
@@ -93,9 +101,9 @@ const MakeupArtistWebsite = ({ merchantData }) => {
              <button className="bg-violet-600 text-white px-10 py-5 rounded-sm font-sync text-[9px] tracking-widest uppercase hover:bg-white hover:text-black transition-all shadow-2xl shadow-violet-900/40">
                Schedule Session
              </button>
-             <button className="border border-white/10 text-white px-10 py-5 rounded-sm font-sync text-[9px] tracking-widest uppercase hover:bg-white/5 transition-all">
+             <a href="#gallery" className="border border-white/10 text-white px-10 py-5 rounded-sm font-sync text-[9px] tracking-widest uppercase hover:bg-white/5 transition-all text-center">
                View Gallery
-             </button>
+             </a>
           </div>
         </div>
       </section>
@@ -125,7 +133,7 @@ const MakeupArtistWebsite = ({ merchantData }) => {
       </section>
 
       {/* --- GALLERY SECTION --- */}
-      {data.showGallery && (
+      {data.showGallery && data.gallery.length > 0 && (
         <section id="gallery" className="py-32 px-6 bg-[#0a0a0a]">
            <div className="max-w-7xl mx-auto text-center mb-20">
               <span className="text-violet-500 font-bold uppercase tracking-widest text-[10px]">The Portfolio</span>
@@ -133,9 +141,9 @@ const MakeupArtistWebsite = ({ merchantData }) => {
            </div>
            <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4">
               {data.gallery.map((img, i) => img && (
-                <div key={i} className="aspect-[3/4] rounded-2xl overflow-hidden group relative">
+                <div key={i} className="aspect-[3/4] rounded-2xl overflow-hidden group relative shadow-2xl">
                    <img src={img} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000" alt="Work" />
-                   <div className="absolute inset-0 bg-violet-600/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                   <div className="absolute inset-0 bg-violet-600/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
                         <CheckCircle2 className="text-white" size={30} />
                    </div>
                 </div>
@@ -150,12 +158,20 @@ const MakeupArtistWebsite = ({ merchantData }) => {
            <div className="space-y-8 text-center lg:text-left flex flex-col items-center lg:items-start">
               <div className="flex items-center gap-3">
                  <Paintbrush className="text-violet-500" size={24} />
-                 <span className="text-xl font-sync tracking-[0.4em] uppercase">{data.name}</span>
+                 <span className="text-xl font-sync tracking-[0.4em] uppercase leading-none">{data.name}</span>
               </div>
               <p className="text-white/30 max-w-xs leading-loose text-sm">{data.slogan}</p>
               <div className="flex gap-4">
-                  <a href="#" className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-violet-600 transition-all text-white/40 hover:text-white"><InstagramIcon /></a>
-                  <a href="#" className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-violet-600 transition-all text-white/40 hover:text-white"><FacebookIcon /></a>
+                  {data.contact.socials.instagram && (
+                    <a href={`https://instagram.com/${data.contact.socials.instagram}`} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-violet-600 transition-all text-white/40 hover:text-white">
+                      <InstagramIcon />
+                    </a>
+                  )}
+                  {data.contact.socials.facebook && (
+                    <a href={data.contact.socials.facebook} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-violet-600 transition-all text-white/40 hover:text-white">
+                      <FacebookIcon />
+                    </a>
+                  )}
               </div>
            </div>
            
@@ -164,7 +180,7 @@ const MakeupArtistWebsite = ({ merchantData }) => {
               <div className="space-y-6">
                  <div className="flex items-start gap-4 justify-center lg:justify-start">
                    <MapPin className="text-violet-500" size={20} />
-                   <p className="text-white/60 font-medium">{data.contact.address}</p>
+                   <p className="text-white/60 font-medium uppercase text-[11px] tracking-widest">{data.contact.address}</p>
                  </div>
                  <div className="flex items-start gap-4 justify-center lg:justify-start text-2xl font-black">
                    <Phone className="text-violet-500" size={20} />
@@ -176,12 +192,14 @@ const MakeupArtistWebsite = ({ merchantData }) => {
            <div className="space-y-8">
               <h4 className="font-bold uppercase tracking-widest text-[10px] text-violet-500">Working Hours</h4>
               <div className="space-y-3">
-                 {data.hours.slice(0, 7).map((h, i) => (
+                 {data.hours.length > 0 ? data.hours.slice(0, 7).map((h, i) => (
                     <div key={i} className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-white/20 border-b border-white/5 pb-2">
                         <span>{h.day}</span>
                         <span className={h.isClosed ? 'text-violet-400' : 'text-white'}>{h.isClosed ? 'Closed' : `${h.open} - ${h.close}`}</span>
                     </div>
-                 ))}
+                 )) : (
+                    <p className="text-white/20 text-[10px] font-bold uppercase italic">Contact for availability</p>
+                 )}
               </div>
            </div>
         </div>
@@ -194,9 +212,9 @@ const MakeupArtistWebsite = ({ merchantData }) => {
   );
 
   return (
-    <div className="relative h-full bg-[#050505]">
+    <div className="relative h-full bg-[#050505] rounded-[2rem] overflow-hidden">
       {!isFullscreen && (
-        <div className="p-4 bg-white border-b border-slate-100 flex justify-between items-center z-50">
+        <div className="p-4 bg-white border-b border-slate-100 flex justify-between items-center relative z-[60]">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-violet-600 animate-pulse" />
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
