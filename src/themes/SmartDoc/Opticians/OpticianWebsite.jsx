@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Added for navigation
 import { 
   Eye, Clock, MapPin, Phone, ChevronRight, 
   Maximize, Minimize, Glasses, ShieldCheck, 
@@ -7,9 +8,11 @@ import {
 
 const OpticianWebsite = ({ data: merchantData }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const navigate = useNavigate(); // Navigation hook
 
   // 1. MASTER DATA MERGE - Optical & Vision Logic
   const data = {
+    slug: merchantData?.slug || "optician", // Needed for booking route
     name: merchantData?.ownerId?.businessName || merchantData?.hero?.title || "Visionary Optics",
     slogan: merchantData?.hero?.slogan || "Precision Eye Exams & Designer Eyewear Collections",
     heroTitle: merchantData?.hero?.title || "See The World In High Definition",
@@ -40,6 +43,11 @@ const OpticianWebsite = ({ data: merchantData }) => {
     hours: merchantData?.businessHours || []
   };
 
+  // Helper to handle booking navigation
+  const handleBooking = () => {
+    navigate(`/book/${data.slug}`);
+  };
+
   const InstagramIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
   );
@@ -64,7 +72,10 @@ const OpticianWebsite = ({ data: merchantData }) => {
             <a href="#services" className="hover:text-blue-600 transition-colors">Services</a>
             <a href="#gallery" className="hover:text-blue-600 transition-colors">Showcase</a>
           </div>
-          <button className="bg-slate-900 hover:bg-blue-600 text-white px-8 py-3 rounded-md text-[10px] font-black uppercase tracking-widest transition-all">
+          <button 
+            onClick={handleBooking}
+            className="bg-slate-900 hover:bg-blue-600 text-white px-8 py-3 rounded-md text-[10px] font-black uppercase tracking-widest transition-all"
+          >
             Book Eye Test
           </button>
         </div>
@@ -89,7 +100,10 @@ const OpticianWebsite = ({ data: merchantData }) => {
             {data.slogan}
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-             <button className="bg-blue-600 text-white px-12 py-5 rounded-full font-black uppercase tracking-widest text-xs hover:bg-slate-900 transition-all shadow-xl shadow-blue-200">
+             <button 
+               onClick={handleBooking}
+               className="bg-blue-600 text-white px-12 py-5 rounded-full font-black uppercase tracking-widest text-xs hover:bg-slate-900 transition-all shadow-xl shadow-blue-200"
+             >
                Discover Collection
              </button>
              <a href="#services" className="bg-white border border-slate-200 text-slate-900 px-12 py-5 rounded-full font-black uppercase tracking-widest text-xs hover:bg-slate-50 transition-all text-center">
@@ -132,8 +146,8 @@ const OpticianWebsite = ({ data: merchantData }) => {
       <section id="services" className="py-32 px-6 bg-slate-900 text-white rounded-[4rem] mx-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
           <div className="max-w-xl">
-             <span className="text-blue-400 font-black uppercase tracking-[0.4em] text-xs">Expert Care</span>
-             <h2 className="text-5xl md:text-7xl font-black mt-4">Optical Precision</h2>
+              <span className="text-blue-400 font-black uppercase tracking-[0.4em] text-xs">Expert Care</span>
+              <h2 className="text-5xl md:text-7xl font-black mt-4">Optical Precision</h2>
           </div>
           <p className="text-slate-400 font-medium max-w-xs text-right hidden md:block">Modern diagnostics combined with a passion for visual health.</p>
         </div>
@@ -142,9 +156,12 @@ const OpticianWebsite = ({ data: merchantData }) => {
             <div key={index} className="group bg-white/5 border border-white/10 p-10 rounded-[3rem] hover:bg-blue-600 transition-all">
               <div className="flex justify-between items-center mb-10">
                 <h3 className="text-2xl font-black uppercase tracking-tighter group-hover:scale-105 transition-transform">{service.title}</h3>
-                <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center">
+                <button 
+                  onClick={handleBooking}
+                  className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors"
+                >
                     <Search size={20} className="text-blue-400 group-hover:text-white" />
-                </div>
+                </button>
               </div>
               <p className="text-slate-400 group-hover:text-white/80 leading-relaxed mb-8">{service.description}</p>
               <span className="text-3xl font-black text-blue-400 group-hover:text-white">{service.price} <span className="text-xs uppercase opacity-60">tnd</span></span>

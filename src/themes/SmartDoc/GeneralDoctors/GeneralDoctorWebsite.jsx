@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Navigation hook added
 import { 
   UserRound, Clock, MapPin, Phone, ChevronRight, 
   Maximize, Minimize, Stethoscope, ShieldCheck, 
@@ -7,9 +8,11 @@ import {
 
 const GeneralDoctorWebsite = ({ data: merchantData }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const navigate = useNavigate(); // Navigation hook
 
   // 1. MASTER DATA MERGE - General Practice Logic
   const data = {
+    slug: merchantData?.slug || "doctor", // Used for the booking route
     name: merchantData?.ownerId?.businessName || merchantData?.hero?.title || "Family Wellness Clinic",
     slogan: merchantData?.hero?.slogan || "Your Partner in Long-Term Health & Preventive Care",
     heroTitle: merchantData?.hero?.title || "Compassionate Care for Every Generation",
@@ -40,6 +43,11 @@ const GeneralDoctorWebsite = ({ data: merchantData }) => {
     hours: merchantData?.businessHours || []
   };
 
+  // Helper to handle booking navigation
+  const handleBooking = () => {
+    navigate(`/book/${data.slug}`);
+  };
+
   const FacebookIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
   );
@@ -64,7 +72,10 @@ const GeneralDoctorWebsite = ({ data: merchantData }) => {
             <a href="#services" className="hover:text-emerald-600 transition-colors">Expertise</a>
             <a href="#contact" className="hover:text-emerald-600 transition-colors">Contact</a>
           </div>
-          <button className="bg-emerald-500 hover:bg-indigo-900 text-white px-8 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-100 transform hover:scale-105 active:scale-95">
+          <button 
+            onClick={handleBooking}
+            className="bg-emerald-500 hover:bg-indigo-900 text-white px-8 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-100 transform hover:scale-105 active:scale-95"
+          >
             Book Visit
           </button>
         </div>
@@ -85,7 +96,10 @@ const GeneralDoctorWebsite = ({ data: merchantData }) => {
               {data.slogan}
             </p>
             <div className="flex flex-wrap gap-4 pt-4">
-               <button className="bg-indigo-950 text-white px-10 py-5 rounded-3xl font-black uppercase tracking-widest text-xs hover:bg-emerald-500 transition-all shadow-2xl shadow-indigo-200">
+               <button 
+                 onClick={handleBooking}
+                 className="bg-indigo-950 text-white px-10 py-5 rounded-3xl font-black uppercase tracking-widest text-xs hover:bg-emerald-500 transition-all shadow-2xl shadow-indigo-200"
+               >
                  Schedule Consultation
                </button>
                <div className="flex items-center gap-4 px-6 py-5 bg-white rounded-3xl border border-indigo-50">
@@ -158,7 +172,11 @@ const GeneralDoctorWebsite = ({ data: merchantData }) => {
         </div>
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
           {data.services.map((service, index) => (
-            <div key={index} className="bg-white/5 p-10 rounded-[3rem] border border-white/10 hover:bg-white/10 transition-all group">
+            <div 
+              key={index} 
+              onClick={handleBooking}
+              className="bg-white/5 p-10 rounded-[3rem] border border-white/10 hover:bg-white/10 transition-all group cursor-pointer"
+            >
               <div className="flex justify-between items-start mb-10">
                 <h3 className="text-3xl font-black tracking-tight max-w-[200px] leading-none group-hover:text-emerald-400 transition-colors">{service.title}</h3>
                 <span className="bg-emerald-500/20 text-emerald-400 px-5 py-2 rounded-xl text-lg font-black italic">

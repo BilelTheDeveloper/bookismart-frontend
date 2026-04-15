@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Added for navigation
 import { 
   Stethoscope, Clock, MapPin, Phone, ChevronRight, 
   Maximize, Minimize, ShieldCheck, HeartPulse, Activity
@@ -6,9 +7,11 @@ import {
 
 const DentistWebsite = ({ data: merchantData }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const navigate = useNavigate(); // Navigation hook
 
   // 1. MASTER DATA MERGE - Clinical Context
   const data = {
+    slug: merchantData?.slug || "clinic", // Needed for the booking route
     name: merchantData?.ownerId?.businessName || merchantData?.hero?.title || "Elite Dental Care",
     slogan: merchantData?.hero?.slogan || "Advanced Dentistry with a Human Touch",
     heroTitle: merchantData?.hero?.title || "Radiant Smiles, Redefined",
@@ -39,6 +42,11 @@ const DentistWebsite = ({ data: merchantData }) => {
     hours: merchantData?.businessHours || []
   };
 
+  // Helper function to handle booking navigation
+  const handleBooking = () => {
+    navigate(`/book/${data.slug}`);
+  };
+
   const InstagramIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
   );
@@ -64,7 +72,10 @@ const DentistWebsite = ({ data: merchantData }) => {
             {data.showGallery && <a href="#gallery" className="hover:text-cyan-600 transition-colors">Results</a>}
             <a href="#contact" className="hover:text-cyan-600 transition-colors">Location</a>
           </div>
-          <button className="bg-slate-900 hover:bg-cyan-600 text-white px-8 py-3.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-slate-200 transform hover:scale-105">
+          <button 
+            onClick={handleBooking}
+            className="bg-slate-900 hover:bg-cyan-600 text-white px-8 py-3.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-slate-200 transform hover:scale-105"
+          >
             Book Appointment
           </button>
         </div>
@@ -88,7 +99,10 @@ const DentistWebsite = ({ data: merchantData }) => {
             {data.slogan}
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-             <button className="bg-cyan-600 text-white px-10 py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-slate-900 transition-all shadow-2xl shadow-cyan-200">
+             <button 
+               onClick={handleBooking}
+               className="bg-cyan-600 text-white px-10 py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-slate-900 transition-all shadow-2xl shadow-cyan-200"
+             >
                New Patient Portal
              </button>
              <a href="#services" className="bg-white text-slate-900 border border-slate-200 px-10 py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-slate-50 transition-all text-center">
@@ -148,7 +162,7 @@ const DentistWebsite = ({ data: merchantData }) => {
                 <p className="text-slate-400 text-sm leading-relaxed mb-8">{service.description}</p>
                 <div className="flex justify-between items-center pt-6 border-t border-slate-50">
                     <span className="text-lg font-black text-cyan-600">{service.price} <span className="text-[10px] uppercase ml-1">tnd</span></span>
-                    <button className="text-slate-300 group-hover:text-cyan-600 transition-colors">
+                    <button onClick={handleBooking} className="text-slate-300 group-hover:text-cyan-600 transition-colors">
                         <ChevronRight size={20} />
                     </button>
                 </div>

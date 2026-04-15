@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Added for navigation
 import { 
   Activity, Clock, MapPin, Phone, ChevronRight, 
   Maximize, Minimize, Zap, Dumbbell, 
@@ -7,9 +8,11 @@ import {
 
 const PhysioWebsite = ({ data: merchantData }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const navigate = useNavigate(); // Navigation hook
 
   // 1. MASTER DATA MERGE - Physical Therapy & Rehab Logic
   const data = {
+    slug: merchantData?.slug || "physio", // Needed for booking route
     name: merchantData?.ownerId?.businessName || merchantData?.hero?.title || "Kinetic Rehab Center",
     slogan: merchantData?.hero?.slogan || "Evidence-Based Therapy to Restore Your Movement",
     heroTitle: merchantData?.hero?.title || "Reclaim Your Active Lifestyle",
@@ -40,6 +43,11 @@ const PhysioWebsite = ({ data: merchantData }) => {
     hours: merchantData?.businessHours || []
   };
 
+  // Helper to handle booking navigation
+  const handleBooking = () => {
+    navigate(`/book/${data.slug}`);
+  };
+
   const WebsiteContent = (
     <div className="bg-[#f8fafc] text-slate-900 font-sans selection:bg-lime-100 overflow-y-auto h-full no-scrollbar scroll-smooth">
       <style>{`.no-scrollbar::-webkit-scrollbar { display: none; }`}</style>
@@ -60,7 +68,10 @@ const PhysioWebsite = ({ data: merchantData }) => {
             <a href="#services" className="hover:text-lime-500 transition-colors">Treatments</a>
             <a href="#contact" className="hover:text-lime-500 transition-colors">Location</a>
           </div>
-          <button className="bg-lime-400 hover:bg-slate-900 hover:text-white text-slate-900 px-8 py-3.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-lime-100">
+          <button 
+            onClick={handleBooking}
+            className="bg-lime-400 hover:bg-slate-900 hover:text-white text-slate-900 px-8 py-3.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-lime-100"
+          >
             Start Recovery
           </button>
         </div>
@@ -83,7 +94,10 @@ const PhysioWebsite = ({ data: merchantData }) => {
               {data.slogan}
             </p>
             <div className="flex flex-col sm:flex-row gap-5">
-               <button className="bg-slate-900 text-white px-12 py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-lime-400 hover:text-slate-900 transition-all shadow-2xl shadow-slate-200">
+               <button 
+                 onClick={handleBooking}
+                 className="bg-slate-900 text-white px-12 py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-lime-400 hover:text-slate-900 transition-all shadow-2xl shadow-slate-200"
+               >
                  Book Consultation
                </button>
                <button className="flex items-center gap-4 group">
@@ -145,13 +159,20 @@ const PhysioWebsite = ({ data: merchantData }) => {
              <span className="text-lime-400 font-black uppercase tracking-[0.4em] text-xs">Specializations</span>
              <h2 className="text-5xl md:text-8xl font-black tracking-tighter mt-4 italic uppercase">Programs</h2>
           </div>
-          <button className="border border-white/20 px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">
+          <button 
+            onClick={handleBooking}
+            className="border border-white/20 px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all"
+          >
              View All Treatments
           </button>
         </div>
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-1">
           {data.services.map((service, index) => (
-            <div key={index} className="group p-12 border border-white/5 hover:bg-white transition-all duration-500">
+            <div 
+              key={index} 
+              onClick={handleBooking}
+              className="group p-12 border border-white/5 hover:bg-white transition-all duration-500 cursor-pointer"
+            >
               <div className="flex justify-between items-start mb-8">
                 <span className="text-xs font-black text-lime-400 group-hover:text-slate-400 opacity-50 italic">0{index + 1}</span>
                 <span className="text-2xl font-black group-hover:text-slate-900">{service.price} <span className="text-[10px] uppercase">tnd</span></span>
