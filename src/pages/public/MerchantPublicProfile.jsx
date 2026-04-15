@@ -2,12 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import API from "../api/config"; 
 
-// Import Theme Layouts
+// Import Theme Layouts - Beauty & Barbers
 import BarberWebsite from "../../themes/SmartStyle/Barbershops/Theme1/WebsiteLayout";
 import HairSalonWebsite from "../../themes/SmartStyle/HairSalons/Theme1/WebsiteLayout";
 import MakeupArtistWebsite from "../../themes/SmartStyle/MakeupArtists/Theme1/WebsiteLayout";
 import NailSalonWebsite from "../../themes/SmartStyle/NailSalons/Theme1/WebsiteLayout";
 import SpaWebsite from "../../themes/SmartStyle/Spas/Theme1/WebsiteLayout";
+
+// Import Theme Layouts - Health & Medical
+import DentistWebsite from "../../themes/SmartDoc/Dentists/DentistWebsite";
+import DoctorWebsite from "../../themes/SmartDoc/GeneralDoctors/GeneralDoctorWebsite";
+import OpticianWebsite from "../../themes/SmartDoc/Opticians/OpticianWebsite";
+import PhysioWebsite from "../../themes/SmartDoc/Physiotherapists/PhysioWebsite";
 
 const MerchantPublicProfile = () => {
   const { slug } = useParams();
@@ -19,7 +25,7 @@ const MerchantPublicProfile = () => {
     const fetchWebsite = async () => {
       try {
         setLoading(true);
-        // ✅ Targeted Public Route from your Controller
+        // ✅ Targeted Public Route
         const response = await API.get(`/public/website/${slug}`);
         setWebsiteData(response.data);
       } catch (err) {
@@ -68,8 +74,7 @@ const MerchantPublicProfile = () => {
 
   /**
    * ✅ DYNAMIC THEME ENGINE (PRO UPDATED)
-   * This logic ensures the correct template is rendered by checking
-   * multiple possible data identifiers (templateId or category).
+   * Recognizes Beauty & Barbers AND Health & Medical templates.
    */
   const renderTheme = () => {
     const themeProps = { data: websiteData };
@@ -78,15 +83,22 @@ const MerchantPublicProfile = () => {
     const templateId = websiteData.templateId?.toUpperCase() || "";
     const category = websiteData.ownerId?.category?.toLowerCase() || websiteData.category?.toLowerCase() || "";
 
-    // 1. Check by Template ID first
+    // 1. Check by Template ID first (Exact Mapping)
     if (templateId === "BARBER_THEME_01") return <BarberWebsite {...themeProps} />;
     if (templateId === "HAIR_THEME_01") return <HairSalonWebsite {...themeProps} />;
     if (templateId === "MAKEUP_THEME_01") return <MakeupArtistWebsite {...themeProps} />;
     if (templateId === "NAIL_THEME_01") return <NailSalonWebsite {...themeProps} />;
     if (templateId === "SPA_THEME_01") return <SpaWebsite {...themeProps} />;
+    
+    // Medical Template IDs
+    if (templateId === "DENTIST_THEME_01") return <DentistWebsite {...themeProps} />;
+    if (templateId === "DOCTOR_THEME_01") return <DoctorWebsite {...themeProps} />;
+    if (templateId === "OPTICIAN_THEME_01") return <OpticianWebsite {...themeProps} />;
+    if (templateId === "PHYSIO_THEME_01") return <PhysioWebsite {...themeProps} />;
 
-    // 2. Fallback check by Category (If templateId isn't matching perfectly)
+    // 2. Fallback check by Category String
     switch (category) {
+      // Beauty & Barbers
       case "barbershops":
       case "barber":
         return <BarberWebsite {...themeProps} />;
@@ -102,8 +114,24 @@ const MerchantPublicProfile = () => {
       case "spas":
       case "spa":
         return <SpaWebsite {...themeProps} />;
+
+      // Health & Medical
+      case "dentists":
+      case "dentist":
+        return <DentistWebsite {...themeProps} />;
+      case "general-doctors":
+      case "doctors":
+      case "doctor":
+        return <DoctorWebsite {...themeProps} />;
+      case "opticians":
+      case "optician":
+        return <OpticianWebsite {...themeProps} />;
+      case "physiotherapists":
+      case "physio":
+        return <PhysioWebsite {...themeProps} />;
+
       default:
-        // Absolute fallback
+        // Absolute fallback to a clean layout
         return <BarberWebsite {...themeProps} />;
     }
   };
