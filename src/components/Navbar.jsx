@@ -60,6 +60,7 @@ const Navbar = () => {
             className="hidden sm:flex items-center gap-2 px-5 py-2 text-sm font-bold rounded-xl transition-all text-slate-700 hover:bg-slate-100"
           >
             <LogIn size={18} />
+            
             Login
           </Link>
           
@@ -68,12 +69,13 @@ const Navbar = () => {
             className="flex items-center gap-2 bg-cyan-500 text-slate-900 px-4 py-2.5 rounded-full text-sm font-black hover:bg-cyan-300 hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] active:scale-95 transition-all shadow-lg"
           >
             <UserPlus size={16} />
+            
             Join as Owner
           </Link>
 
           {/* Mobile Menu Toggle */}
           <button 
-            className="md:hidden p-2 text-slate-900 transition-colors"
+            className="md:hidden p-1 text-slate-900 transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
