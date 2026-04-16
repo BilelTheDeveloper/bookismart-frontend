@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Eye } from "lucide-react"; // Added for a professional icon look
 
 const categories = [
   { id: 1, title: "SmartStyle", sub: "Beauty & Barbers", icon: "✂️", color: "bg-rose-500", details: ["Hair Salons", "Barbershops", "Nail Salons", "Spas", "Makeup Artists"] },
@@ -34,18 +35,24 @@ const Categories = () => {
         </div>
 
         {/* 🚀 THE SMART GRID */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap- -mt-5 md:-mt-32 relative z-20 transition-all duration-700">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-8 -mt-5 md:-mt-32 relative z-20 transition-all duration-700">
           {visibleCategories.map((cat) => (
             <div
               key={cat.id}
               onClick={() => setSelectedCat(cat)}
-              className="group bg-white rounded-[2rem] p-6 md:p-10 shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col items-center text-center transition-all duration-300 hover:shadow-2xl active:scale-95 cursor-pointer"
+              className="group bg-white rounded-[2rem] p-6 md:p-10 shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col items-center text-center transition-all duration-300 hover:shadow-2xl active:scale-95 cursor-pointer relative overflow-hidden"
             >
               <div className={`w-14 h-14 md:w-20 md:h-20 ${cat.color} rounded-3xl flex items-center justify-center text-white text-3xl md:text-4xl shadow-lg mb-6 group-hover:rotate-6 transition-transform`}>
                 {cat.icon}
               </div>
               <h3 className="text-lg md:text-xl font-black text-slate-900 leading-tight">{cat.title}</h3>
               <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mt-2">{cat.sub}</p>
+
+              {/* ✨ NEW: Click to See Works Overlay */}
+              <div className="mt-6 flex items-center gap-2 px-4 py-2 bg-slate-50 text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-full opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 border border-slate-200">
+                <Eye size={12} className="text-indigo-600" />
+                See Works
+              </div>
             </div>
           ))}
         </div>
