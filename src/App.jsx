@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 
 // Auth & Theme Context Providers
 import { ThemeProvider } from "./context/ThemeContext";
@@ -33,7 +33,7 @@ import OwnerDashboard from "./pages/users/OwnerDashboard";
 import TemplateGallery from "./pages/users/TemplateGallery";
 import TemplateSetupForm from "./pages/users/TemplateSetupForm"; 
 import LiveBooking from "./pages/users/LiveBooking"; 
-import SettingsHub from "./pages/users/SettingsHub"; // ✅ Added Settings Hub
+import SettingsHub from "./pages/users/SettingsHub"; 
 
 // Specialized Website Layouts - Beauty & Wellness
 import BarberWebsite from "./themes/SmartStyle/Barbershops/Theme1/WebsiteLayout";
@@ -47,6 +47,20 @@ import Dentist from "./themes/SmartDoc/Dentists/DentistWebsite";
 import GeneralDoctorWebsite from "./themes/SmartDoc/GeneralDoctors/GeneralDoctorWebsite";
 import OpticianWebsite from "./themes/SmartDoc/Opticians/OpticianWebsite";
 import PhysioWebsite from "./themes/SmartDoc/Physiotherapists/PhysioWebsite";
+
+/**
+ * ✅ NEW: Internal Protected Route Component
+ * Redirects non-admins to the home page automatically.
+ */
+const ProtectedAdminRoute = ({ children }) => {
+  const user = JSON.parse(localStorage.getItem('user'));
+  const token = localStorage.getItem('token');
+
+  if (!token || !user || user.role !== 'admin') {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+};
 
 /**
  * ScrollToTop Component
@@ -115,16 +129,16 @@ function App() {
               <Route path="/p/:slug" element={<MerchantPublicProfile />} />
               <Route path="/book/:slug" element={<BookingPage />} />
 
-              {/* --- Admin Routes --- */}
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/verification" element={<UserVerification />} />
-              <Route path="/admin/web-verification" element={<WebVerification />} />
+              {/* --- 🔒 Protected Admin Routes --- */}
+              <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
+              <Route path="/admin/verification" element={<ProtectedAdminRoute><UserVerification /></ProtectedAdminRoute>} />
+              <Route path="/admin/web-verification" element={<ProtectedAdminRoute><WebVerification /></ProtectedAdminRoute>} />
 
               {/* --- Merchant/Owner Dashboard --- */}
               <Route path="/merchant" element={<MainUserPage />}>
                 <Route index element={<OwnerDashboard />} />
                 <Route path="live" element={<LiveBooking />} /> 
-                <Route path="settings" element={<SettingsHub />} /> {/* ✅ New Settings Hub Route */}
+                <Route path="settings" element={<SettingsHub />} />
                 <Route path="templates" element={<TemplateGallery />} />
                 
                 {/* --- Beauty & Wellness Preview Routes --- */}
@@ -134,7 +148,7 @@ function App() {
                 <Route path="templates/preview/nail-salons" element={<NailSalonWebsite />} />
                 <Route path="templates/preview/spas" element={<SpaWebsite />} />
 
-                {/* ✅ NEW: Medical & Health Preview Routes --- */}
+                {/* ✅ Medical & Health Preview Routes --- */}
                 <Route path="templates/preview/general-doctors" element={<GeneralDoctorWebsite />} />
                 <Route path="templates/preview/opticians" element={<OpticianWebsite />} />
                 <Route path="templates/preview/physiotherapists" element={<PhysioWebsite />} />
