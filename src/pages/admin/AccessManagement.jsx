@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+// ✅ Import your central API instance
+import API from "../api/config"; 
 import { 
   ShieldCheck, 
   UserPlus, 
@@ -13,7 +14,7 @@ import {
   ChevronDown,
   Loader2
 } from "lucide-react";
-const API_URL = "https://bookismart-backend.onrender.com";
+
 const AccessManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [admins, setAdmins] = useState([]);
@@ -29,15 +30,11 @@ const AccessManagement = () => {
     secretKey: ""
   });
 
-  const API_URL = `${API_URL}/api/admin/access`;
-  const token = localStorage.getItem("token"); // Assuming your JWT is here
-
   // --- Backend: Fetch Admins ---
   const fetchAdmins = async () => {
     try {
-      const response = await axios.get(`${API_URL}/list`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      // ✅ Using central API instance (endpoint starts after /api)
+      const response = await API.get("/admin/access/list");
       setAdmins(response.data.admins);
     } catch (error) {
       console.error("Error fetching admins:", error);
@@ -54,11 +51,16 @@ const AccessManagement = () => {
   const handleCreateAccess = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_URL}/grant`, formData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      // ✅ Using central API instance
+      await API.post("/admin/access/grant", formData);
       setShowModal(false);
-      setFormData({ fullName: "", email: "", password: "", accessLevel: "moderator", secretKey: "" });
+      setFormData({ 
+        fullName: "", 
+        email: "", 
+        password: "", 
+        accessLevel: "moderator", 
+        secretKey: "" 
+      });
       fetchAdmins(); // Refresh list
     } catch (error) {
       alert(error.response?.data?.message || "Failed to create access");
@@ -68,9 +70,8 @@ const AccessManagement = () => {
   // --- Backend: Toggle Active Status ---
   const handleToggleStatus = async (id) => {
     try {
-      await axios.patch(`${API_URL}/toggle/${id}`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      // ✅ Using central API instance
+      await API.patch(`/admin/access/toggle/${id}`);
       fetchAdmins();
     } catch (error) {
       alert(error.response?.data?.message || "Toggle failed");
@@ -160,7 +161,7 @@ const AccessManagement = () => {
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-white font-bold text-xs">
-                            {admin.fullName.charAt(0)}
+                            {admin.fullName ? admin.fullName.charAt(0) : "A"}
                           </div>
                           <div>
                             <p className="text-sm font-black text-slate-900">{admin.fullName}</p>
