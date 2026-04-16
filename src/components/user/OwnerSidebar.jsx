@@ -14,8 +14,9 @@ import {
   ChevronRight,
   ChevronLeft,
   Globe,
-  Menu, // Added for Mobile
-  X     // Added for Mobile
+  Menu,
+  X,
+  Zap 
 } from "lucide-react";
 
 const OwnerSidebar = () => {
@@ -23,7 +24,6 @@ const OwnerSidebar = () => {
   const path = location.pathname;
   const { theme } = useTheme(); 
   
-  // 🔘 States for both Collapsed (Desktop) and Open (Mobile)
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -34,7 +34,7 @@ const OwnerSidebar = () => {
       group: "Business Control",
       items: [
         { name: "Dashboard", icon: LayoutDashboard, path: "/merchant" },
-        { name: "Live Bookings", icon: Calendar, path: "/merchant/bookings" },
+        { name: "Live Bookings", icon: Calendar, path: "/merchant/live" },
         { name: "Client Aperçu", icon: Users, path: "/merchant/clients" },
         { name: "Web Templates", icon: Globe, path: "/merchant/templates" },
       ]
@@ -63,7 +63,7 @@ const OwnerSidebar = () => {
 
   return (
     <>
-      {/* 📱 Mobile Toggle - Only visible on small screens */}
+      {/* 📱 Mobile Toggle */}
       <button 
         onClick={() => setIsMobileOpen(!isMobileOpen)}
         className="lg:hidden fixed top-5 left-4 z-[60] p-2 bg-white border border-slate-100 rounded-xl shadow-lg text-slate-600"
@@ -86,7 +86,7 @@ const OwnerSidebar = () => {
           ${isCollapsed ? "lg:w-24" : "w-80"}
         `}
       >
-        {/* 🛠️ Desktop Toggle Button (Floating) - Hidden on Mobile */}
+        {/* 🛠️ Desktop Toggle Button */}
         <button 
           onClick={() => setIsCollapsed(!isCollapsed)}
           className={`hidden lg:flex absolute -right-3 top-10 w-6 h-6 bg-white border border-slate-100 rounded-full items-center justify-center shadow-md hover:scale-110 transition-all z-50 text-slate-400 hover:text-slate-900`}
@@ -95,7 +95,7 @@ const OwnerSidebar = () => {
         </button>
 
         {/* 🏷️ Brand Logo */}
-        <div className={`p-8 pb-10 flex items-center justify-center ${(!isCollapsed || isMobileOpen) && "lg:justify-start"}`}>
+        <div className={`p-8 pb-6 flex items-center justify-center ${(!isCollapsed || isMobileOpen) && "lg:justify-start"}`}>
           <div className="flex items-center gap-3">
             <div 
               className={`w-10 h-10 ${theme.accent} rounded-xl flex items-center justify-center shadow-lg transition-all duration-500 shrink-0`} 
@@ -110,6 +110,29 @@ const OwnerSidebar = () => {
               </span>
             )}
           </div>
+        </div>
+
+        {/* ⚡ SPECIAL BUTTON: Set Work Mode */}
+        <div className="px-4 mb-6">
+          <Link
+            to="/merchant/work-mode"
+            onClick={() => setIsMobileOpen(false)}
+            className={`
+              flex items-center gap-3 p-4 rounded-2xl transition-all duration-300
+              ${path === "/merchant/work-mode" 
+                ? "bg-slate-900 text-white shadow-xl scale-[1.02]" 
+                : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100 shadow-sm hover:shadow-md"
+              }
+              ${(isCollapsed && !isMobileOpen) ? "justify-center" : "justify-start"}
+            `}
+          >
+            <Zap size={20} className={path === "/merchant/work-mode" ? "text-yellow-400 fill-yellow-400" : "animate-pulse"} />
+            {(!isCollapsed || isMobileOpen) && (
+              <span className="text-sm font-black uppercase tracking-wider animate-in fade-in">
+                Set Work Mode
+              </span>
+            )}
+          </Link>
         </div>
 
         {/* 🧭 Navigation Menu */}
@@ -128,7 +151,7 @@ const OwnerSidebar = () => {
                     <Link
                       key={item.name}
                       to={item.path}
-                      onClick={() => setIsMobileOpen(false)} // Close on mobile navigation
+                      onClick={() => setIsMobileOpen(false)}
                       className={`flex items-center ${(isCollapsed && !isMobileOpen) ? "justify-center" : "justify-between"} px-4 py-3.5 rounded-2xl transition-all duration-300 group ${
                         isActive 
                           ? `${theme.lightAccent} ${theme.textAccent}` 
@@ -157,7 +180,7 @@ const OwnerSidebar = () => {
           ))}
         </div>
 
-        {/* 💡 AI Advisor Quick Tip Box (Hidden when collapsed on desktop) */}
+        {/* 💡 AI Advisor Quick Tip Box */}
         {(!isCollapsed || isMobileOpen) && (
           <div 
             className="mx-6 my-6 p-5 rounded-[2rem] relative overflow-hidden group shadow-xl transition-all duration-500 animate-in fade-in zoom-in lg:block" 

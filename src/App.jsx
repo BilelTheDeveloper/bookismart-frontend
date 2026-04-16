@@ -32,6 +32,8 @@ import MainUserPage from "./pages/users/MainUserPage";
 import OwnerDashboard from "./pages/users/OwnerDashboard";
 import TemplateGallery from "./pages/users/TemplateGallery";
 import TemplateSetupForm from "./pages/users/TemplateSetupForm"; 
+import LiveBooking from "./pages/users/LiveBooking"; 
+import SettingsHub from "./pages/users/SettingsHub"; // ✅ Added Settings Hub
 
 // Specialized Website Layouts - Beauty & Wellness
 import BarberWebsite from "./themes/SmartStyle/Barbershops/Theme1/WebsiteLayout";
@@ -121,6 +123,8 @@ function App() {
               {/* --- Merchant/Owner Dashboard --- */}
               <Route path="/merchant" element={<MainUserPage />}>
                 <Route index element={<OwnerDashboard />} />
+                <Route path="live" element={<LiveBooking />} /> 
+                <Route path="settings" element={<SettingsHub />} /> {/* ✅ New Settings Hub Route */}
                 <Route path="templates" element={<TemplateGallery />} />
                 
                 {/* --- Beauty & Wellness Preview Routes --- */}
@@ -134,8 +138,7 @@ function App() {
                 <Route path="templates/preview/general-doctors" element={<GeneralDoctorWebsite />} />
                 <Route path="templates/preview/opticians" element={<OpticianWebsite />} />
                 <Route path="templates/preview/physiotherapists" element={<PhysioWebsite />} />
-       
-                
+        
                 <Route path="templates/setup/:id" element={<TemplateSetupForm />} />
               </Route>
             </Routes>
