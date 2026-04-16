@@ -65,9 +65,9 @@ const Navbar = () => {
           
           <Link 
             to="/join-as-owner"
-            className="flex items-center gap-2 bg-cyan-400 text-slate-900 px-6 py-2.5 rounded-full text-sm font-black hover:bg-cyan-300 hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] active:scale-95 transition-all shadow-lg"
+            className="flex items-center gap-2 bg-cyan-500 text-slate-900 px-4 py-2.5 rounded-full text-sm font-black hover:bg-cyan-300 hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] active:scale-95 transition-all shadow-lg"
           >
-            <UserPlus size={18} />
+            <UserPlus size={16} />
             Join as Owner
           </Link>
 
