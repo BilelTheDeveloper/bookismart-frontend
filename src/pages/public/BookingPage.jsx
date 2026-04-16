@@ -43,27 +43,20 @@ const BookingPage = ({ websiteData: propData, onBack }) => {
     if (!websiteData) return CATEGORY_THEMES[1];
 
     const categoryMap = {
+      "medical": 2,
+      "health": 2,
+      "opticians": 2,   // ADD THIS
+      "opticien": 2,    // ADD THIS
+      "dentists": 2,    // ADD THIS
+      "general-doctors": 2, // ADD THIS
+      "physiotherapists": 2, // ADD THIS
+
+
       "barbershops": 1,
       "spas": 1,
       "beauty": 1,
-      "medical": 2,
-      "health": 2,
-      "gyms": 3,
-      "fitness": 3,
-      "creative": 4,
-      "photography": 4,
-      "auto": 5,
-      "repairs": 5,
-      "maintenance": 6,
-      "home": 6,
-      "education": 7,
-      "coaching": 7,
-      "consultants": 8,
-      "legal": 8,
-      "events": 9,
-      "entertainment": 9,
-      "grooming": 10,
-      "pets": 10
+      "hair-salons": 1,
+      "makeup-artists": 1,
     };
 
     const dbCategory = websiteData.category?.toLowerCase() || "";

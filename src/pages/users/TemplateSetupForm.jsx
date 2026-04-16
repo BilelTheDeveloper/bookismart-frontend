@@ -206,10 +206,10 @@ const TemplateSetupForm = () => {
       'nail-salons': NailSalonWebsite,
       'spas': SpaWebsite,
 
-      'opticians': 'Medical & Health',
-      'opticians': 'Medical & Health', // Added this just in case of typos
-      'general-doctors': 'Medical & Health',
-      'physiotherapists': 'Medical & Health'
+      'opticians': OpticianWebsite,
+      'opticien': OpticianWebsite, // Added this just in case of typos
+      'general-doctors': GeneralDoctorWebsite,
+      'physiotherapists': PhysioWebsite
     };
     const SelectedTheme = components[id] || BarberWebsite;
     return <SelectedTheme merchantData={merchantData} />;
