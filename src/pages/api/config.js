@@ -1,10 +1,5 @@
 import axios from "axios";
 
-/**
- * 🛠️ API CONFIGURATION
- * We use import.meta.env.VITE_API_URL which pulls from your .env file.
- * This is more secure and flexible than hardcoding the URL.
- */
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "https://bookismart-backend.onrender.com/api",
   headers: {
@@ -12,14 +7,8 @@ const API = axios.create({
   },
 });
 
-/**
- * 🛡️ AUTH INTERCEPTOR
- * Automatically attaches the JWT token to the headers of every request.
- * This allows the backend to identify the Merchant securely.
- */
 API.interceptors.request.use(
   (config) => {
-    // We still pull the token from localStorage for persistence across refreshes
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -32,17 +21,27 @@ API.interceptors.request.use(
 );
 
 /**
- * 🚨 RESPONSE INTERCEPTOR (Security Addition)
- * If the backend returns a 401 (Unauthorized), it means the token expired.
- * We should log the user out to keep the app secure.
+ * 🚨 UPDATED RESPONSE INTERCEPTOR
  */
 API.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Check if the error is 401 (Unauthorized)
     if (error.response && error.response.status === 401) {
-      // Clear storage and redirect if the session is dead
-      localStorage.clear();
-      window.location.href = "/login";
+      
+      // 1. Don't kick the user if they are already trying to login!
+      const isLoginRequest = error.config.url.includes("/login");
+      
+      if (!isLoginRequest) {
+        console.warn("🔐 Session expired or unauthorized. Redirecting...");
+        
+        // 2. Only clear and redirect if we aren't already on the login page
+        if (window.location.pathname !== "/login") {
+          localStorage.removeItem("token");
+          localStorage.removeItem("admin"); // Clear admin data too
+          window.location.href = "/login";
+        }
+      }
     }
     return Promise.reject(error);
   }
