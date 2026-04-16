@@ -26,7 +26,6 @@ import BookingPage from "./pages/public/BookingPage";
 import AdminDashboard from "./pages/admin/Dashboard";
 import UserVerification from "./pages/admin/UserVerification";
 import WebVerification from "./pages/admin/WebVerification";
-import AccessManagement from "./pages/admin/AccessManagement";
 
 // Merchant/User Pages
 import MainUserPage from "./pages/users/MainUserPage";
@@ -120,7 +119,7 @@ function App() {
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/verification" element={<UserVerification />} />
               <Route path="/admin/web-verification" element={<WebVerification />} />
-              <Route path="/admin/access" element={<AccessManagement />} />
+
               {/* --- Merchant/Owner Dashboard --- */}
               <Route path="/merchant" element={<MainUserPage />}>
                 <Route index element={<OwnerDashboard />} />
