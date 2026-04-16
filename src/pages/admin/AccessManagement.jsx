@@ -33,11 +33,12 @@ const AccessManagement = () => {
   // --- Backend: Fetch Admins ---
   const fetchAdmins = async () => {
     try {
-      // ✅ Using central API instance (endpoint starts after /api)
-      const response = await API.get("/admin/access/list");
-      setAdmins(response.data.admins);
+      setLoading(true);
+      // ✅ Added { skipKick: true } to prevent auto-redirecting on error
+      const response = await API.get("/admin/access/list", { skipKick: true });
+      setAdmins(response.data.admins || []);
     } catch (error) {
-      console.error("Error fetching admins:", error);
+      console.error("Error fetching admins:", error.response?.data || error.message);
     } finally {
       setLoading(false);
     }
@@ -51,8 +52,8 @@ const AccessManagement = () => {
   const handleCreateAccess = async (e) => {
     e.preventDefault();
     try {
-      // ✅ Using central API instance
-      await API.post("/admin/access/grant", formData);
+      // ✅ Added { skipKick: true }
+      await API.post("/admin/access/grant", formData, { skipKick: true });
       setShowModal(false);
       setFormData({ 
         fullName: "", 
@@ -70,8 +71,8 @@ const AccessManagement = () => {
   // --- Backend: Toggle Active Status ---
   const handleToggleStatus = async (id) => {
     try {
-      // ✅ Using central API instance
-      await API.patch(`/admin/access/toggle/${id}`);
+      // ✅ Added { skipKick: true }
+      await API.patch(`/admin/access/toggle/${id}`, {}, { skipKick: true });
       fetchAdmins();
     } catch (error) {
       alert(error.response?.data?.message || "Toggle failed");
@@ -84,10 +85,10 @@ const AccessManagement = () => {
     moderator: "bg-amber-50 text-amber-600 border-amber-100",
   };
 
-  const filteredAdmins = admins.filter(a => 
+  const filteredAdmins = Array.isArray(admins) ? admins.filter(a => 
     a.fullName.toLowerCase().includes(searchTerm.toLowerCase()) || 
     a.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ) : [];
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] p-8">
