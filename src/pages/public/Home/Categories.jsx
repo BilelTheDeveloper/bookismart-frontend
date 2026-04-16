@@ -4,14 +4,14 @@ import { Eye } from "lucide-react"; // Added for a professional icon look
 const categories = [
   { id: 1, title: "SmartStyle", sub: "Beauty & Barbers", icon: "✂️", color: "bg-rose-500", details: ["Hair Salons", "Barbershops", "Nail Salons", "Spas", "Makeup Artists"] },
   { id: 2, title: "SmartDoc", sub: "Health & Medical", icon: "🏥", color: "bg-blue-500", details: ["Dentists", "General Doctors", "Opticians", "Physiotherapists", "Psychologists"] },
+  { id: 8, title: "SmartPro", sub: "Consultants", icon: "⚖️", color: "bg-amber-600", details: ["Lawyers", "Accountants", "Real Estate Agents", "Business Consultants"] },
+  { id: 5, title: "SmartAuto", sub: "Car Services", icon: "🚗", color: "bg-slate-700", details: ["Repair Garages", "Car Wash", "Tire Services", "Vehicle Inspection"] },
+  { id: 10, title: "SmartPet", sub: "Grooming & Vets", icon: "🐾", color: "bg-teal-500", details: ["Veterinarians", "Pet Grooming", "Dog Trainers", "Pet Boarding"] },
   { id: 3, title: "SmartFit", sub: "Fitness & Gyms", icon: "🏋️", color: "bg-emerald-500", details: ["Personal Trainers", "Yoga Studios", "Gyms", "Pilates", "Martial Arts"] },
   { id: 4, title: "SmartLens", sub: "Creative & Media", icon: "📸", color: "bg-violet-500", details: ["Photographers", "Videographers", "Recording Studios", "Podcast Hubs"] },
-  { id: 5, title: "SmartAuto", sub: "Car Services", icon: "🚗", color: "bg-slate-700", details: ["Repair Garages", "Car Wash", "Tire Services", "Vehicle Inspection"] },
   { id: 6, title: "SmartHome", sub: "Maintenance", icon: "🏠", color: "bg-orange-500", details: ["Plumbers", "Electricians", "AC Repair", "Cleaning Services", "Pest Control"] },
   { id: 7, title: "SmartEdu", sub: "Coaching & Tutors", icon: "🎓", color: "bg-indigo-600", details: ["Private Tutors", "Language Schools", "Music Teachers", "Driving Schools"] },
-  { id: 8, title: "SmartPro", sub: "Consultants", icon: "⚖️", color: "bg-amber-600", details: ["Lawyers", "Accountants", "Real Estate Agents", "Business Consultants"] },
   { id: 9, title: "SmartEvent", sub: "Events & DJs", icon: "🎉", color: "bg-pink-500", details: ["Event Planners", "Party Venues", "DJs", "Catering Services"] },
-  { id: 10, title: "SmartPet", sub: "Grooming & Vets", icon: "🐾", color: "bg-teal-500", details: ["Veterinarians", "Pet Grooming", "Dog Trainers", "Pet Boarding"] },
 ];
 
 const Categories = () => {
@@ -49,7 +49,7 @@ const Categories = () => {
               <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mt-2">{cat.sub}</p>
 
               {/* ✨ NEW: Click to See Works Overlay */}
-              <div className="mt-6 flex items-center gap-2 px-4 py-2 bg-slate-50 text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-full opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 border border-slate-200">
+              <div className="mt-6 flex items-center gap-2 px-4 py-2 bg-slate-50 text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-full opacity-100 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 border border-slate-200">
                 <Eye size={12} className="text-indigo-600" />
                 See Works
               </div>

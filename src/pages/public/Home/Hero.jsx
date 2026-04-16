@@ -2,12 +2,24 @@ import React from "react";
 
 const Hero = () => {
   return (
-    /* 🎨 Background: Midnight Navy (#0f172a) with adaptive padding for mobile/desktop */
+    /* 🎨 Updated Background: Replaced solid color with image and overlay */
     <section className="relative pt-24 pb-20 md:pt-32 md:pb-24 lg:pt-48 lg:pb-40 overflow-hidden bg-[#0f172a]">
       
-      {/* 🛡️ Soft Top Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_top,_rgba(79,70,229,0.15)_0%,_transparent_55%)] -z-0" />
+      {/* 🖼️ Background Image Layer */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: "url('/hero-bg.jpg')", 
+        }}
+      />
+      
+      {/* 🌑 Dark Overlay to ensure text readability */}
+      <div className="absolute inset-0 z-1 bg-black/50" />
 
+      {/* 🛡️ Soft Top Glow (Moved z-index for layering) */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_top,_rgba(79,70,229,0.15)_0%,_transparent_55%)] z-2" />
+
+      {/* Content Container: z-10 ensures it stays on top of the image and overlay */}
       <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
         
         {/* Responsive Headline: text-4xl for mobile, 7xl for large screens */}
@@ -15,7 +27,7 @@ const Hero = () => {
           Réservez Votre Prochain <br className="hidden sm:block" />
           Rendez-vous en un 
           <span className="inline-block ml-2 md:ml-3 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 [text-shadow:0_0_20px_rgba(34,211,238,0.4)]">
-             Éclair
+              Éclair
           </span>
           <span className="text-white">.</span>
         </h1>
@@ -60,8 +72,8 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* 🌊 Bottom Transition to White Section */}
-      <div className="absolute bottom-0 left-0 w-full h-24 md:h-32 bg-gradient-to-t from-white to-transparent" />
+      {/* 🌊 Bottom Transition to White Section (Moved z-index for layering) */}
+      <div className="absolute bottom-0 left-0 w-full h-24 md:h-32 bg-gradient-to-t from-white to-transparent z-3" />
     </section>
   );
 };
