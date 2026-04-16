@@ -13,7 +13,7 @@ import {
   ChevronDown,
   Loader2
 } from "lucide-react";
-
+const API_URL = "https://bookismart-backend.onrender.com";
 const AccessManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [admins, setAdmins] = useState([]);
@@ -29,7 +29,7 @@ const AccessManagement = () => {
     secretKey: ""
   });
 
-  const API_URL = "http://localhost:5000/api/admin/access";
+  const API_URL = `${API_URL}/api/admin/access`;
   const token = localStorage.getItem("token"); // Assuming your JWT is here
 
   // --- Backend: Fetch Admins ---
