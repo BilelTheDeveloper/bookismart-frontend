@@ -71,12 +71,12 @@ const Categories = () => {
 
       {/* 💎 ULTRA PRO MODAL (Pop-up) */}
       {selectedCat && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-2">
           <div 
             className="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300"
             onClick={() => setSelectedCat(null)}
           />
-          <div className="relative bg-white w-full max-w-md rounded-[3rem] p-8 md:p-12 shadow-2xl animate-in zoom-in-95 duration-300">
+          <div className="relative bg-white w-full max-w-md rounded-[3rem] p-5 md:p-10 shadow-2xl animate-in zoom-in-95 duration-300">
             <button 
               onClick={() => setSelectedCat(null)}
               className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center bg-slate-100 rounded-full font-bold text-slate-500 hover:bg-red-50 hover:text-red-500 transition-colors"
@@ -84,15 +84,15 @@ const Categories = () => {
               ✕
             </button>
             
-            <div className={`w-20 h-20 ${selectedCat.color} rounded-[2rem] flex items-center justify-center text-5xl text-white shadow-2xl mb-8`}>
+            <div className={`w-20 h-20 ${selectedCat.color} rounded-[2rem] flex items-center justify-center text-5xl text-white shadow-2xl mb-1`}>
               {selectedCat.icon}
             </div>
             
             <h2 className="text-3xl font-black text-slate-900">{selectedCat.title}</h2>
-            <p className="text-indigo-600 font-bold uppercase tracking-widest text-sm mt-1">{selectedCat.sub}</p>
+            <p className="text-indigo-600 font-bold uppercase tracking-widest text-sm mt-0.5">{selectedCat.sub}</p>
             
             <div className="mt-8">
-              <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-4">Available Services:</p>
+              <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-2">Available Services:</p>
               <div className="grid grid-cols-1 gap-3">
                 {selectedCat.details.map((item, i) => (
                   <div key={i} className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl font-bold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-default">
@@ -103,7 +103,7 @@ const Categories = () => {
               </div>
             </div>
 
-            <button className="w-full mt-8 py-5 bg-indigo-600 text-white font-black rounded-2xl shadow-xl shadow-indigo-200 hover:bg-indigo-700 transition-all">
+            <button className="w-full mt-2 py-5 bg-indigo-600 text-white font-black rounded-2xl shadow-xl shadow-indigo-200 hover:bg-indigo-700 transition-all">
               EXPLORE {selectedCat.title.toUpperCase()}
             </button>
           </div>
