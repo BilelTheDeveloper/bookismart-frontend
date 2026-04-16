@@ -54,6 +54,11 @@ const Sidebar = () => {
       label: 'Settings', 
       path: '/admin/settings' 
     },
+    { 
+      icon: <Settings size={20} />, 
+      label: 'Access', 
+      path: '/admin/access' 
+    },
   ];
 
   return (
