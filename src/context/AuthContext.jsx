@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import API from '../pages/api/config'; 
 
 const AuthContext = createContext(null);
@@ -8,70 +8,81 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   /**
-   * 🛡️ ADVANCED INITIALIZATION
-   * Every time the app loads or refreshes, we ask the server: "Who is this user?"
-   * The browser automatically sends the HttpOnly 'token' cookie.
+   * 🛡️ SESSION VERIFIER
+   * Wrapped in useCallback so we can call it manually to refresh user data
+   * (e.g., after a profile update or KYC submission).
    */
-  useEffect(() => {
-    const verifySession = async () => {
-      try {
-        // We call the 'me' endpoint to get the user profile via the cookie
-        const res = await API.get("/auth/me", { skipKick: true });
-        
-        if (res.data.success) {
-          setUser(res.data.user);
-        } else {
-          setUser(null);
-        }
-      } catch (err) {
-        console.log("🔒 Session: No valid security cookie found.");
+  const verifySession = useCallback(async () => {
+    try {
+      // { skipKick: true } prevents the Axios interceptor from redirecting 
+      // if the user is just a guest visiting the landing page.
+      const res = await API.get("/auth/me", { skipKick: true });
+      
+      if (res.data.success) {
+        setUser(res.data.user);
+      } else {
         setUser(null);
-      } finally {
-        // ✅ CRITICAL: App is only "ready" after the backend responds
-        setLoading(false);
       }
-    };
-
-    verifySession();
+    } catch (err) {
+      // 401 errors are expected here if the user isn't logged in yet
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    verifySession();
+  }, [verifySession]);
 
   /**
    * 🔐 LOGIN
-   * Saves user profile to RAM (state). Token is already handled by the Set-Cookie header.
+   * Receives the user object from the Login page after a successful POST.
    */
   const login = (userData) => {
     setUser(userData);
-    // 🔥 REMOVED: No more localStorage.setItem("user")
   };
 
   /**
    * 🚪 LOGOUT
-   * Tells the backend to expire the HttpOnly cookie and clears memory.
+   * Destroys the cookie on the server and resets the frontend RAM.
    */
   const logout = async () => {
     try {
-      // Backend should clear the 'token' cookie on its side
+      // Backend must have a route that does: res.clearCookie('token')
       await API.post("/auth/logout");
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
-      // 🧹 Cleanup RAM state
       setUser(null);
-      // 🔥 REMOVED: localStorage.clear() - since it's already empty!
+      // Full refresh to login to ensure all state is wiped clean
       window.location.href = "/login";
     }
   };
 
+  // 👑 Helper: Quick check for Admin privileges
+  const isAdmin = user?.role === 'admin';
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
-      {/* We hide the entire app until the server verifies the session. 
-          This is what prevents the "kick-out" redirect loop. 
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      login, 
+      logout, 
+      isAdmin,
+      refreshUser: verifySession // Allow components to refresh user data
+    }}>
+      {/* THIS IS THE FIX:
+          We do not render the App routes until we know if the user is logged in.
+          This prevents the ProtectedRoute from seeing 'null' and kicking the user.
       */}
       {!loading ? children : (
         <div className="min-h-screen flex items-center justify-center bg-white">
           <div className="flex flex-col items-center gap-4">
              <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-             <p className="text-slate-400 font-bold text-sm animate-pulse tracking-widest uppercase">Securing Session...</p>
+             <p className="text-slate-400 font-bold text-sm animate-pulse tracking-widest uppercase">
+               Securing Session...
+             </p>
           </div>
         </div>
       )}
@@ -79,4 +90,10 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};

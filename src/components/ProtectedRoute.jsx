@@ -1,25 +1,38 @@
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // ✅ Import your Auth Hook
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; 
 
+/**
+ * 🛡️ PROTECTED ADMIN ROUTE
+ * This component guards admin-only pages. 
+ * It relies entirely on the AuthContext (RAM) and the HttpOnly cookie handshake.
+ */
 const ProtectedAdminRoute = ({ children }) => {
-  // ✅ Get the user and loading state from the Context (Memory), NOT LocalStorage
   const { user, loading } = useAuth();
+  const location = useLocation();
 
-  // 1. 🛡️ WAIT for the server. 
-  // If we don't wait, 'user' is null for a split second and you get kicked.
+  // 1. ⏳ THE SYNCHRONIZATION PHASE
+  // We must wait for the AuthContext to finish the '/me' check with the server.
+  // Without this, 'user' is null initially, and the app would 'kick' you incorrectly.
   if (loading) {
-    return null; // Or a loading spinner
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
 
-  // 2. 🛡️ SECURE CHECK
-  // We don't check for 'token' anymore because the token is a hidden cookie.
-  // We only check if the user exists in memory and if they are an admin.
+  // 2. 🔐 THE SECURITY GATE
+  // We strictly check the role from the decoded user object in memory.
   if (!user || user.role !== 'admin') {
-    console.warn("🚫 Access Denied: Not an Admin");
-    return <Navigate to="/" replace />;
+    console.warn(`🚫 [Security Guard]: Unauthorized access attempt to ${location.pathname}`);
+    
+    // We redirect to home and save the 'from' location so we can redirect them back 
+    // after they login with the correct account if needed.
+    return <Navigate to="/" state={{ from: location }} replace />;
   }
 
-  // 3. ✅ SUCCESS
+  // 3. ✅ ACCESS GRANTED
+  // If the user exists and is an admin, render the requested page.
   return children;
 };
 
