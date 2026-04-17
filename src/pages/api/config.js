@@ -8,19 +8,18 @@ const API = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  // ✅ NEW: Most important line for Security.
-  // This tells the browser to send HttpOnly cookies (the token) with every request.
+  // ✅ CRITICAL: This allows the browser to send the HttpOnly 'token' cookie
+  // between your Vercel frontend and Render backend.
   withCredentials: true, 
 });
 
 /**
  * 🛡️ AUTH INTERCEPTOR
- * We no longer need to manually attach the "Bearer token" header 
- * because the browser does it automatically via Cookies.
+ * Clean & simple. The browser handles the cookie handshake automatically.
  */
 API.interceptors.request.use(
   (config) => {
-    // We keep this block clean. No more localStorage.getItem("token")
+    // No more manual token attachment. Pure security.
     return config;
   },
   (error) => {
@@ -30,24 +29,27 @@ API.interceptors.request.use(
 
 /**
  * 🚨 RESPONSE INTERCEPTOR
- * Handles 401 errors (unauthorized) by cleaning up the frontend state.
+ * Handles 401 errors (unauthorized) by kicking the user to login.
  */
 API.interceptors.response.use(
   (response) => response,
   (error) => {
     const skipKick = error.config?.skipKick;
 
+    // If the server says 401 (Unauthorized/Token Expired)
     if (error.response && error.response.status === 401) {
       const isLoginRequest = error.config.url.includes("/login");
 
+      // We don't kick if it's the login request failing or if skipKick is true
       if (!isLoginRequest && !skipKick) {
-        console.warn("🔐 Session expired or unauthorized. Redirecting...");
+        console.warn("🔐 Session invalid. Redirecting to login...");
 
-        // Only redirect if we aren't already on the login page
+        // Only redirect if we aren't already on the login page to avoid loops
         if (window.location.pathname !== "/login") {
-          // ✅ Cleanup: We only remove user data; the cookie is cleared by the backend or expires
-          localStorage.removeItem("user"); // Clear user profile info
-          localStorage.removeItem("admin"); 
+          // 🔥 ZERO LOCALSTORAGE: We clear everything just in case something stayed.
+          localStorage.clear(); 
+          
+          // Force a full refresh to the login page to clear RAM (AuthContext state)
           window.location.href = "/login";
         }
       }
