@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { AlertCircle, Loader2 } from "lucide-react"; 
 import { useAuth } from "../../context/AuthContext.jsx";
 import API from "../api/config.js";
 import Navbar from "../../components/Navbar.jsx";
+
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth(); 
@@ -32,42 +32,39 @@ const Login = () => {
     setError("");
 
     try {
-      // 🔍 Debug: Verify where the request is going
-      console.log("📡 Attempting login to:", API.defaults.baseURL);
+      // 📡 Requesting via the secure API config (withCredentials: true)
+      console.log("📡 Attempting secure login...");
 
       const res = await API.post("/auth/login", {
         email: formData.email,
         password: formData.password
       });
 
-      // 📥 Debug: See the full object returned by your Render backend
+      // 📥 Debug: Token will NOT be in this object anymore (it's in the cookie!)
       console.log("📥 Server Response:", res.data);
 
       if (res.data.success) {
         /**
          * 🛡️ SECURE UPDATE:
-         * We call login() to save the token and keep user in memory.
+         * We pass only the user data to the AuthContext. 
+         * The browser automatically stores the HttpOnly token cookie.
          */
-        login(res.data.user, res.data.token);
+        login(res.data.user); 
 
         const userRole = res.data.user?.role;
         console.log("👤 User Role detected:", userRole);
 
         // 🚀 NAVIGATION LOGIC
         if (userRole === "admin") {
-          console.log("➡️ Navigating to Admin Dashboard...");
-          navigate("/admin/dashboard");
+          navigate("/admin");
         } else if (userRole === "owner") {
-          console.log("➡️ Navigating to Merchant Hub...");
           navigate("/merchant");
         } else {
-          console.log("⚠️ Role not recognized or missing. Navigating to Home.");
           navigate("/");
         }
       }
     } catch (err) {
-      console.error("🔥 Login Error Object:", err);
-      // ⚠️ Handle specific errors like 401 (Wrong Pass) or 403 (Locked)
+      console.error("🔥 Login Error:", err.response?.data?.error || err.message);
       setError(err.response?.data?.error || "Connection failed. Please try again.");
     } finally {
       setLoading(false);
@@ -78,7 +75,7 @@ const Login = () => {
     <div className="min-h-screen bg-white flex flex-col lg:flex-row pt-20 lg:pt-0">
       <Navbar />
       
-      {/* 🌌 LEFT SIDE: The "Control Center" Inspiration */}
+      {/* 🌌 LEFT SIDE */}
       <div className="lg:w-5/12 bg-indigo-600 text-white p-12 lg:p-20 flex flex-col justify-between relative overflow-hidden">
         <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-white opacity-10 rounded-full blur-[80px]" />
         <div className="absolute top-[10%] left-[-5%] w-[300px] h-[300px] bg-cyan-400 opacity-20 rounded-full blur-[100px]" />
@@ -99,7 +96,7 @@ const Login = () => {
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-200">Business Hub.</span>
           </h1>
           <p className="text-indigo-100/80 mt-6 text-lg font-medium leading-relaxed max-w-md">
-            Log in to access your real-time dashboard, manage staff schedules, and track your Flouci earnings.
+            Log in to access your real-time dashboard, manage staff schedules, and track your business performance.
           </p>
 
           <div className="mt-12 space-y-8">
@@ -115,7 +112,7 @@ const Login = () => {
         </div>
 
         <div className="relative z-10 text-indigo-200/50 text-xs font-bold uppercase tracking-widest">
-          Secure Enterprise Login v2.0
+          Secure Cookie Authentication v3.0
         </div>
       </div>
 
@@ -183,7 +180,7 @@ const Login = () => {
                 className="w-5 h-5 rounded-lg border-slate-200 text-indigo-600 focus:ring-indigo-500 transition-all"
               />
               <label htmlFor="rememberMe" className="text-xs font-bold text-slate-500 cursor-pointer select-none">
-                Remember this device for 30 days
+                Remember this device
               </label>
             </div>
 
