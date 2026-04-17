@@ -8,17 +8,19 @@ const API = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  // ✅ NEW: Most important line for Security.
+  // This tells the browser to send HttpOnly cookies (the token) with every request.
+  withCredentials: true, 
 });
 
 /**
  * 🛡️ AUTH INTERCEPTOR
+ * We no longer need to manually attach the "Bearer token" header 
+ * because the browser does it automatically via Cookies.
  */
 API.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    // We keep this block clean. No more localStorage.getItem("token")
     return config;
   },
   (error) => {
@@ -28,24 +30,23 @@ API.interceptors.request.use(
 
 /**
  * 🚨 RESPONSE INTERCEPTOR
- * Includes a 'skipKick' check to prevent unwanted redirects on specific pages.
+ * Handles 401 errors (unauthorized) by cleaning up the frontend state.
  */
 API.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Check if the request configuration explicitly asked to skip the redirect kick
     const skipKick = error.config?.skipKick;
 
     if (error.response && error.response.status === 401) {
-      // 1. Don't kick if it's a login attempt or if skipKick is enabled
       const isLoginRequest = error.config.url.includes("/login");
 
       if (!isLoginRequest && !skipKick) {
         console.warn("🔐 Session expired or unauthorized. Redirecting...");
 
-        // 2. Only clear and redirect if we aren't already on the login page
+        // Only redirect if we aren't already on the login page
         if (window.location.pathname !== "/login") {
-          localStorage.removeItem("token");
+          // ✅ Cleanup: We only remove user data; the cookie is cleared by the backend or expires
+          localStorage.removeItem("user"); // Clear user profile info
           localStorage.removeItem("admin"); 
           window.location.href = "/login";
         }
