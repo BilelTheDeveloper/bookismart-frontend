@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import API from '../api/config'; // ✅ Ensure this points to your new Axios config
+import API from '../pages/api/config'; // ✅ Ensure this points to your new Axios config
 
 const AuthContext = createContext(null);
 
