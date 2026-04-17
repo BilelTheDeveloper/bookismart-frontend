@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import API from "../api/config";
+
 import { Search, MapPin, Loader2, LayoutGrid, Star, ShieldCheck, ArrowUpRight } from "lucide-react";
 
 const ProfessionalsPage = () => {
