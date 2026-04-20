@@ -65,7 +65,7 @@ const Navbar = () => {
           </Link>
           
           <Link 
-            to="/join-as-owner"
+            to="/signup"
             className="flex items-center gap-2 bg-cyan-500 text-slate-900 px-4 py-2.5 rounded-full text-sm font-black hover:bg-cyan-300 hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] active:scale-95 transition-all shadow-lg"
           >
             <UserPlus size={16} />
@@ -111,7 +111,7 @@ const Navbar = () => {
             Login
           </Link>
           <Link 
-            to="/join-as-owner"
+            to="/signup"
             onClick={() => setIsMobileMenuOpen(false)}
             className="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-lg flex items-center justify-center gap-2"
           >
