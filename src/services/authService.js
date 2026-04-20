@@ -29,36 +29,36 @@ export const login = async (credentials) => {
 
 /**
  * 4. Finalizes the 5-step registration process.
- * CRITICAL FIX: Ensure field names match the Joi Validator and Multer Routes.
+ * ADVANCED FIX: Detects if data is already FormData or needs packaging.
  */
 export const registerUser = async (userData) => {
-  const formData = new FormData();
+  let payload;
 
-  // --- TEXT FIELDS (Must match Joi Validator exactly) ---
-  formData.append("fullName", userData.fullName);
-  formData.append("email", userData.email);
-  formData.append("phone", userData.phone);
-  formData.append("password", userData.password);
-  formData.append("businessName", userData.businessName);
-  formData.append("category", userData.category);
-  formData.append("ville", userData.ville);
-
-  // --- FILE FIELDS (Must match upload.fields in authRoutes.js) ---
-  if (userData.idFront) {
-    formData.append("idFront", userData.idFront);
-  }
-  if (userData.idBack) {
-    formData.append("idBack", userData.idBack);
-  }
-  if (userData.livenessVideo) {
-    // Ensuring the blob is correctly named for the server
-    formData.append("livenessVideo", userData.livenessVideo, "liveness.webm");
+  // If Step5Submit already sent a FormData instance, use it directly
+  if (userData instanceof FormData) {
+    payload = userData;
+  } else {
+    // Fallback for standard object data
+    payload = new FormData();
+    Object.keys(userData).forEach((key) => {
+      // Map 'video' from state to 'livenessVideo' for the backend
+      if (key === 'video') {
+        payload.append('livenessVideo', userData[key]);
+      } else {
+        payload.append(key, userData[key]);
+      }
+    });
   }
 
-  // Debugging: View the payload in the console before sending
-  console.log("🚀 Submitting Registration Payload...");
+  console.log("🚀 Submitting Secure Multipart Payload to Cloudinary...");
 
-  return await API.post("/auth/register", formData);
+  // IMPORTANT: We do NOT set 'Content-Type' manually. 
+  // Let the browser set it with the correct boundary.
+  return await API.post("/auth/register", payload, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    }
+  });
 };
 
 /**
