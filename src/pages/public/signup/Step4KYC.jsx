@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { Check, Camera, Upload, RefreshCw, ArrowLeft, ShieldCheck } from "lucide-react";
 
 const Step4KYC = ({ formData, setFormData, onNext, onPrev }) => {
-  const [step, setStep] = useState("docs"); // docs -> camera
+  const [step, setStep] = useState("docs"); 
   const [recording, setRecording] = useState(false);
   const [progress, setProgress] = useState(0);
   const videoRef = useRef(null);
@@ -12,7 +12,6 @@ const Step4KYC = ({ formData, setFormData, onNext, onPrev }) => {
   const handleFile = (e, field) => {
     const file = e.target.files[0];
     if (file) {
-      // Flattened state update: idFront or idBack
       setFormData((prev) => ({ ...prev, [field]: file }));
     }
   };
@@ -31,6 +30,7 @@ const Step4KYC = ({ formData, setFormData, onNext, onPrev }) => {
       }
 
       const chunks = [];
+      // WEBM is standard for browser recording
       const mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm" });
       mediaRecorderRef.current = mediaRecorder;
 
@@ -40,14 +40,22 @@ const Step4KYC = ({ formData, setFormData, onNext, onPrev }) => {
 
       mediaRecorder.onstop = () => {
         const blob = new Blob(chunks, { type: "video/webm" });
-        // Correct field name for authService
-        setFormData((prev) => ({ ...prev, livenessVideo: blob }));
+        
+        // --- CRITICAL FIX ---
+        // We name the file 'liveness.webm' so Multer/Cloudinary recognize it
+        const videoFile = new File([blob], "liveness.webm", { type: "video/webm" });
+        
+        // We save it to BOTH common keys to ensure Step 5 and AuthService find it
+        setFormData((prev) => ({ 
+          ...prev, 
+          livenessVideo: videoFile,
+          video: videoFile 
+        }));
       };
 
       mediaRecorder.start();
       setRecording(true);
 
-      // Automated scanning sequence
       let timer = 0;
       const interval = setInterval(() => {
         timer += 0.1;
@@ -78,7 +86,6 @@ const Step4KYC = ({ formData, setFormData, onNext, onPrev }) => {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-500">
-      {/* --- HEADER --- */}
       <header className="text-left">
         <div className="flex items-center gap-2 mb-2">
           <div className="bg-indigo-100 p-2 rounded-lg">
@@ -93,7 +100,6 @@ const Step4KYC = ({ formData, setFormData, onNext, onPrev }) => {
       {step === "docs" ? (
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* ID FRONT */}
             <label className={`relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-[2.5rem] cursor-pointer transition-all duration-300 group ${
               formData.idFront ? "border-emerald-500 bg-emerald-50/30" : "border-slate-200 bg-white hover:border-indigo-400"
             }`}>
@@ -113,7 +119,6 @@ const Step4KYC = ({ formData, setFormData, onNext, onPrev }) => {
               )}
             </label>
 
-            {/* ID BACK */}
             <label className={`relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-[2.5rem] cursor-pointer transition-all duration-300 group ${
               formData.idBack ? "border-emerald-500 bg-emerald-50/30" : "border-slate-200 bg-white hover:border-indigo-400"
             }`}>
@@ -150,7 +155,6 @@ const Step4KYC = ({ formData, setFormData, onNext, onPrev }) => {
       ) : (
         <div className="space-y-8 text-center animate-in zoom-in-95 duration-500">
           <div className="relative w-72 h-72 mx-auto">
-            {/* The Scanning Circle */}
             <div className="absolute inset-0 bg-slate-900 rounded-full overflow-hidden border-4 border-indigo-600 shadow-[0_0_50px_rgba(79,70,229,0.3)]">
               <video 
                 ref={videoRef} 
@@ -160,7 +164,6 @@ const Step4KYC = ({ formData, setFormData, onNext, onPrev }) => {
                 className="w-full h-full object-cover grayscale contrast-125" 
               />
               
-              {/* Dynamic Instruction Overlay */}
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-indigo-900/10">
                 <div className="absolute top-12 left-0 right-0">
                   <div className="bg-indigo-600 text-white text-[10px] font-black uppercase px-4 py-1.5 rounded-full inline-block tracking-widest shadow-lg animate-bounce">
@@ -172,7 +175,6 @@ const Step4KYC = ({ formData, setFormData, onNext, onPrev }) => {
                 </div>
               </div>
 
-              {/* Progress Ring */}
               <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none">
                 <circle cx="144" cy="144" r="140" fill="none" stroke="white" strokeWidth="8" strokeOpacity="0.1" />
                 <circle 
