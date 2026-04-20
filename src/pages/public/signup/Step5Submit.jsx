@@ -9,7 +9,7 @@ const Step5Submit = ({ formData, onPrev }) => {
 
   /**
    * Final Submission Handler
-   * Triggers the Auth Service and handles the state transition
+   * Packages raw state into Multipart FormData for Multer/Cloudinary
    */
   const handleFinalSubmit = async () => {
     if (!accepted || isSubmitting) return;
@@ -18,8 +18,26 @@ const Step5Submit = ({ formData, onPrev }) => {
     setError(null);
 
     try {
-      // Logic: Calls the synchronized service which handles the FormData
-      await registerUser(formData);
+      // 1. Create a real FormData instance (Mechanical Necessity)
+      const data = new FormData();
+
+      // 2. Append Text Fields
+      data.append('fullName', formData.fullName);
+      data.append('email', formData.email);
+      data.append('phone', formData.phone);
+      data.append('password', formData.password);
+      data.append('businessName', formData.businessName);
+      data.append('category', formData.category);
+      data.append('ville', formData.ville);
+
+      // 3. Append Files (The keys MUST match your Auth Routes/Cloudinary config)
+      if (formData.idFront) data.append('idFront', formData.idFront);
+      if (formData.idBack) data.append('idBack', formData.idBack);
+      if (formData.video) data.append('livenessVideo', formData.video); // Syncing key to 'livenessVideo'
+      if (formData.profilePic) data.append('profilePic', formData.profilePic);
+
+      // 4. Send the packaged data
+      await registerUser(data);
       setIsFinished(true);
     } catch (err) {
       console.error("Submission Error:", err);
@@ -32,7 +50,7 @@ const Step5Submit = ({ formData, onPrev }) => {
     }
   };
 
-  // --- SUCCESS STATE UI ---
+  // --- SUCCESS STATE UI (Keep as is, it's perfect) ---
   if (isFinished) {
     return (
       <div className="text-center space-y-8 animate-in zoom-in duration-700">
@@ -84,9 +102,9 @@ const Step5Submit = ({ formData, onPrev }) => {
       {/* --- BUSINESS SUMMARY CARD --- */}
       <div className="bg-slate-50 border border-slate-100 rounded-[2.5rem] p-6 space-y-6 shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl border border-slate-100">
+          <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl border border-slate-100 overflow-hidden">
             {formData.profilePic ? (
-               <img src={URL.createObjectURL(formData.profilePic)} alt="profile" className="w-full h-full object-cover rounded-2xl" />
+               <img src={URL.createObjectURL(formData.profilePic)} alt="profile" className="w-full h-full object-cover" />
             ) : "🏢"}
           </div>
           <div>
@@ -102,14 +120,14 @@ const Step5Submit = ({ formData, onPrev }) => {
           </div>
           <div className="bg-white p-3 rounded-2xl border border-slate-100">
             <p className="text-[9px] font-black text-slate-400 uppercase">Documents</p>
-            <p className="text-xs font-bold text-emerald-600">✓ KYC SECURED</p>
+            <p className="text-xs font-bold text-emerald-600">✓ KYC READY</p>
           </div>
         </div>
       </div>
 
       {/* --- ERROR FEEDBACK --- */}
       {error && (
-        <div className="p-4 bg-rose-50 border border-rose-100 text-rose-600 text-xs font-bold rounded-2xl animate-bounce">
+        <div className="p-4 bg-rose-50 border border-rose-100 text-rose-600 text-xs font-bold rounded-2xl animate-shake">
           ⚠️ {error}
         </div>
       )}
@@ -123,7 +141,7 @@ const Step5Submit = ({ formData, onPrev }) => {
               className="peer w-6 h-6 rounded-lg border-slate-300 text-indigo-600 focus:ring-indigo-500 transition-all cursor-pointer appearance-none border-2 checked:bg-indigo-600 checked:border-indigo-600"
               onChange={(e) => setAccepted(e.target.checked)}
             />
-            <span className="absolute inset-0 flex items-center justify-center text-white opacity-0 peer-checked:opacity-100 pointer-events-none">✓</span>
+            <span className="absolute inset-0 flex items-center justify-center text-white opacity-0 peer-checked:opacity-100 pointer-events-none text-xs">✓</span>
           </div>
           <span className="text-sm text-slate-500 leading-relaxed group-hover:text-slate-800 transition-colors font-medium">
             I certify that the provided identification is authentic. I agree to the <span className="text-indigo-600 font-bold underline">Terms of Professional Service</span> and consent to identity processing.
@@ -152,7 +170,7 @@ const Step5Submit = ({ formData, onPrev }) => {
           {isSubmitting ? (
             <>
               <div className="w-5 h-5 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
-              <span>VERIFYING...</span>
+              <span>UPLOADING DOSSIER...</span>
             </>
           ) : (
             "SIGN UP & SUBMIT"
