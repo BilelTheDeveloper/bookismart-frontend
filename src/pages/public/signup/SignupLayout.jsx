@@ -8,6 +8,7 @@ import Step5Submit from "./Step5Submit";
 const SignupLayout = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
+    // --- Step 1 & 3 Data ---
     fullName: "",
     email: "",
     phone: "",
@@ -15,7 +16,12 @@ const SignupLayout = () => {
     category: "",
     ville: "",
     password: "",
-    kycFiles: null,
+    
+    // --- Step 4 KYC Files (Flattened for Auth Service Sync) ---
+    // These must be null initially so we can check if they exist before appending
+    idFront: null,
+    idBack: null,
+    livenessVideo: null,
   });
 
   // Navigation Logic
@@ -24,7 +30,7 @@ const SignupLayout = () => {
 
   return (
     <div className="flex min-h-screen bg-white">
-      {/* --- LEFT SIDE: THE BRANDING (Rule 1: Visual Identity) --- */}
+      {/* --- LEFT SIDE: THE BRANDING --- */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-indigo-900 items-center justify-center p-12">
         {/* Background Image with Overlay */}
         <div 
@@ -56,7 +62,7 @@ const SignupLayout = () => {
         </div>
       </div>
 
-      {/* --- RIGHT SIDE: THE ACTION ZONE (Rule 3: Decoupled Steps) --- */}
+      {/* --- RIGHT SIDE: THE ACTION ZONE --- */}
       <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 md:p-16 lg:p-24 bg-slate-50">
         <div className="w-full max-w-md">
           {/* Progress Indicator */}

@@ -1,29 +1,34 @@
 import React, { useState, useRef } from "react";
+import { Check, Camera, Upload, RefreshCw, ArrowLeft, ShieldCheck } from "lucide-react";
 
 const Step4KYC = ({ formData, setFormData, onNext, onPrev }) => {
   const [step, setStep] = useState("docs"); // docs -> camera
-  const [cameraActive, setCameraActive] = useState(false);
   const [recording, setRecording] = useState(false);
   const [progress, setProgress] = useState(0);
   const videoRef = useRef(null);
   const mediaRecorderRef = useRef(null);
-  
-  // 1. Handle ID File Uploads (Updated to match field names)
-  const handleFile = (e, side) => {
+
+  // 1. Handle ID File Uploads
+  const handleFile = (e, field) => {
     const file = e.target.files[0];
     if (file) {
-      // Syncing with backend: idFront and idBack
-      setFormData({ ...formData, [`id${side}`]: file });
+      // Flattened state update: idFront or idBack
+      setFormData((prev) => ({ ...prev, [field]: file }));
     }
   };
 
-  // 2. Camera Logic: 3 Positions + 5s Video
+  // 2. Camera Logic
   const startLivenessCheck = async () => {
     try {
       setStep("camera");
-      setCameraActive(true);
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      videoRef.current.srcObject = stream;
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: "user", width: { ideal: 720 }, height: { ideal: 720 } }, 
+        audio: false 
+      });
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
 
       const chunks = [];
       const mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm" });
@@ -34,26 +39,29 @@ const Step4KYC = ({ formData, setFormData, onNext, onPrev }) => {
       };
 
       mediaRecorder.onstop = () => {
-        // Convert chunks to a single Blob and save it to formData
         const blob = new Blob(chunks, { type: "video/webm" });
+        // Correct field name for authService
         setFormData((prev) => ({ ...prev, livenessVideo: blob }));
       };
 
       mediaRecorder.start();
       setRecording(true);
 
-      // Auto-stop after 5 seconds
+      // Automated scanning sequence
       let timer = 0;
       const interval = setInterval(() => {
-        timer += 1;
-        setProgress((timer / 5) * 100);
+        timer += 0.1;
+        const currentProgress = (timer / 5) * 100;
+        setProgress(currentProgress);
+
         if (timer >= 5) {
           clearInterval(interval);
           stopRecording(stream);
         }
-      }, 1000);
+      }, 100);
     } catch (err) {
-      alert("Camera access denied. Please enable camera for identity verification.");
+      console.error("Camera Error:", err);
+      alert("Camera access is required for identity verification.");
       setStep("docs");
     }
   };
@@ -64,75 +72,145 @@ const Step4KYC = ({ formData, setFormData, onNext, onPrev }) => {
     }
     setRecording(false);
     stream.getTracks().forEach((track) => track.stop());
-    setCameraActive(false);
   };
 
+  const isDocsComplete = formData.idFront && formData.idBack;
+
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-      <header>
-        <h2 className="text-3xl font-black text-slate-900">Identity Trust</h2>
-        <p className="text-slate-500 mt-2">Upload your ID and complete a quick live scan.</p>
+    <div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-500">
+      {/* --- HEADER --- */}
+      <header className="text-left">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="bg-indigo-100 p-2 rounded-lg">
+            <ShieldCheck className="w-5 h-5 text-indigo-600" />
+          </div>
+          <span className="text-xs font-black text-indigo-600 uppercase tracking-widest">Security Layer</span>
+        </div>
+        <h2 className="text-3xl font-black text-slate-900 leading-tight">Identity Trust</h2>
+        <p className="text-slate-500 mt-2">Verify your business identity to unlock your dashboard.</p>
       </header>
 
       {step === "docs" ? (
-        <div className="grid grid-cols-1 gap-4">
-          {/* ID Front */}
-          <div className={`p-6 border-2 border-dashed rounded-[2rem] bg-white text-center transition-all ${formData.idFront ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200'}`}>
-            <p className="text-xs font-black text-slate-400 uppercase mb-4">ID Card Front</p>
-            <input type="file" accept="image/*" onChange={(e) => handleFile(e, "Front")} className="text-xs" />
-            {formData.idFront && <p className="text-[10px] text-emerald-600 font-bold mt-2">✓ Selected</p>}
-          </div>
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* ID FRONT */}
+            <label className={`relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-[2.5rem] cursor-pointer transition-all duration-300 group ${
+              formData.idFront ? "border-emerald-500 bg-emerald-50/30" : "border-slate-200 bg-white hover:border-indigo-400"
+            }`}>
+              <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFile(e, "idFront")} />
+              {formData.idFront ? (
+                <div className="text-center animate-in zoom-in duration-300">
+                  <div className="bg-emerald-500 rounded-full p-2 mx-auto mb-3">
+                    <Check className="w-6 h-6 text-white" />
+                  </div>
+                  <p className="text-emerald-700 font-black text-xs uppercase tracking-tighter">ID Front Captured</p>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <Upload className="w-8 h-8 text-slate-300 group-hover:text-indigo-500 mb-3 mx-auto transition-colors" />
+                  <p className="text-slate-400 font-bold text-xs uppercase tracking-tighter">ID Card Front</p>
+                </div>
+              )}
+            </label>
 
-          {/* ID Back */}
-          <div className={`p-6 border-2 border-dashed rounded-[2rem] bg-white text-center transition-all ${formData.idBack ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200'}`}>
-            <p className="text-xs font-black text-slate-400 uppercase mb-4">ID Card Back</p>
-            <input type="file" accept="image/*" onChange={(e) => handleFile(e, "Back")} className="text-xs" />
-            {formData.idBack && <p className="text-[10px] text-emerald-600 font-bold mt-2">✓ Selected</p>}
+            {/* ID BACK */}
+            <label className={`relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-[2.5rem] cursor-pointer transition-all duration-300 group ${
+              formData.idBack ? "border-emerald-500 bg-emerald-50/30" : "border-slate-200 bg-white hover:border-indigo-400"
+            }`}>
+              <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFile(e, "idBack")} />
+              {formData.idBack ? (
+                <div className="text-center animate-in zoom-in duration-300">
+                  <div className="bg-emerald-500 rounded-full p-2 mx-auto mb-3">
+                    <Check className="w-6 h-6 text-white" />
+                  </div>
+                  <p className="text-emerald-700 font-black text-xs uppercase tracking-tighter">ID Back Captured</p>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <Upload className="w-8 h-8 text-slate-300 group-hover:text-indigo-500 mb-3 mx-auto transition-colors" />
+                  <p className="text-slate-400 font-bold text-xs uppercase tracking-tighter">ID Card Back</p>
+                </div>
+              )}
+            </label>
           </div>
 
           <button 
             onClick={startLivenessCheck}
-            disabled={!formData.idFront || !formData.idBack}
-            className="w-full py-5 bg-indigo-600 text-white font-black rounded-2xl disabled:bg-slate-100 disabled:text-slate-400 transition-all shadow-xl shadow-indigo-200 active:scale-95"
+            disabled={!isDocsComplete}
+            className="group w-full py-6 bg-indigo-600 text-white font-black rounded-[2rem] disabled:bg-slate-100 disabled:text-slate-300 transition-all shadow-xl shadow-indigo-200 active:scale-95 flex items-center justify-center gap-3"
           >
-            PROCEED TO LIVE SCAN
+            <Camera className="w-5 h-5" />
+            PROCEED TO BIOMETRIC SCAN
+          </button>
+          
+          <button onClick={onPrev} className="w-full text-slate-400 font-bold text-sm py-2 hover:text-slate-600 transition-colors">
+            Back to Step 3
           </button>
         </div>
       ) : (
-        <div className="space-y-6 text-center">
-          <div className="relative w-full aspect-square max-w-[300px] mx-auto bg-black rounded-full overflow-hidden border-4 border-indigo-600 shadow-2xl">
-            <video ref={videoRef} autoPlay muted playsInline className="w-full h-full object-cover grayscale brightness-110" />
-            
-            {/* 3 Positions UI Overlay */}
-            <div className="absolute inset-0 border-[12px] border-transparent pointer-events-none flex items-center justify-center">
-                {progress < 33 && <p className="absolute top-10 text-white text-[12px] font-black uppercase bg-indigo-600 px-3 py-1 rounded-full">Look Center</p>}
-                {progress >= 33 && progress < 66 && <p className="absolute top-10 text-white text-[12px] font-black uppercase bg-indigo-600 px-3 py-1 rounded-full">Turn Left</p>}
-                {progress >= 66 && progress < 100 && <p className="absolute top-10 text-white text-[12px] font-black uppercase bg-indigo-600 px-3 py-1 rounded-full">Turn Right</p>}
-            </div>
+        <div className="space-y-8 text-center animate-in zoom-in-95 duration-500">
+          <div className="relative w-72 h-72 mx-auto">
+            {/* The Scanning Circle */}
+            <div className="absolute inset-0 bg-slate-900 rounded-full overflow-hidden border-4 border-indigo-600 shadow-[0_0_50px_rgba(79,70,229,0.3)]">
+              <video 
+                ref={videoRef} 
+                autoPlay 
+                muted 
+                playsInline 
+                className="w-full h-full object-cover grayscale contrast-125" 
+              />
+              
+              {/* Dynamic Instruction Overlay */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-indigo-900/10">
+                <div className="absolute top-12 left-0 right-0">
+                  <div className="bg-indigo-600 text-white text-[10px] font-black uppercase px-4 py-1.5 rounded-full inline-block tracking-widest shadow-lg animate-bounce">
+                    {progress < 33 && "Look Straight"}
+                    {progress >= 33 && progress < 66 && "Turn Head Left"}
+                    {progress >= 66 && progress < 100 && "Turn Head Right"}
+                    {progress >= 100 && "Scan Complete"}
+                  </div>
+                </div>
+              </div>
 
-            {/* Progress Bar Circle */}
-            <svg className="absolute inset-0 w-full h-full -rotate-90">
-                <circle cx="150" cy="150" r="145" fill="none" stroke="white" strokeWidth="6" strokeOpacity="0.2" />
-                <circle cx="150" cy="150" r="145" fill="none" stroke="#4f46e5" strokeWidth="6" strokeDasharray="911" strokeDashoffset={911 - (911 * progress) / 100} style={{ transition: 'stroke-dashoffset 1s linear' }} />
-            </svg>
+              {/* Progress Ring */}
+              <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none">
+                <circle cx="144" cy="144" r="140" fill="none" stroke="white" strokeWidth="8" strokeOpacity="0.1" />
+                <circle 
+                  cx="144" cy="144" r="140" fill="none" stroke="#4f46e5" strokeWidth="8" 
+                  strokeDasharray="880" 
+                  strokeDashoffset={880 - (880 * progress) / 100} 
+                  className="transition-all duration-100 ease-linear"
+                />
+              </svg>
+            </div>
           </div>
 
-          {!recording && progress >= 100 ? (
-            <div className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl font-bold border border-emerald-100 scale-in-center">
-                ✓ Liveness Scan Captured
-            </div>
-          ) : (
-            <p className="text-indigo-600 font-black animate-pulse uppercase tracking-widest">Recording Live Scan...</p>
-          )}
-
-          <div className="flex gap-4">
-            <button onClick={() => setStep("docs")} className="flex-1 py-4 bg-slate-200 text-slate-700 font-bold rounded-2xl hover:bg-slate-300">BACK</button>
+          <div className="max-w-xs mx-auto">
+            {progress >= 100 ? (
+              <div className="flex flex-col items-center gap-4">
+                <div className="flex items-center gap-2 bg-emerald-50 text-emerald-600 px-6 py-3 rounded-2xl border border-emerald-100 animate-in slide-in-from-bottom-2">
+                  <Check className="w-5 h-5 font-black" />
+                  <span className="font-black text-xs uppercase">Biometrics Verified</span>
+                </div>
+                <button 
+                  onClick={onNext}
+                  className="w-full py-5 bg-slate-900 text-white font-black rounded-2xl shadow-2xl hover:bg-black transition-all active:scale-95 uppercase tracking-widest text-sm"
+                >
+                  Finalize Application
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-indigo-600 font-black text-xs uppercase tracking-[0.2em] animate-pulse">Analyzing Motion...</p>
+                <p className="text-slate-400 text-[10px] uppercase font-bold">Keep your face within the frame</p>
+              </div>
+            )}
+            
             <button 
-                onClick={onNext} 
-                disabled={progress < 100 || !formData.livenessVideo}
-                className="flex-[2] py-4 bg-slate-900 text-white font-black rounded-2xl disabled:bg-slate-100 disabled:text-slate-400 shadow-lg"
+              onClick={() => { setStep("docs"); setProgress(0); }} 
+              className="mt-6 flex items-center justify-center gap-2 mx-auto text-slate-400 hover:text-slate-600 font-bold text-xs uppercase"
             >
-                FINISH KYC
+              <RefreshCw className="w-3 h-3" /> Retry Scan
             </button>
           </div>
         </div>

@@ -20,7 +20,6 @@ export const verifyOTP = async (type, target, code) => {
 export const login = async (credentials) => {
   const response = await API.post("/auth/login", credentials);
   
-  // Save the Access Token for the Axios Interceptor to use
   if (response.data.accessToken) {
     localStorage.setItem("accessToken", response.data.accessToken);
   }
@@ -30,12 +29,12 @@ export const login = async (credentials) => {
 
 /**
  * 4. Finalizes the 5-step registration process.
- * Matches Cloudinary field names: idFront, idBack, livenessVideo
+ * CRITICAL FIX: Ensure field names match the Joi Validator and Multer Routes.
  */
 export const registerUser = async (userData) => {
   const formData = new FormData();
 
-  // Append Text Fields
+  // --- TEXT FIELDS (Must match Joi Validator exactly) ---
   formData.append("fullName", userData.fullName);
   formData.append("email", userData.email);
   formData.append("phone", userData.phone);
@@ -44,37 +43,33 @@ export const registerUser = async (userData) => {
   formData.append("category", userData.category);
   formData.append("ville", userData.ville);
 
-  // Append Profile Picture
-  if (userData.profilePic) {
-    formData.append("profilePic", userData.profilePic);
-  }
-
-  // Append KYC Documents (Field names must match backend)
+  // --- FILE FIELDS (Must match upload.fields in authRoutes.js) ---
   if (userData.idFront) {
     formData.append("idFront", userData.idFront);
   }
   if (userData.idBack) {
     formData.append("idBack", userData.idBack);
   }
-
-  // Append Liveness Video
   if (userData.livenessVideo) {
+    // Ensuring the blob is correctly named for the server
     formData.append("livenessVideo", userData.livenessVideo, "liveness.webm");
   }
 
-  // Note: Axios sets 'Content-Type: multipart/form-data' automatically for FormData
+  // Debugging: View the payload in the console before sending
+  console.log("🚀 Submitting Registration Payload...");
+
   return await API.post("/auth/register", formData);
 };
 
 /**
- * 5. Identity Verification Status (For the Redirect Lock)
+ * 5. Identity Verification Status
  */
 export const checkOnboardingStatus = async () => {
   return await API.get("/auth/onboarding-status");
 };
 
 /**
- * 6. Logout - Wipes the session
+ * 6. Logout
  */
 export const logout = async () => {
   try {
