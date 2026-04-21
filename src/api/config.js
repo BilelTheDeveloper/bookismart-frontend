@@ -1,74 +1,136 @@
 import axios from "axios";
 
+/**
+ * 🔒 ADVANCED API CONFIGURATION
+ * Synchronized with Backend Security Version: 2026.1.3
+ */
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "https://bookismart-backend.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true, // Required for HttpOnly Refresh Tokens
+  withCredentials: true, // 👈 CRITICAL: Allows HttpOnly Refresh Cookies
 });
 
 /**
- * 🛡️ REQUEST INTERCEPTOR
- * Automatically adds the Device Fingerprint to every request.
- * This satisfies the 'x-device-fingerprint' check in your backend.
+ * 🛡️ DEVICE FINGERPRINT ENGINE
+ * Generates a persistent hardware-linked ID to prevent Token Hijacking.
  */
-API.interceptors.request.use((config) => {
-  // We recreate the fingerprint logic on the frontend side 
-  // or use a unique ID stored in localStorage for this device.
+const getBrowserFingerprint = () => {
   let deviceId = localStorage.getItem("device_fingerprint");
   
   if (!deviceId) {
-    deviceId = crypto.randomUUID(); // Generate a unique ID for this browser
+    // Generate a unique high-entropy ID
+    deviceId = `${crypto.randomUUID()}-${Date.now()}`;
     localStorage.setItem("device_fingerprint", deviceId);
   }
+  return deviceId;
+};
 
-  config.headers["x-device-fingerprint"] = deviceId;
+// Queue for handling multiple 401 errors at once
+let isRefreshing = false;
+let failedQueue = [];
 
-  // Add Access Token if it exists in memory
-  const token = localStorage.getItem("accessToken"); 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
 
-  return config;
-});
+/**
+ * 🛡️ REQUEST INTERCEPTOR
+ * Injects Authorization and Security Headers into every outgoing request.
+ */
+API.interceptors.request.use(
+  (config) => {
+    // 1. Inject Fingerprint (Matches backend requirement)
+    config.headers["x-device-fingerprint"] = getBrowserFingerprint();
+
+    // 2. Inject Access Token
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 /**
  * 🛡️ RESPONSE INTERCEPTOR
- * The "Silent Refresh" Engine.
- * If a request fails with 401 (Expired), it tries to get a new token automatically.
+ * The "Silent Refresh" Engine with Collision Protection.
  */
 API.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // If error is 401 and we haven't tried refreshing yet
+    // Detect 401 (Expired) and handle the Silent Refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
+      
+      if (isRefreshing) {
+        // If a refresh is already in progress, wait in the queue
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return API(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
 
       try {
-        // Call the /refresh route we built in the backend
+        // Call the /refresh route (Fingerprint is automatically added by the Request Interceptor above)
         const { data } = await axios.post(
           `${API.defaults.baseURL}/auth/refresh`,
           {},
           { withCredentials: true }
         );
 
-        // Store the new Access Token
-        localStorage.setItem("accessToken", data.accessToken);
+        const newToken = data.accessToken;
+        localStorage.setItem("accessToken", newToken);
 
-        // Retry the original request with the new token
-        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+        // Update global instance headers
+        API.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+        
+        processQueue(null, newToken);
+        isRefreshing = false;
+
+        // Retry the original request
         return API(originalRequest);
+
       } catch (refreshError) {
-        // If refresh fails, the session is truly dead
+        processQueue(refreshError, null);
+        isRefreshing = false;
+
+        // If the refresh token is also expired, wipe the session
         localStorage.removeItem("accessToken");
-        // Optional: window.location.href = "/login";
+        
+        // Only redirect to login if we are not already there
+        if (!window.location.pathname.includes('/login')) {
+            window.location.href = "/login?session=expired";
+        }
+        
         return Promise.reject(refreshError);
       }
     }
+
+    // Handle 403 (Forbidden - AdminGuard rejection)
+    if (error.response?.status === 403) {
+      console.error("⛔ [Security Alert]: Unauthorized Access Blocked.");
+      // You can trigger a notification here or redirect
+    }
+
     return Promise.reject(error);
   }
 );

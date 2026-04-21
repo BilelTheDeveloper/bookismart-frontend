@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 
 // --- Components ---
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import AdminGuard from "./components/AdminGuard"; // 🛡️ The new Guard we created
 
 // --- Public Pages ---
 import HomeLayout from "./pages/public/Home/HomeLayout";
@@ -15,13 +16,14 @@ import ProfessionalsPage from "./pages/public/Professionals";
 import SignupLayout from "./pages/public/signup/SignupLayout";
 import Login from "./pages/public/auth/Login";
 import OnboardingStatus from './pages/public/auth/OnboardingStatus'
-// --- Admin Pages & Layout (Rule 3) ---
+
+// --- Admin Pages & Layout ---
 import AdminLayout from "./pages/admin/AdminLayout";
 import IdentityVerify from "./pages/admin/IdentityVerify";
 
-
-
+// --- Owner Pages ---
 import OwnerDashboard from "./pages/owner/Dashboard";
+
 /**
  * ScrollToTop: Ensures every route change starts at the top of the page.
  */
@@ -35,14 +37,17 @@ function ScrollToTop() {
 
 /**
  * LayoutManager: Automatically hides Navbar/Footer on specific routes.
- * Hidden on: /signup and any route starting with /admin
+ * Updated: Now hides chrome for /signup, /admin, AND /owner dashboards.
  */
 const LayoutManager = ({ children }) => {
   const location = useLocation();
+  
   const isSignupPage = location.pathname === "/signup";
   const isAdminPage = location.pathname.startsWith("/admin");
+  const isOwnerPage = location.pathname.startsWith("/owner");
   
-  const hideChrome = isSignupPage || isAdminPage;
+  // Rule: If it's a dashboard or signup, hide the main site navigation
+  const hideChrome = isSignupPage || isAdminPage || isOwnerPage;
 
   return (
     <>
@@ -72,14 +77,33 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/onboarding-status" element={<OnboardingStatus />} />
           
-          {/* --- 3. Admin Dashboard & KYC Review (Nested) --- */}
-          <Route path="/admin" element={<AdminLayout />}>
+          {/* --- 3. Admin Dashboard (Fortified with AdminGuard) --- */}
+          <Route 
+            path="/admin" 
+            element={
+              <AdminGuard>
+                <AdminLayout />
+              </AdminGuard>
+            }
+          >
             {/* These routes render inside AdminLayout's <Outlet /> */}
             <Route path="verify-identity" element={<IdentityVerify />} />
-            <Route path="dashboard" element={<div className="font-bold">Admin Statistics Coming Soon</div>} />
+            <Route path="dashboard" element={<div className="p-6 font-bold">Admin Statistics Coming Soon</div>} />
           </Route>
-          {/* --- 4. Owner Dashboard (Nested) --- */}
-          <Route path="/owner/dashboard" element={<OwnerDashboard />} />
+
+          {/* --- 4. Owner Dashboard (Protected Zone) --- */}
+          {/* Note: If you want to block non-owners from here, 
+              you can wrap this in a similar 'OwnerGuard' or reuse AdminGuard 
+              since AdminGuard allows both 'admin' and 'owner'.
+          */}
+          <Route 
+            path="/owner/dashboard" 
+            element={
+              <AdminGuard> 
+                <OwnerDashboard />
+              </AdminGuard>
+            } 
+          />
           
           {/* Fallback Redirect */}
           <Route path="*" element={<HomeLayout />} />
