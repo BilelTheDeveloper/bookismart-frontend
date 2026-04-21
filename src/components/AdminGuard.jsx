@@ -23,7 +23,7 @@ const AdminGuard = ({ children }) => {
    * 3. Role-Based Access Control (RBAC)
    * Matches the authorizedRoles in your backend adminGuard.js
    */
-  const authorizedRoles = ['admin', 'owner'];
+  const authorizedRoles = ['admin'];
   const hasAccess = authorizedRoles.includes(user.role);
 
   if (!hasAccess) {
