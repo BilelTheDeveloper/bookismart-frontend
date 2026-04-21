@@ -30,7 +30,7 @@ const Login = () => {
         } else if (data.user.accountStatus === "review") {
           navigate("/onboarding-status");
         } else {
-          navigate("/dashboard");
+          navigate("/owner/dashboard");
         }
       }, 800);
     } catch (err) {
