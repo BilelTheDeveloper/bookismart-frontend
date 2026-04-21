@@ -13,7 +13,7 @@ import ProfessionalsPage from "./pages/public/Professionals";
 
 // --- New Onboarding & Auth Pages ---
 import SignupLayout from "./pages/public/signup/SignupLayout";
-
+import Login from "./pages/public/auth/Login";
 // --- Admin Pages & Layout (Rule 3) ---
 import AdminLayout from "./pages/admin/AdminLayout";
 import IdentityVerify from "./pages/admin/IdentityVerify";
@@ -65,7 +65,8 @@ function App() {
 
           {/* --- 2. Advanced Onboarding (5 Steps) --- */}
           <Route path="/signup" element={<SignupLayout />} />
-
+          <Route path="/login" element={<Login />} />
+          
           {/* --- 3. Admin Dashboard & KYC Review (Nested) --- */}
           <Route path="/admin" element={<AdminLayout />}>
             {/* These routes render inside AdminLayout's <Outlet /> */}
