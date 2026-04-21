@@ -18,6 +18,9 @@ import Login from "./pages/public/auth/Login";
 import AdminLayout from "./pages/admin/AdminLayout";
 import IdentityVerify from "./pages/admin/IdentityVerify";
 
+
+
+import OwnerDashboard from "./pages/owner/Dashboard";
 /**
  * ScrollToTop: Ensures every route change starts at the top of the page.
  */
@@ -73,6 +76,8 @@ function App() {
             <Route path="verify-identity" element={<IdentityVerify />} />
             <Route path="dashboard" element={<div className="font-bold">Admin Statistics Coming Soon</div>} />
           </Route>
+          {/* --- 4. Owner Dashboard (Nested) --- */}
+          <Route path="/owner/dashboard" element={<OwnerDashboard />} />
           
           {/* Fallback Redirect */}
           <Route path="*" element={<HomeLayout />} />
