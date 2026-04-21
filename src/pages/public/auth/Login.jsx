@@ -22,14 +22,36 @@ const Login = () => {
 
     try {
       const data = await login(sanitizedData);
+
+      /**
+       * 🛡️ PERSISTENCE UPDATE
+       * We must save the data to localStorage so the AdminGuard and API config 
+       * can see the user and token immediately.
+       */
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
       toast.success(`Access Granted: Welcome back, ${data.user.fullName.split(' ')[0]}`);
 
+      // Wait for toast and state synchronization
       setTimeout(() => {
-        if (data.user.role === "admin") {
-          navigate("/admin/dashboard");
-        } else if (data.user.accountStatus === "review") {
+        // 1. Check for Admin clearance
+        if (data.user.role === "admin" || data.user.role === "owner") {
+          // If role is owner, we check if they are still in boarding or active
+          if (data.user.accountStatus === "on_boarding" || data.user.accountStatus === "review") {
+             navigate("/onboarding-status");
+          } else if (data.user.role === "admin") {
+             navigate("/admin/dashboard");
+          } else {
+             navigate("/owner/dashboard");
+          }
+        } 
+        // 2. Check for Specific Review Statuses
+        else if (data.user.accountStatus === "review" || data.user.accountStatus === "on_boarding") {
           navigate("/onboarding-status");
-        } else {
+        } 
+        // 3. Default Redirect
+        else {
           navigate("/owner/dashboard");
         }
       }, 800);
@@ -148,7 +170,7 @@ const Login = () => {
                   <AnimatePresence mode="wait">
                     {showPassword ? (
                       <motion.div key="hide" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                        <EyeOff className="h-6 w-6" />
+                        <Lock className="h-6 w-6" /> 
                       </motion.div>
                     ) : (
                       <motion.div key="show" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
