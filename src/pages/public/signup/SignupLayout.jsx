@@ -4,7 +4,7 @@ import Step2OTP from "./Step2OTP";
 import Step3Password from "./Step3Password";
 import Step4KYC from "./Step4KYC";
 import Step5Submit from "./Step5Submit";
-
+import Navbar from "../../../components/Navbar"
 const SignupLayout = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -29,7 +29,12 @@ const SignupLayout = () => {
   const prevStep = () => setCurrentStep((prev) => prev - 1);
 
   return (
+    
     <div className="flex min-h-screen bg-white">
+     
+     
+      <Navbar />
+     
       {/* --- LEFT SIDE: THE BRANDING --- */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-indigo-900 items-center justify-center p-12">
         {/* Background Image with Overlay */}

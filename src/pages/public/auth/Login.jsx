@@ -21,25 +21,12 @@ const Login = () => {
     };
 
     try {
-      // 🛡️ AUTHENTICATION VIA COOKIES
-      // The 'login' service call now triggers the Backend to set HttpOnly cookies.
       const data = await login(sanitizedData);
-
-      /**
-       * 🛡️ UI PERSISTENCE
-       * We NO LONGER save 'accessToken' here. It is handled by the browser's 
-       * secure cookie storage. We only save the user profile for UI logic.
-       */
       localStorage.setItem("user", JSON.stringify(data.user));
+      toast.success(`Welcome back, ${data.user.fullName.split(' ')[0]}`);
 
-      toast.success(`Access Granted: Welcome back, ${data.user.fullName.split(' ')[0]}`);
-
-      // Wait for toast and state synchronization
       setTimeout(() => {
-        // 1. Role-Based Navigation Logic
         if (data.user.role === "admin" || data.user.role === "owner") {
-          
-          // Check for account status constraints
           if (data.user.accountStatus === "on_boarding" || data.user.accountStatus === "review") {
              navigate("/onboarding-status");
           } else if (data.user.role === "admin") {
@@ -47,173 +34,139 @@ const Login = () => {
           } else {
              navigate("/owner/dashboard");
           }
-        } 
-        // 2. Specific Review Statuses for standard users
-        else if (data.user.accountStatus === "review" || data.user.accountStatus === "on_boarding") {
-          navigate("/onboarding-status");
-        } 
-        // 3. Default workspace redirect
-        else {
+        } else {
           navigate("/owner/dashboard");
         }
       }, 800);
     } catch (err) {
-      // Logic: If backend rejects due to cookies or credentials, show error
-      toast.error(err.response?.data?.message || "Authentication failed. Access denied.");
+      toast.error(err.response?.data?.message || "Error: Please check your email and password.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-white flex font-sans selection:bg-indigo-100">
-      {/* --- LEFT SIDE: THE AUTHORITY PANEL --- */}
-      <motion.div 
-        initial={{ x: -100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="hidden lg:flex lg:w-1/2 bg-[#0F172A] p-16 flex-col justify-between relative overflow-hidden"
-      >
-        <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-indigo-600/30 blur-[120px] rounded-full animate-pulse" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-emerald-500/10 blur-[100px] rounded-full" />
+    <div className="flex min-h-screen bg-white font-sans">
+      
+      {/* --- LEFT SIDE: BRANDING (Matches Signup) --- */}
+      <div className="hidden lg:flex lg:w-1/2 relative bg-indigo-900 items-center justify-center p-12 overflow-hidden">
+        {/* Background Image with Overlay */}
+        <div 
+          className="absolute inset-0 z-0 opacity-40 bg-cover bg-center"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&q=80')" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-indigo-600/20 to-slate-900/80 z-10" />
 
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-16">
-            <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 p-2.5 rounded-2xl shadow-lg shadow-indigo-500/20">
+        <div className="relative z-20 max-w-lg text-white">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/20">
               <ShieldCheck className="w-8 h-8 text-white" />
             </div>
-            <span className="text-3xl font-black text-white tracking-[-0.05em]">BOOKIIFY</span>
+            <span className="text-2xl font-black tracking-tighter">BOOKIIFY</span>
           </div>
-
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            <h1 className="text-7xl font-black text-white leading-[0.9] mb-8 tracking-tighter">
-              The Vault <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-indigo-600">Protocol.</span>
-            </h1>
-            <p className="text-slate-400 text-xl max-w-md font-medium leading-relaxed border-l-2 border-indigo-500/30 pl-6">
-              Encrypted session management for 2026 booking professionals. Secure, decentralized, and modular.
-            </p>
-          </motion.div>
-        </div>
-
-        <div className="relative z-10">
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-[2rem] flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex -space-x-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="w-12 h-12 rounded-full border-4 border-[#0F172A] bg-slate-800 shadow-xl" />
-                ))}
-              </div>
-              <p className="text-white text-sm font-bold tracking-tight">
-                Join <span className="text-indigo-400">1.2k+</span> Experts
-              </p>
+          
+          <h1 className="text-6xl font-black leading-tight mb-6">
+            Welcome <br />
+            <span className="text-indigo-400">Back.</span>
+          </h1>
+          <p className="text-xl text-slate-200 leading-relaxed font-medium">
+            Log in to manage your bookings and grow your business today.
+          </p>
+          
+          <div className="mt-12 flex gap-8">
+            <div>
+              <p className="text-3xl font-bold">1.2k+</p>
+              <p className="text-slate-400 text-xs uppercase tracking-widest font-bold">Users</p>
             </div>
-            <Sparkles className="text-indigo-400 w-6 h-6 animate-bounce" />
+            <div className="w-px h-12 bg-slate-700" />
+            <div>
+              <p className="text-3xl font-bold">Secure</p>
+              <p className="text-slate-400 text-xs uppercase tracking-widest font-bold">Platform</p>
+            </div>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      {/* --- RIGHT SIDE: THE LOGIN VAULT --- */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-20 bg-slate-50/50 relative">
-        <motion.div 
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-[460px] space-y-10"
-        >
-          <div className="space-y-3">
-            <h2 className="text-5xl font-black text-slate-900 tracking-tight">System Login</h2>
-            <p className="text-slate-500 text-lg font-medium">Verify your identity to access your workspace.</p>
+      {/* --- RIGHT SIDE: LOGIN FORM --- */}
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 md:p-16 lg:p-24 bg-slate-50">
+        <div className="w-full max-w-md">
+          
+          <div className="mb-10 text-left">
+            <h2 className="text-4xl font-black text-slate-900 mb-2">Sign In</h2>
+            <p className="text-slate-500 font-bold">Enter your details below.</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Terminal Identity</label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-slate-300 group-focus-within:text-indigo-600 transition-colors" />
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email Input */}
+            <div className="space-y-2">
+              <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
+              <div className="relative flex items-center bg-white border border-slate-200 rounded-2xl shadow-sm focus-within:border-indigo-600 transition-all">
+                <div className="pl-5 text-slate-300">
+                  <Mail size={18} />
                 </div>
                 <input
                   type="email"
                   required
-                  className="block w-full pl-14 pr-4 py-5 bg-white border-2 border-slate-100 rounded-[1.5rem] text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-indigo-600/5 focus:border-indigo-600 transition-all font-semibold text-lg shadow-sm"
-                  placeholder="name@company.com"
+                  className="w-full py-4 px-4 bg-transparent outline-none text-slate-900 font-bold placeholder:text-slate-300"
+                  placeholder="name@email.com"
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
               </div>
             </div>
 
-            <div className="space-y-3">
-              <div className="flex justify-between items-center ml-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Access Key</label>
-                <Link to="/forgot-password" size="sm" className="text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
-                  Reset Key?
+            {/* Password Input */}
+            <div className="space-y-2">
+              <div className="flex justify-between px-1">
+                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Password</label>
+                <Link to="/forgot-password" size="sm" className="text-xs font-bold text-indigo-600 hover:underline">
+                  Forgot?
                 </Link>
               </div>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-slate-300 group-focus-within:text-indigo-600 transition-colors" />
+              <div className="relative flex items-center bg-white border border-slate-200 rounded-2xl shadow-sm focus-within:border-indigo-600 transition-all">
+                <div className="pl-5 text-slate-300">
+                  <Lock size={18} />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
                   required
-                  className="block w-full pl-14 pr-14 py-5 bg-white border-2 border-slate-100 rounded-[1.5rem] text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-indigo-600/5 focus:border-indigo-600 transition-all font-semibold text-lg shadow-sm"
-                  placeholder="••••••••••••"
+                  className="w-full py-4 px-4 bg-transparent outline-none text-slate-900 font-bold placeholder:text-slate-300"
+                  placeholder="Your password"
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-5 flex items-center text-slate-300 hover:text-slate-600 transition-colors"
+                  className="pr-5 text-slate-300 hover:text-indigo-600 transition-colors"
                 >
-                  <AnimatePresence mode="wait">
-                    {showPassword ? (
-                      <motion.div key="hide" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                        <Lock className="h-6 w-6" /> 
-                      </motion.div>
-                    ) : (
-                      <motion.div key="show" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                        <Eye className="h-6 w-6" />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
 
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            {/* Submit Button */}
+            <button
               type="submit"
               disabled={loading}
-              className="w-full py-6 bg-slate-900 text-white font-black rounded-[1.5rem] shadow-2xl shadow-indigo-200/50 hover:bg-black transition-all flex items-center justify-center gap-4 group disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full py-4 bg-indigo-600 text-white font-black rounded-2xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-70"
             >
               {loading ? (
-                <Loader2 className="w-6 h-6 animate-spin" />
+                <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
-                  <span className="tracking-widest">INITIATE SESSION</span>
-                  <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+                  <span>LOG IN</span>
+                  <ArrowRight size={18} />
                 </>
               )}
-            </motion.button>
+            </button>
           </form>
 
-          <div className="pt-8 text-center flex items-center justify-center gap-2">
-            <div className="h-px w-12 bg-slate-200" />
-            <p className="text-slate-400 font-bold text-sm">
-              No account?{" "}
-              <Link to="/signup" className="text-indigo-600 font-black hover:text-indigo-800 transition-colors">
-                Apply for Credentials
-              </Link>
-            </p>
-            <div className="h-px w-12 bg-slate-200" />
-          </div>
-        </motion.div>
+          <p className="mt-8 text-center text-slate-500 font-bold text-sm">
+            Don't have an account?{" "}
+            <Link to="/signup" className="text-indigo-600 font-black hover:underline">
+              Sign Up Now
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

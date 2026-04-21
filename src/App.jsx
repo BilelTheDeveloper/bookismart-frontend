@@ -73,6 +73,7 @@ function App() {
           {/* --- 2. Advanced Onboarding (5 Steps) --- */}
           <Route path="/signup" element={<SignupLayout />} />
           <Route path="/login" element={<Login />} />
+          
           <Route path="/onboarding-status" element={<OnboardingStatus />} />
           
           {/* --- 3. Admin Dashboard (Strictly ONLY Admin) --- */}

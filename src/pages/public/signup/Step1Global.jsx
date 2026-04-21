@@ -18,12 +18,16 @@ const Step1Global = ({ formData, setFormData, onNext }) => {
   ];
 
   const villes = [
-    "Tunis", "Sousse", "Sfax", "Monastir", "Bizerte", "Ariana", "Ben Arous", "Nabeul"
+    "Ariana", "Beja", "Ben Arous", "Bizerte", "Gabes", "Gafsa", 
+      "Jendouba", "Kairouan", "Kasserine", "Kebili", "Kef", "Mahdia", 
+      "Manouba", "Medenine", "Monastir", "Nabeul", "Sfax", "Sidi Bouzid", 
+      "Siliana", "Sousse", "Tataouine", "Tozeur", "Tunis", "Zaghouan"
     // ... rest of the 24 governorates from your model
   ];
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+      
       <header>
         <h2 className="text-3xl font-black text-slate-900">Tell us about your business</h2>
         <p className="text-slate-500 mt-2">Let's start with the basics to set up your profile.</p>
