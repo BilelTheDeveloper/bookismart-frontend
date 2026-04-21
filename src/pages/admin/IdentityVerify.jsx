@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import API from "../../api/config"; // Using your secured config
+import API from "../../api/config"; // 🛡️ Using the Cookie-Enabled Config
 import { 
   ShieldCheck, 
   Search, 
@@ -14,6 +14,10 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
 
+/**
+ * 🏛️ IDENTITY VERIFICATION HUB
+ * Secured via HttpOnly Cookies + AdminGuard.
+ */
 const IdentityVerify = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [requests, setRequests] = useState([]);
@@ -26,11 +30,14 @@ const IdentityVerify = () => {
   const fetchRequests = async () => {
     try {
       setLoading(true);
-      // Endpoint updated to match the new adminRoutes.js
+      /**
+       * The API instance automatically attaches the HttpOnly cookie.
+       * The backend 'adminGuard' will verify this cookie against the DB.
+       */
       const { data } = await API.get("/admin/verifications/pending");
       setRequests(data.data);
     } catch (err) {
-      toast.error("Security Hub: Failed to fetch dossiers.");
+      toast.error("Security Hub: Session expired or Unauthorized.");
       console.error(err);
     } finally {
       setLoading(false);
@@ -41,7 +48,7 @@ const IdentityVerify = () => {
     fetchRequests();
   }, []);
 
-  // --- 2. ADMIN ACTIONS ---
+  // --- 2. ADMIN ACTIONS (APPROVE/REJECT) ---
   const handleReview = async (userId, action) => {
     if (action === 'reject' && (!rejectionReason || rejectionReason.length < 10)) {
       toast.error("Detailed reason required (min 10 chars).");
@@ -50,6 +57,7 @@ const IdentityVerify = () => {
 
     try {
       setIsProcessing(true);
+      // PATCH request protected by Cookie-based Admin Authentication
       await API.patch(`/admin/verifications/review/${userId}`, {
         action,
         reason: action === 'reject' ? rejectionReason : null
@@ -61,7 +69,7 @@ const IdentityVerify = () => {
       setRejectionReason("");
       toast.success(`Merchant ${action === 'approve' ? 'Authorized' : 'Rejected'} Successfully`);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Action Interrupted");
+      toast.error(err.response?.data?.message || "Action Interrupted by Security Engine");
     } finally {
       setIsProcessing(false);
     }
@@ -70,7 +78,7 @@ const IdentityVerify = () => {
   if (loading) return (
     <div className="flex flex-col h-screen items-center justify-center bg-slate-50">
       <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mb-4" />
-      <p className="text-slate-400 font-black text-xs uppercase tracking-widest">Accessing Secure Vault...</p>
+      <p className="text-slate-400 font-black text-xs uppercase tracking-widest font-sans">Verifying Administrative Clearance...</p>
     </div>
   );
 
@@ -176,7 +184,7 @@ const IdentityVerify = () => {
                 {/* ID Evidence */}
                 <div className="space-y-8">
                   <h4 className="text-[10px] font-black text-indigo-500 uppercase tracking-widest border-l-4 border-indigo-500 pl-4">Evidence 01: Government ID</h4>
-                  <div className="space-y-6">
+                  <div className="grid grid-cols-1 gap-6">
                     <div className="rounded-[2rem] overflow-hidden border-2 border-slate-100 shadow-md group">
                       <img src={selectedUser.kyc?.idFrontUrl} className="w-full grayscale hover:grayscale-0 transition-all duration-700 cursor-zoom-in" alt="Front" />
                     </div>
@@ -191,16 +199,16 @@ const IdentityVerify = () => {
                   <h4 className="text-[10px] font-black text-indigo-500 uppercase tracking-widest border-l-4 border-indigo-500 pl-4">Evidence 02: Liveness Sync</h4>
                   <div className="rounded-[3rem] overflow-hidden bg-black aspect-square md:aspect-video border-[8px] border-slate-50 relative shadow-2xl">
                     <video src={selectedUser.kyc?.livePhotoUrl} controls className="w-full h-full object-cover" />
-                    <div className="absolute top-6 left-6 bg-indigo-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest">ENCRYPTED STREAM</div>
+                    <div className="absolute top-6 left-6 bg-indigo-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest">SECURE STREAM</div>
                   </div>
                   
                   {showRejectInput ? (
                     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
-                      <label className="text-[10px] font-black text-rose-600 uppercase tracking-widest">Rejection Reason (Sent to User)</label>
+                      <label className="text-[10px] font-black text-rose-600 uppercase tracking-widest">Rejection Reason</label>
                       <textarea 
                         value={rejectionReason}
                         onChange={(e) => setRejectionReason(e.target.value)}
-                        placeholder="e.g., ID photo is blurry or expired..."
+                        placeholder="State why this dossier was rejected..."
                         className="w-full p-6 bg-rose-50 border-2 border-rose-100 rounded-3xl focus:outline-none focus:border-rose-400 font-bold text-slate-700"
                         rows="4"
                       />

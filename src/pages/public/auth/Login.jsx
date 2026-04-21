@@ -21,23 +21,25 @@ const Login = () => {
     };
 
     try {
+      // 🛡️ AUTHENTICATION VIA COOKIES
+      // The 'login' service call now triggers the Backend to set HttpOnly cookies.
       const data = await login(sanitizedData);
 
       /**
-       * 🛡️ PERSISTENCE UPDATE
-       * We must save the data to localStorage so the AdminGuard and API config 
-       * can see the user and token immediately.
+       * 🛡️ UI PERSISTENCE
+       * We NO LONGER save 'accessToken' here. It is handled by the browser's 
+       * secure cookie storage. We only save the user profile for UI logic.
        */
-      localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("user", JSON.stringify(data.user));
 
       toast.success(`Access Granted: Welcome back, ${data.user.fullName.split(' ')[0]}`);
 
       // Wait for toast and state synchronization
       setTimeout(() => {
-        // 1. Check for Admin clearance
+        // 1. Role-Based Navigation Logic
         if (data.user.role === "admin" || data.user.role === "owner") {
-          // If role is owner, we check if they are still in boarding or active
+          
+          // Check for account status constraints
           if (data.user.accountStatus === "on_boarding" || data.user.accountStatus === "review") {
              navigate("/onboarding-status");
           } else if (data.user.role === "admin") {
@@ -46,16 +48,17 @@ const Login = () => {
              navigate("/owner/dashboard");
           }
         } 
-        // 2. Check for Specific Review Statuses
+        // 2. Specific Review Statuses for standard users
         else if (data.user.accountStatus === "review" || data.user.accountStatus === "on_boarding") {
           navigate("/onboarding-status");
         } 
-        // 3. Default Redirect
+        // 3. Default workspace redirect
         else {
           navigate("/owner/dashboard");
         }
       }, 800);
     } catch (err) {
+      // Logic: If backend rejects due to cookies or credentials, show error
       toast.error(err.response?.data?.message || "Authentication failed. Access denied.");
     } finally {
       setLoading(false);
@@ -79,7 +82,7 @@ const Login = () => {
             <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 p-2.5 rounded-2xl shadow-lg shadow-indigo-500/20">
               <ShieldCheck className="w-8 h-8 text-white" />
             </div>
-            <span className="text-3xl font-black text-white tracking-[ -0.05em]">BOOKIIFY</span>
+            <span className="text-3xl font-black text-white tracking-[-0.05em]">BOOKIIFY</span>
           </div>
 
           <motion.div

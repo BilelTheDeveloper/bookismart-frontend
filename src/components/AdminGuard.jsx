@@ -2,46 +2,51 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
 /**
- * 🛡️ ADVANCED ROLE-BASED ACCESS CONTROL (RBAC) GUARD
- * * This guard handles multi-neighborhood security. It verifies:
- * 1. Session Integrity (Token + User object existence)
- * 2. Role Authorization (Checks user role against specific route permissions)
+ * 🛡️ ADVANCED ROLE-BASED ACCESS CONTROL (RBAC) GUARD (Cookie-Protocol Edition)
+ * Purpose: Protects sensitive routes by verifying session data and roles.
+ * Logic: Relies on the HttpOnly cookie (handled by the browser) and the user profile.
  */
 const AdminGuard = ({ children, allowedRoles = [] }) => {
   const location = useLocation();
   
-  // 1. Retrieve the session from the browser's encrypted-at-rest storage (localStorage)
+  /**
+   * 1. Retrieve the session profile.
+   * Since 'accessToken' is now an HttpOnly cookie, it is NO LONGER in localStorage.
+   * The existence of the 'user' object indicates an active UI session.
+   */
   const user = JSON.parse(localStorage.getItem('user')); 
-  const token = localStorage.getItem('accessToken');
 
   /**
-   * 🚩 SECURITY GATE 1: AUTHENTICATION CHECK
-   * If the user isn't logged in, we send them to login.
-   * We save the 'location' in state so after they login, they return exactly here.
+   * 🚩 SECURITY GATE 1: SESSION CHECK
+   * If the user profile is missing, the UI session is dead.
+   * We redirect to login and save the 'from' location to return after re-auth.
    */
-  if (!token || !user) {
+  if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   /**
-   * 🚩 SECURITY GATE 2: AUTHORIZATION CHECK (RBAC)
-   * We check if the user's role is permitted for this specific zone.
-   * Example: If guarding /admin, allowedRoles is ["admin"]
-   * Example: If guarding /owner, allowedRoles is ["owner"]
+   * 🚩 SECURITY GATE 2: ROLE AUTHORIZATION (RBAC)
+   * We verify if the user's role matches the requirements for this route.
+   * Logic: 'admin' and 'owner' are handled separately.
    */
   const hasAccess = allowedRoles.includes(user.role);
 
   if (!hasAccess) {
-    console.error(`⛔ [Security Violation]: ${user.role} attempted to access unauthorized path: ${location.pathname}`);
+    console.error(`⛔ [Security Violation]: ${user.role} attempted unauthorized access to: ${location.pathname}`);
     
-    // Logic: If an owner accidentally hits an admin link, redirect to unauthorized
-    // but keep their session alive so they can still access their own owner dashboard.
+    /**
+     * If they are logged in but just in the wrong neighborhood (e.g., an Owner hitting Admin routes),
+     * we send them to /unauthorized without killing their session.
+     */
     return <Navigate to="/unauthorized" replace />;
   }
 
   /**
-   * ✅ SUCCESS: SESSION VERIFIED & ROLE MATCHED
-   * We render the children (the Dashboard/Layout components).
+   * ✅ SUCCESS: ROLE MATCHED
+   * The guard allows the components to render. 
+   * Note: The actual data fetching inside these components will still be 
+   * verified by the Backend using the HttpOnly cookie.
    */
   return children;
 };
