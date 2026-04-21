@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "r
 // --- Components ---
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import AdminGuard from "./components/AdminGuard"; // 🛡️ The new Guard we created
+import AdminGuard from "./components/AdminGuard"; 
 
 // --- Public Pages ---
 import HomeLayout from "./pages/public/Home/HomeLayout";
@@ -37,7 +37,6 @@ function ScrollToTop() {
 
 /**
  * LayoutManager: Automatically hides Navbar/Footer on specific routes.
- * Updated: Now hides chrome for /signup, /admin, AND /owner dashboards.
  */
 const LayoutManager = ({ children }) => {
   const location = useLocation();
@@ -46,7 +45,6 @@ const LayoutManager = ({ children }) => {
   const isAdminPage = location.pathname.startsWith("/admin");
   const isOwnerPage = location.pathname.startsWith("/owner");
   
-  // Rule: If it's a dashboard or signup, hide the main site navigation
   const hideChrome = isSignupPage || isAdminPage || isOwnerPage;
 
   return (
@@ -77,29 +75,24 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/onboarding-status" element={<OnboardingStatus />} />
           
-          {/* --- 3. Admin Dashboard (Fortified with AdminGuard) --- */}
+          {/* --- 3. Admin Dashboard (Strictly ONLY Admin) --- */}
           <Route 
             path="/admin" 
             element={
-              <AdminGuard>
+              <AdminGuard allowedRoles={["admin"]}>
                 <AdminLayout />
               </AdminGuard>
             }
           >
-            {/* These routes render inside AdminLayout's <Outlet /> */}
             <Route path="verify-identity" element={<IdentityVerify />} />
-            <Route path="dashboard" element={<div className="p-6 font-bold">Admin Statistics Coming Soon</div>} />
+            <Route path="dashboard" element={<div className="p-6 font-bold">Admin Statistics</div>} />
           </Route>
 
-          {/* --- 4. Owner Dashboard (Protected Zone) --- */}
-          {/* Note: If you want to block non-owners from here, 
-              you can wrap this in a similar 'OwnerGuard' or reuse AdminGuard 
-              since AdminGuard allows both 'admin' and 'owner'.
-          */}
+          {/* --- 4. Owner Dashboard (Strictly ONLY Owner) --- */}
           <Route 
             path="/owner/dashboard" 
             element={
-              <AdminGuard> 
+              <AdminGuard allowedRoles={["owner"]}> 
                 <OwnerDashboard />
               </AdminGuard>
             } 
