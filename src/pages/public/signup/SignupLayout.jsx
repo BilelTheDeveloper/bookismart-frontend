@@ -5,6 +5,7 @@ import Step3Password from "./Step3Password";
 import Step4KYC from "./Step4KYC";
 import Step5Submit from "./Step5Submit";
 import Navbar from "../../../components/Navbar"
+import Footer from "../../../components/Footer"
 const SignupLayout = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -30,9 +31,9 @@ const SignupLayout = () => {
 
   return (
     
-    <div className="flex min-h-screen bg-white">
+    <div className="">
      
-     
+     <div className="flex min-h-screen bg-white">
       <Navbar />
      
       {/* --- LEFT SIDE: THE BRANDING --- */}
@@ -106,7 +107,13 @@ const SignupLayout = () => {
           </p>
         </div>
       </div>
+       
     </div>
+    <Footer/>
+    </div>
+
+  
+    
   );
 };
 
