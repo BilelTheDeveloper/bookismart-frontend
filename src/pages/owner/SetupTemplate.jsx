@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 // Import our new Central Registry
-import { getThemeById } from "../../themes/ThemeRegistry";
+import { getThemeById } from "../owner/ThemeRegistry";
 
 const TemplateSetupForm = () => {
   const navigate = useNavigate();
