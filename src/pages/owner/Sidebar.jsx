@@ -14,9 +14,9 @@ const Sidebar = () => {
   const location = useLocation();
 
   const menuItems = [
-    { name: "Overview", icon: <LayoutDashboard size={20} />, path: "/dashboard" },
-    { name: "Appointments", icon: <CalendarCheck size={20} />, path: "/dashboard/bookings" },
-    { name: "Customers", icon: <Users size={20} />, path: "/dashboard/customers" },
+    { name: "Overview", icon: <LayoutDashboard size={20} />, path: "/owner/dashboard" },
+    { name: "Appointments", icon: <CalendarCheck size={20} />, path: "/owner/dashboard/bookings" },
+    { name: "Customers", icon: <Users size={20} />, path: "/owner/dashboard/customers" },
     { name: "Analytics", icon: <BarChart3 size={20} />, path: "/dashboard/stats" },
     { name: "Subscription", icon: <CreditCard size={20} />, path: "/dashboard/billing" },
     { name: "Settings", icon: <Settings size={20} />, path: "/dashboard/settings" },
