@@ -102,7 +102,7 @@ function App() {
             } 
           >
             {/* The index route is what shows at /owner/dashboard */}
-            <Route path="dashboard" element={<div className="p-4 font-bold text-2xl text-slate-800">Owner Overview Content</div>} />
+            <Route path="dashboard" element={<OwnerOverview />} />
             
             {/* Future Owner Routes */}
             <Route path="bookings" element={<div className="p-4 font-bold text-2xl text-slate-800">Manage Appointments</div>} />
