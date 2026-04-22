@@ -1,6 +1,6 @@
 import React from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
-import { useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 
 const feedbacks = [
   {
@@ -12,7 +12,6 @@ const feedbacks = [
     avatar: "👨‍💼",
     rating: 5,
     color: "from-rose-500 to-pink-500",
-    accent: "rose",
   },
   {
     id: 2,
@@ -23,7 +22,6 @@ const feedbacks = [
     avatar: "👩‍🎨",
     rating: 5,
     color: "from-violet-500 to-purple-500",
-    accent: "violet",
   },
   {
     id: 3,
@@ -34,33 +32,16 @@ const feedbacks = [
     avatar: "👨‍⚕️",
     rating: 5,
     color: "from-emerald-500 to-teal-500",
-    accent: "emerald",
   },
 ];
 
-const FloatingOrb = ({ className }) => (
-  <motion.div
-    className={`absolute rounded-full blur-[100px] ${className}`}
-    animate={{
-      x: [0, 60, 0],
-      y: [0, 40, 0],
-      scale: [1, 1.2, 1],
-    }}
-    transition={{
-      duration: 10,
-      repeat: Infinity,
-      ease: "easeInOut",
-    }}
-  />
-);
-
-const TiltCard = ({ children, feedback, onClick }) => {
+const TiltCard = ({ children, onClick }) => {
   const [rotate, setRotate] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
-  const ref = useRef(null);
+  const [cardRef, setCardRef] = useState(null);
 
   const handleMouseMove = (e) => {
-    const card = ref.current;
+    const card = cardRef;
     if (!card) return;
     const rect = card.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
@@ -80,7 +61,7 @@ const TiltCard = ({ children, feedback, onClick }) => {
 
   return (
     <motion.div
-      ref={ref}
+      ref={setCardRef}
       className="relative cursor-pointer"
       onClick={onClick}
       onMouseMove={handleMouseMove}
@@ -98,14 +79,7 @@ const TiltCard = ({ children, feedback, onClick }) => {
         scale: { duration: 0.2 },
       }}
     >
-      <motion.div
-        className="absolute inset-0 rounded-[2.5rem]"
-        style={{
-          background: `linear-gradient(135deg, ${feedback.color.replace('from-', '').replace(' to-', ', ')})`,
-          opacity: isHovered ? 0.08 : 0,
-          filter: "blur(20px)",
-        }}
-      />
+      <motion.div className="absolute inset-0 rounded-[2rem] bg-indigo-500/5 blur-xl" style={{ opacity: isHovered ? 1 : 0 }} />
       {children}
     </motion.div>
   );
@@ -121,14 +95,14 @@ const FeedbackModal = ({ feedback, isOpen, onClose }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50"
+            className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm"
           />
           <motion.div
-            className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
+            className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center"
             style={{ perspective: 2000 }}
           >
             <motion.div
-              className="pointer-events-auto w-full max-w-lg mx-4"
+              className="pointer-events-auto mx-4 w-full max-w-lg"
               initial={{ rotateX: 90, opacity: 0, scale: 0.8, y: 80 }}
               animate={{ rotateX: 0, opacity: 1, scale: 1, y: 0 }}
               exit={{ rotateX: -90, opacity: 0, scale: 0.8, y: -80 }}
@@ -136,7 +110,7 @@ const FeedbackModal = ({ feedback, isOpen, onClose }) => {
               style={{ transformStyle: "preserve-3d" }}
             >
               <motion.div
-                className="bg-white rounded-[2.5rem] overflow-hidden shadow-2xl"
+                className="overflow-hidden rounded-[2rem] bg-white shadow-2xl"
                 whileHover={{ scale: 1.01 }}
               >
                 <div className={`h-2 bg-gradient-to-r ${feedback.color}`} />
@@ -145,7 +119,7 @@ const FeedbackModal = ({ feedback, isOpen, onClose }) => {
                     whileHover={{ scale: 1.1, rotate: 90 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={onClose}
-                    className="absolute top-6 right-6 w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500"
+                    className="absolute right-6 top-6 flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 font-bold text-slate-500"
                   >
                     ✕
                   </motion.button>
@@ -203,23 +177,29 @@ const FeedbackModal = ({ feedback, isOpen, onClose }) => {
 
 const Feedback = () => {
   const [selectedFeedback, setSelectedFeedback] = useState(null);
-  const heroRef = useRef(null);
-  const heroInView = useInView(heroRef, { once: true });
 
   return (
-    <section className="py-24 bg-slate-50 overflow-hidden relative">
+    <section className="relative overflow-hidden bg-slate-50 py-20 md:py-28">
       <div className="absolute inset-0">
-        <FloatingOrb className="top-[-10%] left-[10%] w-[400px] h-[400px] bg-indigo-600/10" />
-        <FloatingOrb className="bottom-[-10%] right-[10%] w-[300px] h-[300px] bg-cyan-500/10" />
-        <FloatingOrb className="top-[30%] left-[-5%] w-[200px] h-[200px] bg-rose-500/10" />
+        <motion.div
+          className="absolute -left-10 top-0 h-64 w-64 rounded-full bg-indigo-500/15 blur-3xl"
+          animate={{ y: [0, 30, 0], x: [0, 25, 0] }}
+          transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute -right-10 bottom-0 h-72 w-72 rounded-full bg-cyan-400/15 blur-3xl"
+          animate={{ y: [0, -28, 0], x: [0, -24, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        />
       </div>
 
-      <div ref={heroRef} className="container mx-auto px-6 relative z-10">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
-          animate={heroInView ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center max-w-2xl mx-auto mb-16"
+          className="mx-auto mb-14 max-w-2xl text-center"
         >
           <span className="text-indigo-600 font-black text-sm uppercase tracking-[0.3em]">
             Community
@@ -235,19 +215,16 @@ const Feedback = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {feedbacks.map((f, i) => {
-            const cardRef = useRef(null);
-            const isInView = useInView(cardRef, { once: true, margin: "-50px" });
-
             return (
-              <TiltCard key={f.id} feedback={f} onClick={() => setSelectedFeedback(f)}>
+              <TiltCard key={f.id} onClick={() => setSelectedFeedback(f)}>
                 <motion.div
-                  ref={cardRef}
                   initial={{ opacity: 0, y: 50, scale: 0.95 }}
-                  animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.1, type: "spring" }}
-                  className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-lg shadow-slate-200/30 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full"
+                  className="flex h-full flex-col justify-between rounded-[2rem] border border-slate-100 bg-white p-7 shadow-lg shadow-slate-200/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                 >
                   <div>
                     <div className="flex gap-1 mb-6">
@@ -272,7 +249,7 @@ const Feedback = () => {
                     className="mt-8 flex items-center gap-4"
                     whileHover={{ x: 4 }}
                   >
-                    <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-2xl shadow-inner">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-2xl shadow-inner">
                       {f.avatar}
                     </div>
                     <div>
@@ -295,7 +272,7 @@ const Feedback = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="mt-16 pt-12 border-t border-slate-200 flex flex-wrap justify-center gap-8 md:gap-20"
+          className="mt-16 flex flex-wrap justify-center gap-8 border-t border-slate-200 pt-12 md:gap-20"
         >
           {["RELIABLE", "SECURE", "SMART", "FAST"].map((word, i) => (
             <motion.span

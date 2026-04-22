@@ -1,79 +1,81 @@
 import React from "react";
+import { motion } from "framer-motion";
 
 const Hero = () => {
   return (
-    /* 🎨 Updated Background: Replaced solid color with image and overlay */
-    <section className="relative pt-24 pb-20 md:pt-32 md:pb-24 lg:pt-48 lg:pb-40 overflow-hidden bg-[#0f172a]">
-      
-      {/* 🖼️ Background Image Layer */}
-      <div 
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: "url('/hero-bg.jpg')", 
-        }}
-      />
-      
-      {/* 🌑 Dark Overlay to ensure text readability */}
-      <div className="absolute inset-0 z-1 bg-black/50" />
-
-      {/* 🛡️ Soft Top Glow (Moved z-index for layering) */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_top,_rgba(79,70,229,0.15)_0%,_transparent_55%)] z-2" />
-
-      {/* Content Container: z-10 ensures it stays on top of the image and overlay */}
-      <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
-        
-        {/* Responsive Headline: text-4xl for mobile, 7xl for large screens */}
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.2] md:leading-[1.1]">
-          Réservez Votre Prochain <br className="hidden sm:block" />
-          Rendez-vous en un 
-          <span className="inline-block ml-2 md:ml-3 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 [text-shadow:0_0_20px_rgba(34,211,238,0.4)]">
-              Éclair
-          </span>
-          <span className="text-white">.</span>
-        </h1>
-        
-        <p className="mt-6 md:mt-8 text-base md:text-xl text-slate-300 max-w-2xl mx-auto font-medium opacity-90 leading-relaxed">
-          Barbiers à Sousse, Dentistes à Tunis. <br className="hidden md:block" />
-          Simple, rapide, et sans compte.
-        </p>
-
-        {/* 🚀 Super Responsive Search Bar */}
-        <div className="mt-10 md:mt-14 max-w-4xl mx-auto">
-          {/* On mobile (flex-col): uses rounded-3xl and gap-1 
-              On desktop (md:flex-row): uses rounded-full and gap-2 
-          */}
-          <div className="bg-white p-2 rounded-[2rem] md:rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col md:flex-row items-center gap-1 md:gap-2 border border-white/10">
-            
-            {/* Input 1: Quel Service */}
-            <div className="flex-[1.2] w-full px-6 md:px-8 py-3 flex flex-col items-start border-b md:border-b-0 md:border-r border-slate-100 text-left">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Quel Service ?</span>
-              <input 
-                type="text" 
-                placeholder="e.g. Coiffeur, Médecin..." 
-                className="w-full bg-transparent outline-none text-slate-900 font-bold placeholder:text-slate-300 text-sm md:text-base"
-              />
-            </div>
-
-            {/* Input 2: Quelle Ville */}
-            <div className="flex-1 w-full px-6 md:px-8 py-3 flex flex-col items-start text-left">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Quelle Ville ?</span>
-              <input 
-                type="text" 
-                placeholder="Sousse, Tunis..." 
-                className="w-full bg-transparent outline-none text-slate-900 font-bold placeholder:text-slate-300 text-sm md:text-base"
-              />
-            </div>
-
-            {/* The Search Button: Full width on mobile, auto width on desktop */}
-            <button className="w-full md:w-auto px-10 md:px-12 py-4 bg-gradient-to-r from-indigo-600 to-cyan-500 text-white font-black rounded-[1.5rem] md:rounded-full hover:scale-[1.02] transition-all shadow-[0_10px_25px_rgba(6,182,212,0.4)] active:scale-95 cursor-pointer text-sm md:text-base">
-              Rechercher
-            </button>
-          </div>
-        </div>
+    <section className="relative overflow-hidden bg-slate-950 pb-20 pt-28 sm:pt-32 md:pb-24 lg:pb-32 lg:pt-40">
+      <div className="absolute inset-0">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-25"
+          style={{ backgroundImage: "url('/hero-bg.jpg')" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-950/75 to-slate-950" />
+        <motion.div
+          className="absolute -left-12 top-16 h-56 w-56 rounded-full bg-indigo-500/20 blur-3xl"
+          animate={{ x: [0, 20, 0], y: [0, 18, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute -right-8 top-36 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl"
+          animate={{ x: [0, -24, 0], y: [0, -18, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        />
       </div>
 
-      {/* 🌊 Bottom Transition to White Section (Moved z-index for layering) */}
-      <div className="absolute bottom-0 left-0 w-full h-24 md:h-32 bg-gradient-to-t from-white to-transparent z-3" />
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.65 }}
+          className="mx-auto max-w-4xl text-center"
+        >
+          <span className="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">
+            Modern Booking Engine
+          </span>
+          <h1 className="mt-6 text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
+            Book appointments faster with a
+            <span className="block bg-gradient-to-r from-cyan-300 to-indigo-300 bg-clip-text text-transparent">
+              premium digital experience.
+            </span>
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-base font-medium leading-relaxed text-slate-300 sm:text-lg md:text-xl">
+            From salons to clinics, Bookiify helps clients book instantly while your team runs on autopilot.
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 28 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.65 }}
+          className="mx-auto mt-10 max-w-5xl"
+        >
+          <div className="rounded-[2rem] border border-white/20 bg-white/95 p-2 shadow-[0_30px_80px_rgba(2,6,23,0.45)] md:rounded-full">
+            <div className="flex flex-col gap-2 md:flex-row md:items-center">
+              <div className="w-full px-5 py-3 text-left md:flex-1 md:border-r md:border-slate-100 md:px-7">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Service</span>
+                <input
+                  type="text"
+                  placeholder="Hair Salon, Dentist, Therapist..."
+                  className="mt-1 w-full bg-transparent text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-400 md:text-base"
+                />
+              </div>
+              <div className="w-full px-5 py-3 text-left md:flex-1 md:px-7">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">City</span>
+                <input
+                  type="text"
+                  placeholder="Tunis, Sousse, Sfax..."
+                  className="mt-1 w-full bg-transparent text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-400 md:text-base"
+                />
+              </div>
+              <button className="mx-1 mb-1 mt-1 rounded-[1.3rem] bg-gradient-to-r from-indigo-600 to-cyan-500 px-8 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-cyan-500/25 transition-all hover:scale-[1.02] active:scale-95 md:mx-0 md:mb-0 md:mt-0 md:rounded-full md:px-10">
+                Search Now
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      <div className="absolute bottom-0 left-0 h-24 w-full bg-gradient-to-t from-white via-white/70 to-transparent" />
     </section>
   );
 };

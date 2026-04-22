@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const services = [
   {
@@ -49,76 +50,104 @@ const services = [
 const ServicesPage = () => {
   return (
     <div className="min-h-screen bg-white">
-      {/* 🚀 Hero Header */}
-      <section className="pt-40 pb-20 bg-slate-950 text-white relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
-            <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-indigo-600 rounded-full blur-[150px]" />
+      <section className="relative overflow-hidden bg-slate-950 pb-20 pt-28 text-white sm:pt-32">
+        <div className="absolute inset-0 pointer-events-none">
+          <motion.div
+            className="absolute -left-20 top-0 h-72 w-72 rounded-full bg-indigo-500/25 blur-3xl"
+            animate={{ x: [0, 24, 0], y: [0, 24, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute -right-16 top-20 h-80 w-80 rounded-full bg-cyan-400/20 blur-3xl"
+            animate={{ x: [0, -20, 0], y: [0, -20, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          />
         </div>
 
-        <div className="container mx-auto px-6 relative z-10 text-center">
-          <span className="text-cyan-400 font-black text-sm uppercase tracking-[0.4em]">Our Capabilities</span>
-          <h1 className="text-5xl md:text-7xl font-black mt-6 tracking-tighter leading-tight">
-            The Full <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Digital Toolkit.</span>
+        <div className="relative z-10 mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+          <span className="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs font-bold uppercase tracking-[0.2em] text-cyan-200">
+            Our capabilities
+          </span>
+          <h1 className="mt-6 text-4xl font-black leading-tight tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
+            The complete
+            <span className="block bg-gradient-to-r from-indigo-300 to-cyan-300 bg-clip-text text-transparent">
+              business engine.
+            </span>
           </h1>
-          <p className="text-slate-400 text-lg md:text-xl mt-8 max-w-3xl mx-auto font-medium">
+          <p className="mx-auto mt-6 max-w-3xl text-base font-medium text-slate-300 sm:text-lg md:text-xl">
             We provide the infrastructure. You provide the expertise. Together, we build the future of service-based business in Tunisia.
           </p>
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              to="/signup"
+              className="w-full rounded-2xl bg-indigo-600 px-8 py-3.5 text-sm font-black text-white transition-all hover:-translate-y-0.5 hover:bg-indigo-500 sm:w-auto"
+            >
+              Start Free Trial
+            </Link>
+            <Link
+              to="/how-it-works"
+              className="w-full rounded-2xl border border-white/25 bg-white/10 px-8 py-3.5 text-sm font-black text-white transition-all hover:bg-white/20 sm:w-auto"
+            >
+              See How It Works
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* 🛠️ Services Grid */}
-      <main className="py-24 container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-20 lg:px-8 lg:py-24">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {services.map((s, i) => (
-            <div 
-              key={i} 
-              className="group relative p-10 rounded-[3rem] bg-white border border-slate-100 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
+            <motion.article
+              key={s.title}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.06 }}
+              className="group relative overflow-hidden rounded-[1.8rem] border border-slate-100 bg-white p-6 shadow-lg shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl sm:p-8"
             >
-              {/* Icon & Title */}
-              <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${s.color} flex items-center justify-center text-3xl text-white mb-8 shadow-lg`}>
+              <div className="absolute inset-x-8 top-0 h-16 rounded-b-3xl bg-gradient-to-b from-slate-50 to-transparent" />
+              <div className={`mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br text-3xl text-white shadow-lg ${s.color}`}>
                 {s.icon}
               </div>
-              <h3 className="text-2xl font-black text-slate-900 mb-4">{s.title}</h3>
-              <p className="text-slate-500 font-medium leading-relaxed mb-8">
+              <h3 className="mb-3 text-xl font-black text-slate-900 sm:text-2xl">{s.title}</h3>
+              <p className="mb-6 text-sm font-medium leading-relaxed text-slate-500 sm:text-base">
                 {s.desc}
               </p>
 
-              {/* Feature List */}
-              <ul className="space-y-3 border-t border-slate-50 pt-8">
-                {s.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-center gap-3 text-sm font-bold text-slate-700">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+              <ul className="space-y-2.5 border-t border-slate-100 pt-6">
+                {s.features.map((feature) => (
+                  <li key={feature} className="flex items-center gap-3 text-sm font-semibold text-slate-700">
+                    <div className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
                     {feature}
                   </li>
                 ))}
               </ul>
 
-              {/* Hover Glow */}
-              <div className="absolute inset-0 rounded-[3rem] border-2 border-transparent group-hover:border-indigo-100 transition-colors pointer-events-none" />
-            </div>
+              <div className="pointer-events-none absolute inset-0 rounded-[1.8rem] border border-transparent transition-colors group-hover:border-indigo-100" />
+            </motion.article>
           ))}
         </div>
       </main>
 
-      {/* 🏁 Bottom Call to Action */}
-      <section className="pb-24 px-6">
-        <div className="max-w-6xl mx-auto bg-indigo-600 rounded-[4rem] p-12 md:p-20 text-center text-white relative overflow-hidden shadow-2xl shadow-indigo-200">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20" />
-          
-          <h2 className="text-3xl md:text-5xl font-black tracking-tight relative z-10">
-            Everything you need for <br /> <span className="italic opacity-80 underline decoration-cyan-400">90 days, for free.</span>
+      <section className="px-4 pb-20 sm:px-6 lg:px-8 lg:pb-24">
+        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-gradient-to-r from-indigo-600 to-violet-600 p-8 text-center text-white shadow-2xl shadow-indigo-200 sm:p-12 lg:p-16">
+          <div className="absolute -right-12 -top-12 h-56 w-56 rounded-full bg-white/15 blur-3xl" />
+
+          <h2 className="relative z-10 text-3xl font-black tracking-tight sm:text-4xl md:text-5xl">
+            Everything you need to scale,
+            <span className="block italic text-cyan-200">90 days free.</span>
           </h2>
-          <p className="text-indigo-100 font-medium mt-8 text-lg max-w-xl mx-auto relative z-10">
+          <p className="relative z-10 mx-auto mt-6 max-w-xl text-base font-medium text-indigo-100 sm:text-lg">
             Take your business to the next level with our ultra-secure ecosystem.
           </p>
-          
-          <div className="mt-12 flex flex-col sm:flex-row justify-center gap-6 relative z-10">
-            <Link to="/pricing" className="px-12 py-5 bg-white text-indigo-600 font-black rounded-2xl shadow-xl hover:bg-slate-50 transition-all active:scale-95">
-              View Pricing
+
+          <div className="relative z-10 mt-10 flex flex-col justify-center gap-4 sm:flex-row">
+            <Link to="/signup" className="rounded-2xl bg-white px-10 py-3.5 text-sm font-black text-indigo-600 transition-all hover:bg-slate-50 active:scale-95">
+              Create Account
             </Link>
-            <button className="px-12 py-5 bg-slate-900 text-white font-black rounded-2xl hover:bg-black transition-all active:scale-95">
-              Contact Sales
-            </button>
+            <Link to="/login" className="rounded-2xl border border-white/30 bg-white/10 px-10 py-3.5 text-sm font-black text-white transition-all hover:bg-white/20 active:scale-95">
+              Sign In
+            </Link>
           </div>
         </div>
       </section>

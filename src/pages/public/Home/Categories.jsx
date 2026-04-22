@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Eye } from "lucide-react"; // Added for a professional icon look
+import { ChevronDown, Sparkles, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const categories = [
   { id: 1, title: "SmartStyle", sub: "Beauty & Barbers", icon: "✂️", color: "bg-rose-500", details: ["Hair Salons", "Barbershops", "Nail Salons", "Spas", "Makeup Artists"] },
@@ -21,94 +22,103 @@ const Categories = () => {
   const visibleCategories = showAll ? categories : categories.slice(0, 5);
 
   return (
-    <section className="relative pb-32 bg-white">
-      <div className="container mx-auto px-5 md:px-6">
-        
-        {/* 🛡️ Header */}
-        <div className="mb-12 md:mb-44 text-center md:text-left">
-          <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter">
-            Book <span className="text-indigo-600">Everything.</span>
+    <section className="relative bg-white pb-24 pt-12 sm:pt-14 md:pb-28">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-10 text-center md:mb-14 md:text-left">
+          <span className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-4 py-1 text-xs font-bold uppercase tracking-[0.18em] text-indigo-700">
+            <Sparkles size={14} />
+            Top categories
+          </span>
+          <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl md:text-5xl">
+            Book <span className="text-indigo-600">everything</span> in one place.
           </h2>
-          <p className="text-slate-500 font-medium mt-4 text-lg max-w-xl">
-            Click on a category to explore specialized services near you.
+          <p className="mt-4 max-w-2xl text-base font-medium text-slate-500 sm:text-lg">
+            Explore curated services with a modern discovery experience built for speed.
           </p>
         </div>
 
-        {/* 🚀 THE SMART GRID */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-8 -mt-5 md:-mt-32 relative z-20 transition-all duration-700">
+        <motion.div
+          layout
+          className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-5"
+        >
           {visibleCategories.map((cat) => (
-            <div
+            <motion.button
+              layout
               key={cat.id}
               onClick={() => setSelectedCat(cat)}
-              className="group bg-white rounded-[2rem] p-6 md:p-10 shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col items-center text-center transition-all duration-300 hover:shadow-2xl active:scale-95 cursor-pointer relative overflow-hidden"
+              whileHover={{ y: -6, rotateX: 3, rotateY: -3 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 280, damping: 20 }}
+              className="group relative overflow-hidden rounded-[1.8rem] border border-slate-100 bg-white p-5 text-center shadow-lg shadow-slate-200/40 transition-all sm:p-7"
+              style={{ transformStyle: "preserve-3d" }}
             >
-              <div className={`w-14 h-14 md:w-20 md:h-20 ${cat.color} rounded-3xl flex items-center justify-center text-white text-3xl md:text-4xl shadow-lg mb-6 group-hover:rotate-6 transition-transform`}>
+              <div className="absolute inset-x-6 top-0 h-20 rounded-b-[2rem] bg-gradient-to-b from-slate-50 to-transparent" />
+              <div className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-3xl text-white shadow-lg sm:mb-6 sm:h-16 sm:w-16 ${cat.color}`}>
                 {cat.icon}
               </div>
-              <h3 className="text-lg md:text-xl font-black text-slate-900 leading-tight">{cat.title}</h3>
-              <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mt-2">{cat.sub}</p>
-
-              {/* ✨ NEW: Click to See Works Overlay */}
-              <div className="mt-6 flex items-center gap-2 px-4 py-2 bg-slate-50 text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-full opacity-100 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 border border-slate-200">
-                <Eye size={12} className="text-indigo-600" />
-                See Works
+              <h3 className="text-base font-black leading-tight text-slate-900 sm:text-lg">{cat.title}</h3>
+              <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 sm:text-xs">{cat.sub}</p>
+              <div className="mt-5 inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-700">
+                Explore
               </div>
-            </div>
+            </motion.button>
           ))}
-        </div>
+        </motion.div>
 
-        {/* ➕ See More Button */}
         <div className="mt-12 flex justify-center">
-          <button 
+          <button
             onClick={() => setShowAll(!showAll)}
-            className="flex items-center gap-2 px-8 py-4 bg-slate-900 text-white font-bold rounded-full hover:bg-indigo-600 transition-all shadow-xl active:scale-95"
+            className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-7 py-3 text-sm font-bold text-white shadow-lg transition-all hover:bg-indigo-600 active:scale-95"
           >
             {showAll ? "Show Less" : "See All Categories"}
-            <span className={`transition-transform duration-300 ${showAll ? "rotate-180" : ""}`}>↓</span>
+            <ChevronDown size={16} className={`transition-transform duration-300 ${showAll ? "rotate-180" : ""}`} />
           </button>
         </div>
       </div>
 
-      {/* 💎 ULTRA PRO MODAL (Pop-up) */}
-      {selectedCat && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-2">
-          <div 
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300"
-            onClick={() => setSelectedCat(null)}
-          />
-          <div className="relative bg-white w-full max-w-md rounded-[3rem] p-5 md:p-10 shadow-2xl animate-in zoom-in-95 duration-300">
-            <button 
+      <AnimatePresence>
+        {selectedCat && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-900/65 backdrop-blur-sm"
               onClick={() => setSelectedCat(null)}
-              className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center bg-slate-100 rounded-full font-bold text-slate-500 hover:bg-red-50 hover:text-red-500 transition-colors"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 24, rotateX: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 24 }}
+              transition={{ type: "spring", stiffness: 230, damping: 24 }}
+              className="relative w-full max-w-lg rounded-[2rem] border border-slate-100 bg-white p-6 shadow-2xl sm:p-8"
+              style={{ transformStyle: "preserve-3d" }}
             >
-              ✕
-            </button>
-            
-            <div className={`w-20 h-20 ${selectedCat.color} rounded-[2rem] flex items-center justify-center text-5xl text-white shadow-2xl mb-1`}>
-              {selectedCat.icon}
-            </div>
-            
-            <h2 className="text-3xl font-black text-slate-900">{selectedCat.title}</h2>
-            <p className="text-indigo-600 font-bold uppercase tracking-widest text-sm mt-0.5">{selectedCat.sub}</p>
-            
-            <div className="mt-8">
-              <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-2">Available Services:</p>
-              <div className="grid grid-cols-1 gap-3">
-                {selectedCat.details.map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl font-bold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-default">
-                    <span className="w-2 h-2 bg-cyan-400 rounded-full" />
+              <button
+                onClick={() => setSelectedCat(null)}
+                className="absolute right-4 top-4 rounded-full bg-slate-100 p-2 text-slate-500 transition-colors hover:bg-red-50 hover:text-red-500"
+                aria-label="Close category details"
+              >
+                <X size={18} />
+              </button>
+
+              <div className={`mb-4 flex h-16 w-16 items-center justify-center rounded-2xl text-4xl text-white shadow-lg ${selectedCat.color}`}>
+                {selectedCat.icon}
+              </div>
+              <h3 className="text-2xl font-black text-slate-900">{selectedCat.title}</h3>
+              <p className="mt-1 text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">{selectedCat.sub}</p>
+
+              <div className="mt-6 space-y-2.5">
+                {selectedCat.details.map((item) => (
+                  <div key={item} className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
                     {item}
                   </div>
                 ))}
               </div>
-            </div>
-
-            <button className="w-full mt-2 py-5 bg-indigo-600 text-white font-black rounded-2xl shadow-xl shadow-indigo-200 hover:bg-indigo-700 transition-all">
-              EXPLORE {selectedCat.title.toUpperCase()}
-            </button>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </section>
   );
 };

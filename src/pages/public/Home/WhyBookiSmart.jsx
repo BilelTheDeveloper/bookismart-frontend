@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 
 const WhyBookiSmart = () => {
   const benefits = {
@@ -15,81 +16,85 @@ const WhyBookiSmart = () => {
   };
 
   return (
-    <section className="py-24 bg-white overflow-hidden">
-      <div className="container mx-auto px-6">
-        
-        {/* 🏆 Section Header */}
-        <div className="max-w-3xl mx-auto text-center mb-20">
-          <h2 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter leading-tight">
+    <section className="overflow-hidden bg-white py-20 md:py-28">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto mb-16 max-w-3xl text-center md:mb-20">
+          <h2 className="text-4xl font-black leading-tight tracking-tight text-slate-900 md:text-6xl">
             Built for <span className="text-indigo-600">Pros</span>,<br /> 
             Loved by <span className="text-cyan-500">Clients.</span>
           </h2>
-          <p className="mt-6 text-slate-500 font-medium text-lg">
+          <p className="mt-6 text-lg font-medium text-slate-500">
             A dual-sided ecosystem designed to remove friction from every appointment.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-stretch">
-          
-          {/* 💼 FOR PROJECT OWNERS */}
-          <div className="relative group p-8 md:p-12 rounded-[3rem] bg-slate-900 text-white overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-500/20">
-            {/* Background Glow */}
-            <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-600/20 rounded-full blur-3xl group-hover:bg-indigo-600/40 transition-all duration-700" />
-            
+        <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2 lg:gap-10">
+          <motion.div
+            initial={{ opacity: 0, x: -24 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55 }}
+            className="group relative overflow-hidden rounded-[2.2rem] bg-slate-900 p-8 text-white shadow-2xl shadow-indigo-900/10 md:p-10"
+          >
+            <div className="absolute -right-14 -top-14 h-48 w-48 rounded-full bg-indigo-500/25 blur-3xl transition-all duration-700 group-hover:scale-110" />
             <div className="relative z-10">
-              <span className="px-4 py-1.5 bg-indigo-500/20 border border-indigo-500/30 rounded-full text-indigo-300 text-xs font-black uppercase tracking-widest">
+              <span className="rounded-full border border-indigo-400/30 bg-indigo-500/20 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-indigo-300">
                 Business Owners
               </span>
-              <h3 className="text-3xl md:text-4xl font-black mt-6 mb-8">Scale your <br/>Professional Shop.</h3>
+              <h3 className="mb-8 mt-6 text-3xl font-black md:text-4xl">Scale your professional shop.</h3>
               
               <div className="space-y-8">
                 {benefits.owners.map((b, i) => (
-                  <div key={i} className="flex gap-5 items-start">
-                    <div className="w-12 h-12 shrink-0 bg-white/10 rounded-2xl flex items-center justify-center text-2xl border border-white/10">
+                  <div key={b.title} className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/10 text-2xl">
                       {b.icon}
                     </div>
                     <div>
                       <h4 className="text-lg font-bold text-white">{b.title}</h4>
-                      <p className="text-slate-400 text-sm mt-1 leading-relaxed">{b.desc}</p>
+                      <p className="mt-1 text-sm leading-relaxed text-slate-400">{b.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* ⚡ FOR CLIENTS */}
-          <div className="relative group p-8 md:p-12 rounded-[3rem] bg-slate-50 border border-slate-200 overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-slate-200">
-             {/* Background Glow */}
-             <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-cyan-400/10 rounded-full blur-3xl group-hover:bg-cyan-400/20 transition-all duration-700" />
-
+          <motion.div
+            initial={{ opacity: 0, x: 24 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55 }}
+            className="group relative overflow-hidden rounded-[2.2rem] border border-slate-200 bg-slate-50 p-8 shadow-xl shadow-slate-200/50 md:p-10"
+          >
+             <div className="absolute -bottom-16 -left-14 h-44 w-44 rounded-full bg-cyan-400/20 blur-3xl transition-all duration-700 group-hover:scale-110" />
             <div className="relative z-10">
-              <span className="px-4 py-1.5 bg-cyan-100 border border-cyan-200 rounded-full text-cyan-600 text-xs font-black uppercase tracking-widest">
+              <span className="rounded-full border border-cyan-200 bg-cyan-100 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-cyan-600">
                 Clients & Users
               </span>
-              <h3 className="text-3xl md:text-4xl font-black text-slate-900 mt-6 mb-8">Booking has <br/>never been faster.</h3>
+              <h3 className="mb-8 mt-6 text-3xl font-black text-slate-900 md:text-4xl">Booking has never been faster.</h3>
               
               <div className="space-y-8">
                 {benefits.clients.map((b, i) => (
-                  <div key={i} className="flex gap-5 items-start">
-                    <div className="w-12 h-12 shrink-0 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-slate-100">
+                  <div key={b.title} className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-slate-100 bg-white text-2xl shadow-sm">
                       {b.icon}
                     </div>
                     <div>
                       <h4 className="text-lg font-bold text-slate-900">{b.title}</h4>
-                      <p className="text-slate-500 text-sm mt-1 leading-relaxed">{b.desc}</p>
+                      <p className="mt-1 text-sm leading-relaxed text-slate-500">{b.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
+          </motion.div>
 
         </div>
 
-        {/* 🚀 Action Link */}
         <div className="mt-16 text-center">
-            <p className="text-slate-400 font-bold text-sm">Join 500+ businesses already using Bookismart in Sousse & Tunis.</p>
+          <p className="text-sm font-bold text-slate-400">
+            Join 500+ businesses already using Bookiify in Sousse and Tunis.
+          </p>
         </div>
       </div>
     </section>
