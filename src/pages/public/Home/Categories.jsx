@@ -14,6 +14,7 @@ const categories = [
   { id: 9, title: "SmartEvent", sub: "Events & DJs", icon: "🎉", color: "bg-pink-500", details: ["Event Planners", "Party Venues", "DJs", "Catering Services"] },
 ];
 
+
 const Categories = () => {
   const [showAll, setShowAll] = useState(false);
   const [selectedCat, setSelectedCat] = useState(null);

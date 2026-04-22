@@ -24,9 +24,14 @@ import IdentityVerify from "./pages/admin/IdentityVerify";
 // --- Owner Pages & Layout ---
 import OwnerDashboardLayout from "./pages/owner/DashboardLayout";
 import OwnerOverview from "./pages/owner/Overview";
+import ThemeGallery from "./pages/owner/ThemeGallery"; // <--- Added the new Gallery
+import Billing from "./pages/owner/Billing";
+import Analytics from "./pages/owner/Analytics";
+import Finance from "./pages/owner/Finance";
+import Appointments from "./pages/owner/Appointments";
+import Customers from "./pages/owner/Customers";
+import Settings from "./pages/owner/Settings";
 
-// Add your specific owner sub-pages here as you create them
-// import OwnerOverview from "./pages/owner/Overview";
 
 /**
  * ScrollToTop: Ensures every route change starts at the top of the page.
@@ -49,7 +54,6 @@ const LayoutManager = ({ children }) => {
   const isAdminPage = location.pathname.startsWith("/admin");
   const isOwnerPage = location.pathname.startsWith("/owner");
   
-  // Chrome (Navbar/Footer) is hidden for Auth, Admin, and Owner Dashboards
   const hideChrome = isSignupPage || isAdminPage || isOwnerPage;
 
   return (
@@ -80,7 +84,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/onboarding-status" element={<OnboardingStatus />} />
           
-          {/* --- 3. Admin Dashboard (Strictly ONLY Admin) --- */}
+          {/* --- 3. Admin Dashboard --- */}
           <Route 
             path="/admin" 
             element={
@@ -93,8 +97,7 @@ function App() {
             <Route path="dashboard" element={<div className="p-6 font-bold">Admin Statistics</div>} />
           </Route>
 
-          {/* --- 4. Owner Dashboard (Strictly ONLY Owner) --- */}
-          {/* Using a nested route so the Sidebar in OwnerDashboardLayout is persistent */}
+          {/* --- 4. Owner Dashboard --- */}
           <Route 
             path="/owner" 
             element={
@@ -103,12 +106,23 @@ function App() {
               </AdminGuard>
             } 
           >
-            {/* The index route is what shows at /owner/dashboard */}
+            {/* Main Overview */}
             <Route path="dashboard" element={<OwnerOverview />} />
             
-            {/* Future Owner Routes */}
-            <Route path="bookings" element={<div className="p-4 font-bold text-2xl text-slate-800">Manage Appointments</div>} />
-            <Route path="settings" element={<div className="p-4 font-bold text-2xl text-slate-800">Owner Settings</div>} />
+            {/* Core Management Routes */}
+            <Route path="/owner/dashboard/bookings" element={<Appointments />} />
+            <Route path="/owner/dashboard/customers" element={<Customers />} />
+            
+            {/* Finance & Billing */}
+            <Route path="/owner/dashboard/finance" element={<Finance />} />
+            <Route path="/owner/dashboard/billing" element={<Billing />} />
+            
+            {/* Website & Themes Section */}
+            <Route path="/owner/dashboard/themes" element={<ThemeGallery />} /> {/* <--- Connected Theme Gallery here */}
+            
+            {/* Settings & Analytics */}
+            <Route path="/owner/dashboard/stats" element={<Analytics />} />
+            <Route path="/owner/dashboard/settings" element={<Settings />} />
           </Route>
           
           {/* Fallback Redirect */}

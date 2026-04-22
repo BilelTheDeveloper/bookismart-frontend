@@ -163,10 +163,10 @@ const DashboardLayout = () => {
           <div className="max-w-7xl mx-auto">
             <div className="mb-6">
               <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-                Owner Command Center
+           
               </h1>
               <p className="text-slate-500 text-sm font-medium">
-                Manage your business profile and real-time operations.
+               
               </p>
             </div>
 
