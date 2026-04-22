@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { Search, Bell, ChevronDown } from "lucide-react";
 
 const DashboardLayout = () => {
-  // Retrieve user data from localStorage (Saved by your Login controller)
+  // 1. Sidebar State: Default to collapsed (icons only) as requested
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
+  // 2. Retrieve user data from localStorage
   const user = JSON.parse(localStorage.getItem("user")) || {
     fullName: "Owner Name",
     role: "owner",
@@ -12,11 +15,17 @@ const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex">
-      {/* 1. Permanent Sidebar */}
-      <Sidebar />
+      {/* --- SIDEBAR COMPONENT --- */}
+      {/* We pass the state and the setter to the Sidebar so the toggle button works */}
+      <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
-      {/* 2. Main Content Area */}
-      <main className="flex-1 ml-64 flex flex-col min-h-screen">
+      {/* --- MAIN CONTENT AREA --- */}
+      {/* Dynamic Margin: ml-20 when collapsed, ml-64 when expanded */}
+      <main 
+        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
+          isCollapsed ? "ml-20" : "ml-64"
+        }`}
+      >
         
         {/* --- HIGH-UI HEADER --- */}
         <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 px-8 flex items-center justify-between">
@@ -64,8 +73,8 @@ const DashboardLayout = () => {
                     className="w-11 h-11 rounded-2xl object-cover ring-2 ring-transparent group-hover:ring-indigo-500 transition-all shadow-sm"
                   />
                 ) : (
-                  <div className="w-11 h-11 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-black shadow-lg shadow-indigo-100">
-                    {user.fullName?.charAt(0).toUpperCase()}
+                  <div className="w-11 h-11 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-black shadow-lg shadow-indigo-100 uppercase">
+                    {user.fullName?.charAt(0)}
                   </div>
                 )}
                 {/* Online Status Dot */}
@@ -80,7 +89,7 @@ const DashboardLayout = () => {
         {/* --- DYNAMIC PAGE CONTENT --- */}
         <div className="p-8 flex-1">
           <div className="max-w-7xl mx-auto">
-            {/* Breadcrumbs / Page Context (Optional) */}
+            {/* Context Header */}
             <div className="mb-6">
               <h1 className="text-2xl font-black text-slate-900 tracking-tight">
                 Owner Command Center
@@ -90,6 +99,7 @@ const DashboardLayout = () => {
               </p>
             </div>
 
+            {/* Page Transitions */}
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
               <Outlet />
             </div>
