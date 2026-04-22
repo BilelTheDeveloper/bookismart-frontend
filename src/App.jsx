@@ -11,6 +11,7 @@ import HomeLayout from "./pages/public/Home/HomeLayout";
 import HowItWorksPage from "./pages/public/HowItWorks";
 import ServicesPage from "./pages/public/Services";
 import ProfessionalsPage from "./pages/public/Professionals";
+import ProfilePreview from "./pages/public/ProfilePreview"; // <--- Added the Preview Engine
 
 // --- New Onboarding & Auth Pages ---
 import SignupLayout from "./pages/public/signup/SignupLayout";
@@ -24,7 +25,8 @@ import IdentityVerify from "./pages/admin/IdentityVerify";
 // --- Owner Pages & Layout ---
 import OwnerDashboardLayout from "./pages/owner/DashboardLayout";
 import OwnerOverview from "./pages/owner/Overview";
-import ThemeGallery from "./pages/owner/ThemeGallery"; // <--- Added the new Gallery
+import ThemeGallery from "./pages/owner/ThemeGallery"; 
+import SetupTemplate from "./pages/owner/SetupTemplate"; 
 import Billing from "./pages/owner/Billing";
 import Analytics from "./pages/owner/Analytics";
 import Finance from "./pages/owner/Finance";
@@ -53,8 +55,9 @@ const LayoutManager = ({ children }) => {
   const isSignupPage = location.pathname === "/signup";
   const isAdminPage = location.pathname.startsWith("/admin");
   const isOwnerPage = location.pathname.startsWith("/owner");
+  const isProfilePreview = location.pathname.startsWith("/p/"); // <--- Added to hide Chrome on previews
   
-  const hideChrome = isSignupPage || isAdminPage || isOwnerPage;
+  const hideChrome = isSignupPage || isAdminPage || isOwnerPage || isProfilePreview;
 
   return (
     <>
@@ -78,13 +81,16 @@ function App() {
           <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/professionals" element={<ProfessionalsPage />} />
+          
+          {/* Universal Profile & Demo Route */}
+          <Route path="/p/:slug" element={<ProfilePreview />} />
 
-          {/* --- 2. Advanced Onboarding (5 Steps) --- */}
+          {/* --- 2. Advanced Onboarding & Auth --- */}
           <Route path="/signup" element={<SignupLayout />} />
           <Route path="/login" element={<Login />} />
           <Route path="/onboarding-status" element={<OnboardingStatus />} />
           
-          {/* --- 3. Admin Dashboard --- */}
+          {/* --- 3. Admin Dashboard (Role Protected) --- */}
           <Route 
             path="/admin" 
             element={
@@ -94,10 +100,10 @@ function App() {
             }
           >
             <Route path="verify-identity" element={<IdentityVerify />} />
-            <Route path="dashboard" element={<div className="p-6 font-bold">Admin Statistics</div>} />
+            <Route path="dashboard" element={<div className="p-6 font-bold text-slate-800">Admin Statistics</div>} />
           </Route>
 
-          {/* --- 4. Owner Dashboard --- */}
+          {/* --- 4. Owner Dashboard (Role Protected) --- */}
           <Route 
             path="/owner" 
             element={
@@ -118,7 +124,8 @@ function App() {
             <Route path="/owner/dashboard/billing" element={<Billing />} />
             
             {/* Website & Themes Section */}
-            <Route path="/owner/dashboard/themes" element={<ThemeGallery />} /> {/* <--- Connected Theme Gallery here */}
+            <Route path="/owner/dashboard/themes" element={<ThemeGallery />} /> 
+            <Route path="/owner/theme/customize-site" element={<SetupTemplate />} />
             
             {/* Settings & Analytics */}
             <Route path="/owner/dashboard/stats" element={<Analytics />} />
