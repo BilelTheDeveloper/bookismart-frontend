@@ -40,6 +40,8 @@ const TemplateSetupForm = () => {
 
   const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [uploadingField, setUploadingField] = useState(null); // Track which image is uploading
+  const [validationErrors, setValidationErrors] = useState([]); // 🛡️ Error Tracking for Viber Effect
   
   const heroFileRef = useRef(null);
   const aboutFileRef = useRef(null);
@@ -92,14 +94,8 @@ const TemplateSetupForm = () => {
   useEffect(() => {
     const fetchMySite = async () => {
       try {
-        /**
-         * 🛡️ 2026 PROTOCOL: HttpOnly Cookie Auth
-         * The 'API' instance automatically carries session cookies.
-         * We call the endpoint defined in our new backend routes.
-         */
         const res = await API.get('/merchant/website/my-site');
         if (res.data) {
-          // Merge fetched data with the current themeId and category from navigation state
           setMerchantData({
             ...res.data,
             templateId: themeId,
@@ -115,8 +111,10 @@ const TemplateSetupForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const keys = name.split('.');
+    // Clear error when user starts typing
+    setValidationErrors(prev => prev.filter(err => err !== name));
     
+    const keys = name.split('.');
     setMerchantData(prev => {
       let newData = { ...prev };
       if (keys.length === 3) {
@@ -142,34 +140,70 @@ const TemplateSetupForm = () => {
     setMerchantData({ ...merchantData, services: newServices });
   };
 
-  const handleFileUpload = (e, targetPath, index = null) => {
+  // ☁️ CLOUDINARY UPLOAD HANDLER
+  const handleFileUpload = async (e, targetPath, index = null) => {
     const file = e.target.files[0];
-    if (file) {
-      const fakeUrl = URL.createObjectURL(file);
+    if (!file) return;
+
+    const fieldId = index !== null ? `${targetPath}.${index}` : targetPath;
+    setUploadingField(fieldId);
+
+    try {
+      // 1. Prepare Multipart Form Data
+      const formData = new FormData();
+      formData.append('image', file);
+
+      // 2. Upload to our new backend endpoint
+      const response = await API.post('/merchant/website/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      const secureUrl = response.data.url;
+
+      // 3. Update State with permanent URL
       if (index !== null) {
         const newImgs = [...merchantData.gallery.images];
-        newImgs[index] = fakeUrl;
+        newImgs[index] = secureUrl;
         setMerchantData({ ...merchantData, gallery: { ...merchantData.gallery, images: newImgs } });
       } else {
         const keys = targetPath.split('.');
         setMerchantData(prev => ({
           ...prev,
-          [keys[0]]: { ...prev[keys[0]], [keys[1]]: fakeUrl }
+          [keys[0]]: { ...prev[keys[0]], [keys[1]]: secureUrl }
         }));
       }
+      // Remove error if image is uploaded
+      setValidationErrors(prev => prev.filter(err => err !== fieldId));
+    } catch (err) {
+      alert("Image upload failed. Please try again.");
+    } finally {
+      setUploadingField(null);
     }
   };
 
-  // 🛡️ SAVE DATA TO BACKEND
+  // 🛡️ ADVANCED VALIDATION & SAVE
   const handleSave = async () => {
+    const errors = [];
+
+    // Basic Requirement Check
+    if (!merchantData.name) errors.push('name');
+    if (!merchantData.slug) errors.push('slug');
+    if (!merchantData.hero.title) errors.push('hero.title');
+    if (!merchantData.hero.backgroundImage) errors.push('hero.backgroundImage');
+    if (merchantData.about.show && !merchantData.about.text) errors.push('about.text');
+    if (!merchantData.contact.phone) errors.push('contact.phone');
+    if (!merchantData.contact.email) errors.push('contact.email');
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return; // Block save
+    }
+
     setIsSaving(true);
     try {
-      /**
-       * 🛡️ 2026 PROTOCOL: Live Deployment Mandate
-       * Sends the full merchantData state to the backend.
-       */
       await API.post('/merchant/website/save', merchantData);
-      alert("Changes saved! Waiting for admin approval.");
+      alert("🚀 Website published! Your changes are live after review.");
     } catch (error) {
       const errorMsg = error.response?.data?.message || "Backend connection error.";
       alert(`Save Failed: ${errorMsg}`);
@@ -183,8 +217,23 @@ const TemplateSetupForm = () => {
     return <SelectedTheme data={merchantData} />;
   };
 
+  // Helper for Error Styling
+  const getErrorStyle = (field) => validationErrors.includes(field) 
+    ? "border-2 border-rose-500 animate-shake ring-4 ring-rose-50" 
+    : "border-none";
+
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
+      {/* Dynamic Viber/Shake Keyframes */}
+      <style>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          75% { transform: translateX(5px); }
+        }
+        .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
+      `}</style>
+
       <nav className="sticky top-0 z-[60] bg-white/80 backdrop-blur-xl border-b border-slate-200 px-8 py-4 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <button onClick={() => navigate(-1)} className="p-3 hover:bg-slate-100 rounded-2xl transition-all">
@@ -220,19 +269,19 @@ const TemplateSetupForm = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
-              <label className="text-[11px] font-black uppercase text-slate-400">Business Name</label>
-              <input name="name" value={merchantData.name} onChange={handleChange} className="w-full p-5 bg-slate-50 rounded-2xl font-bold border-none outline-none" placeholder="Vogue Studio" />
+              <label className="text-[11px] font-black uppercase text-slate-400">Business Name *</label>
+              <input name="name" value={merchantData.name} onChange={handleChange} className={`w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none transition-all ${getErrorStyle('name')}`} placeholder="Vogue Studio" />
             </div>
             <div className="space-y-2">
-              <label className="text-[11px] font-black uppercase text-slate-400">Website URL (Slug)</label>
+              <label className="text-[11px] font-black uppercase text-slate-400">Website URL (Slug) *</label>
               <div className="relative">
-                <input name="slug" value={merchantData.slug} onChange={handleChange} className="w-full p-5 bg-slate-50 rounded-2xl font-bold pl-12 border-none outline-none" placeholder="vogue-studio" />
+                <input name="slug" value={merchantData.slug} onChange={handleChange} className={`w-full p-5 bg-slate-50 rounded-2xl font-bold pl-12 outline-none transition-all ${getErrorStyle('slug')}`} placeholder="vogue-studio" />
                 <Globe size={16} className="absolute left-5 top-5 text-slate-400" />
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[11px] font-black uppercase text-slate-400">Hero Title</label>
-              <input name="hero.title" value={merchantData.hero.title} onChange={handleChange} className="w-full p-5 bg-slate-50 rounded-2xl font-bold border-none outline-none" placeholder="Title" />
+              <label className="text-[11px] font-black uppercase text-slate-400">Hero Title *</label>
+              <input name="hero.title" value={merchantData.hero.title} onChange={handleChange} className={`w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none transition-all ${getErrorStyle('hero.title')}`} placeholder="Title" />
             </div>
             <div className="space-y-2">
               <label className="text-[11px] font-black uppercase text-slate-400">Hero Slogan</label>
@@ -241,10 +290,12 @@ const TemplateSetupForm = () => {
           </div>
           
           <div className="space-y-2">
-            <label className="text-[11px] font-black uppercase text-slate-400">Hero Background</label>
-            <div className="flex gap-4">
-              <input name="hero.backgroundImage" value={merchantData.hero.backgroundImage} onChange={handleChange} className="flex-grow p-5 bg-slate-50 rounded-2xl text-xs border-none outline-none" placeholder="Paste Image URL or Upload..." />
-              <button onClick={() => heroFileRef.current.click()} className="bg-slate-900 text-white px-6 rounded-2xl hover:bg-indigo-600 transition-all"><Upload size={18}/></button>
+            <label className="text-[11px] font-black uppercase text-slate-400">Hero Background *</label>
+            <div className={`flex gap-4 p-2 bg-slate-50 rounded-2xl transition-all ${getErrorStyle('hero.backgroundImage')}`}>
+              <input name="hero.backgroundImage" value={merchantData.hero.backgroundImage} onChange={handleChange} className="flex-grow p-3 bg-transparent text-xs outline-none" placeholder="Cloud URL will appear here after upload..." readOnly />
+              <button onClick={() => heroFileRef.current.click()} className="bg-slate-900 text-white px-6 rounded-xl hover:bg-indigo-600 transition-all flex items-center gap-2">
+                {uploadingField === 'hero.backgroundImage' ? '...' : <Upload size={18}/>}
+              </button>
               <input type="file" ref={heroFileRef} className="hidden" onChange={(e) => handleFileUpload(e, 'hero.backgroundImage')} />
             </div>
           </div>
@@ -265,10 +316,11 @@ const TemplateSetupForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="md:col-span-2 space-y-4">
                 <input name="about.title" value={merchantData.about.title} onChange={handleChange} className="w-full p-5 bg-slate-50 rounded-2xl font-bold border-none outline-none" placeholder="About Title" />
-                <textarea name="about.text" value={merchantData.about.text} onChange={handleChange} className="w-full p-5 bg-slate-50 rounded-2xl h-40 text-sm border-none outline-none resize-none" placeholder="Tell your story..." />
+                <textarea name="about.text" value={merchantData.about.text} onChange={handleChange} className={`w-full p-5 bg-slate-50 rounded-2xl h-40 text-sm outline-none resize-none transition-all ${getErrorStyle('about.text')}`} placeholder="Tell your story..." />
               </div>
               <div onClick={() => aboutFileRef.current.click()} className="h-full min-h-[200px] border-2 border-dashed border-slate-200 rounded-[2rem] flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 overflow-hidden relative">
                  {merchantData.about.image ? <img src={merchantData.about.image} className="w-full h-full object-cover" alt="about" /> : <Camera className="text-slate-300" />}
+                 {uploadingField === 'about.image' && <div className="absolute inset-0 bg-white/60 flex items-center justify-center font-black text-[10px]">UPLOADING...</div>}
                  <input type="file" ref={aboutFileRef} className="hidden" onChange={(e) => handleFileUpload(e, 'about.image')} />
               </div>
             </div>
@@ -312,11 +364,11 @@ const TemplateSetupForm = () => {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             <div className="space-y-5">
-              <div className="flex items-center gap-4 bg-slate-50 rounded-2xl p-2 pr-5">
+              <div className={`flex items-center gap-4 bg-slate-50 rounded-2xl p-2 pr-5 transition-all ${getErrorStyle('contact.phone')}`}>
                 <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-slate-400 shadow-sm"><Phone size={18}/></div>
                 <input name="contact.phone" value={merchantData.contact.phone} onChange={handleChange} className="flex-grow bg-transparent font-bold text-sm outline-none border-none" placeholder="Phone Number" />
               </div>
-              <div className="flex items-center gap-4 bg-slate-50 rounded-2xl p-2 pr-5">
+              <div className={`flex items-center gap-4 bg-slate-50 rounded-2xl p-2 pr-5 transition-all ${getErrorStyle('contact.email')}`}>
                 <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-slate-400 shadow-sm"><Mail size={18}/></div>
                 <input name="contact.email" value={merchantData.contact.email} onChange={handleChange} className="flex-grow bg-transparent font-bold text-sm outline-none border-none" placeholder="Business Email" />
               </div>
@@ -387,6 +439,11 @@ const TemplateSetupForm = () => {
               {merchantData.gallery.images.map((img, idx) => (
                 <div key={idx} className="group relative aspect-square bg-slate-50 rounded-[2rem] border-2 border-dashed border-slate-200 overflow-hidden flex items-center justify-center">
                   {img ? <img src={img} className="w-full h-full object-cover" alt="gallery" /> : <Camera className="text-slate-300" />}
+                  {uploadingField === `gallery.${idx}` && (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <label className="cursor-pointer bg-white p-3 rounded-full shadow-lg">
                       <Upload size={16} />
