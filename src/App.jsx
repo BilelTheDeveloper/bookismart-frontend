@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 // --- Components ---
 import Navbar from "./components/Navbar";
@@ -21,8 +21,10 @@ import OnboardingStatus from './pages/public/auth/OnboardingStatus'
 import AdminLayout from "./pages/admin/AdminLayout";
 import IdentityVerify from "./pages/admin/IdentityVerify";
 
-// --- Owner Pages ---
-import OwnerDashboard from "./pages/owner/Dashboard";
+// --- Owner Pages & Layout ---
+import OwnerDashboardLayout from "./pages/owner/DashboardLayout";
+// Add your specific owner sub-pages here as you create them
+// import OwnerOverview from "./pages/owner/Overview";
 
 /**
  * ScrollToTop: Ensures every route change starts at the top of the page.
@@ -45,6 +47,7 @@ const LayoutManager = ({ children }) => {
   const isAdminPage = location.pathname.startsWith("/admin");
   const isOwnerPage = location.pathname.startsWith("/owner");
   
+  // Chrome (Navbar/Footer) is hidden for Auth, Admin, and Owner Dashboards
   const hideChrome = isSignupPage || isAdminPage || isOwnerPage;
 
   return (
@@ -73,7 +76,6 @@ function App() {
           {/* --- 2. Advanced Onboarding (5 Steps) --- */}
           <Route path="/signup" element={<SignupLayout />} />
           <Route path="/login" element={<Login />} />
-          
           <Route path="/onboarding-status" element={<OnboardingStatus />} />
           
           {/* --- 3. Admin Dashboard (Strictly ONLY Admin) --- */}
@@ -90,14 +92,22 @@ function App() {
           </Route>
 
           {/* --- 4. Owner Dashboard (Strictly ONLY Owner) --- */}
+          {/* Using a nested route so the Sidebar in OwnerDashboardLayout is persistent */}
           <Route 
-            path="/owner/dashboard" 
+            path="/owner" 
             element={
               <AdminGuard allowedRoles={["owner"]}> 
-                <OwnerDashboard />
+                <OwnerDashboardLayout />
               </AdminGuard>
             } 
-          />
+          >
+            {/* The index route is what shows at /owner/dashboard */}
+            <Route path="dashboard" element={<div className="p-4 font-bold text-2xl text-slate-800">Owner Overview Content</div>} />
+            
+            {/* Future Owner Routes */}
+            <Route path="bookings" element={<div className="p-4 font-bold text-2xl text-slate-800">Manage Appointments</div>} />
+            <Route path="settings" element={<div className="p-4 font-bold text-2xl text-slate-800">Owner Settings</div>} />
+          </Route>
           
           {/* Fallback Redirect */}
           <Route path="*" element={<HomeLayout />} />
