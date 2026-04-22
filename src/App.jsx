@@ -23,6 +23,8 @@ import IdentityVerify from "./pages/admin/IdentityVerify";
 
 // --- Owner Pages & Layout ---
 import OwnerDashboardLayout from "./pages/owner/DashboardLayout";
+import OwnerOverview from "./pages/owner/Overview";
+
 // Add your specific owner sub-pages here as you create them
 // import OwnerOverview from "./pages/owner/Overview";
 
