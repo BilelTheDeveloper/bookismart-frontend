@@ -88,22 +88,30 @@ const TemplateSetupForm = () => {
     ]
   });
 
+  // 🛡️ LOAD DATA FROM BACKEND ON MOUNT
   useEffect(() => {
     const fetchMySite = async () => {
       try {
         /**
          * 🛡️ 2026 PROTOCOL: HttpOnly Cookie Auth
-         * We no longer manually send 'Authorization' headers. 
          * The 'API' instance automatically carries session cookies.
+         * We call the endpoint defined in our new backend routes.
          */
         const res = await API.get('/merchant/website/my-site');
-        if (res.data) setMerchantData(res.data);
+        if (res.data) {
+          // Merge fetched data with the current themeId and category from navigation state
+          setMerchantData({
+            ...res.data,
+            templateId: themeId,
+            category: location.state?.category || res.data.category
+          });
+        }
       } catch (err) {
         console.log("Starting fresh configuration or unauthorized.");
       }
     };
     fetchMySite();
-  }, []);
+  }, [themeId, location.state?.category]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -152,13 +160,13 @@ const TemplateSetupForm = () => {
     }
   };
 
+  // 🛡️ SAVE DATA TO BACKEND
   const handleSave = async () => {
     setIsSaving(true);
     try {
       /**
        * 🛡️ 2026 PROTOCOL: Live Deployment Mandate
-       * Data is sent to the Render backend via the API instance.
-       * Zero-Trust validation will occur on the server.
+       * Sends the full merchantData state to the backend.
        */
       await API.post('/merchant/website/save', merchantData);
       alert("Changes saved! Waiting for admin approval.");
@@ -185,7 +193,7 @@ const TemplateSetupForm = () => {
           <div>
             <h1 className="text-sm font-black uppercase tracking-widest text-slate-900">Website Builder</h1>
             <div className="flex items-center gap-2">
-              <Sparkles size={12} className="text-indigo-600" />
+              <span className="text-indigo-600"><Sparkles size={12} /></span>
               <p className="text-[10px] text-indigo-600 font-black uppercase tracking-[0.2em]">{themeConfig?.name}</p>
             </div>
           </div>
@@ -380,7 +388,8 @@ const TemplateSetupForm = () => {
                 <div key={idx} className="group relative aspect-square bg-slate-50 rounded-[2rem] border-2 border-dashed border-slate-200 overflow-hidden flex items-center justify-center">
                   {img ? <img src={img} className="w-full h-full object-cover" alt="gallery" /> : <Camera className="text-slate-300" />}
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <label className="cursor-pointer bg-white p-3 rounded-full shadow-lg"><Upload size={16} />
+                    <label className="cursor-pointer bg-white p-3 rounded-full shadow-lg">
+                      <Upload size={16} />
                       <input type="file" className="hidden" onChange={(e) => handleFileUpload(e, 'gallery', idx)} />
                     </label>
                   </div>
