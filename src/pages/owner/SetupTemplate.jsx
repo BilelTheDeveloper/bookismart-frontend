@@ -1,217 +1,225 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import { 
-  Layout, 
-  Image as ImageIcon, 
-  Settings, 
-  Eye, 
-  Save, 
-  Plus, 
-  Trash2, 
-  Globe,
-  Clock,
-  CheckCircle2,
-  X,
-  Smartphone,
-  Monitor
-} from "lucide-react";
+  Save, ArrowLeft, Eye, EyeOff, X, Camera, 
+  Upload, Link as LinkIcon, MapPin, Phone, Sparkles, Plus, Trash2
+} from 'lucide-react';
 
-const SetupTemplate = () => {
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("hero");
+// Import our new Central Registry
+import { getThemeById } from "../../themes/ThemeRegistry";
 
-  // Syncing state with your Mongoose Schema
-  const [siteData, setSiteData] = useState({
-    slug: "vogue-studio-tunis",
-    hero: { title: "Premium Barber Experience", slogan: "Precision and Style in every cut.", backgroundImage: "" },
-    about: { show: true, title: "Our Story", text: "Founded in 2026...", image: "" },
+const TemplateSetupForm = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get themeId from navigation state (passed from Gallery)
+  const themeId = location.state?.selectedThemeId || "BB_THEME_01";
+  const themeConfig = getThemeById(themeId);
+
+  const [showPreview, setShowPreview] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const fileInputRef = useRef(null);
+  const aboutFileRef = useRef(null);
+
+  // 1. Model-Compliant State Structure
+  const [merchantData, setMerchantData] = useState({
+    templateId: themeId,
+    name: "",
+    slug: "", 
+    hero: {
+      title: "",
+      slogan: "",
+      backgroundImage: themeConfig?.cardBg || ""
+    },
+    about: {
+      show: true,
+      title: "Our Story",
+      text: "",
+      image: ""
+    },
     services: [
-      { title: "Classic Haircut", description: "Standard cut & wash", price: "25.000", active: true }
+      { title: "Premium Service", description: "Deep cleaning and styling.", price: "50", active: true }
     ],
-    contact: { phone: "+216 22 000 000", socials: { instagram: "@vogue_tunis" } }
+    gallery: {
+      show: true,
+      images: ["", "", "", ""]
+    },
+    contact: {
+      phone: "",
+      address: "",
+      socials: { instagram: "", facebook: "", tiktok: "" }
+    },
+    businessHours: [
+      { day: 'Monday', open: '09:00', close: '19:00', isClosed: false },
+      { day: 'Tuesday', open: '09:00', close: '19:00', isClosed: false },
+      { day: 'Wednesday', open: '09:00', close: '19:00', isClosed: false },
+      { day: 'Thursday', open: '09:00', close: '19:00', isClosed: false },
+      { day: 'Friday', open: '09:00', close: '19:00', isClosed: false },
+      { day: 'Saturday', open: '09:00', close: '19:00', isClosed: false },
+      { day: 'Sunday', isClosed: true },
+    ]
   });
 
-  const handleInputChange = (section, field, value) => {
-    setSiteData(prev => ({
-      ...prev,
-      [section]: { ...prev[section], [field]: value }
-    }));
+  // Load existing data if available
+  useEffect(() => {
+    const fetchMySite = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get('http://localhost:5000/api/merchant/website/my-site', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.data) setMerchantData(res.data);
+      } catch (err) {
+        console.log("Starting with default template data.");
+      }
+    };
+    fetchMySite();
+  }, []);
+
+  // Handlers
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    const keys = name.split('.');
+    
+    if (keys.length === 3) { 
+        setMerchantData(prev => ({
+            ...prev,
+            [keys[0]]: {
+                ...prev[keys[0]],
+                [keys[1]]: { ...prev[keys[0]][keys[1]], [keys[2]]: value }
+            }
+        }));
+    } else if (keys.length === 2) { 
+        setMerchantData(prev => ({
+            ...prev,
+            [keys[0]]: { ...prev[keys[0]], [keys[1]]: value }
+        }));
+    } else {
+        setMerchantData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const updateService = (index, field, value) => {
+    const newServices = [...merchantData.services];
+    newServices[index][field] = value;
+    setMerchantData({ ...merchantData, services: newServices });
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('http://localhost:5000/api/merchant/website/save', merchantData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Website published successfully!");
+    } catch (error) {
+      alert("Failed to save. Connect your backend to finish.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // The Magic Injection: Renders whichever theme was selected in the gallery
+  const renderLivePreview = () => {
+    if (!themeConfig) return <div className="p-20 text-center font-black">Theme Not Found</div>;
+    const SelectedTheme = themeConfig.component;
+    return <SelectedTheme data={merchantData} />;
   };
 
   return (
-    <div className="relative min-h-screen space-y-8 animate-in fade-in duration-500">
-      
-      {/* --- HEADER --- */}
-      <div className="flex items-center justify-between bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-indigo-600 text-white rounded-2xl">
-            <Layout size={24} />
-          </div>
+    <div className="min-h-screen bg-[#F8FAFC]">
+      {/* --- TOP STICKY BAR --- */}
+      <nav className="sticky top-0 z-[60] bg-white/80 backdrop-blur-xl border-b border-slate-200 px-8 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-6">
+          <button onClick={() => navigate(-1)} className="p-3 hover:bg-slate-100 rounded-2xl transition-all">
+            <ArrowLeft size={20} className="text-slate-600" />
+          </button>
+          <div className="h-10 w-[1px] bg-slate-200" />
           <div>
-            <h2 className="text-2xl font-black text-slate-900">Theme Editor</h2>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-              <Globe size={12} /> bookiify.com/p/{siteData.slug}
-            </p>
+            <h1 className="text-sm font-black uppercase tracking-widest text-slate-900">Site Editor</h1>
+            <div className="flex items-center gap-2">
+              <Sparkles size={12} className="text-indigo-500" />
+              <p className="text-[10px] text-indigo-500 font-black uppercase tracking-[0.2em]">{themeConfig?.name}</p>
+            </div>
           </div>
         </div>
-        <div className="flex gap-3">
-          <button 
-            onClick={() => setIsPreviewOpen(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-slate-100 text-slate-600 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-slate-200 transition-all"
-          >
-            <Eye size={18} /> Live Preview
+
+        <div className="flex gap-4">
+          <button onClick={() => setShowPreview(true)} className="flex items-center gap-3 bg-white border border-slate-200 text-slate-900 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:border-indigo-500 transition-all shadow-sm">
+            <Eye size={16} /> Live Preview
           </button>
-          <button className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all">
-            <Save size={18} /> Publish Site
+          <button onClick={handleSave} disabled={isSaving} className="flex items-center gap-3 bg-indigo-600 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200">
+            {isSaving ? "Saving..." : <><Save size={16} /> Save & Publish</>}
           </button>
         </div>
-      </div>
+      </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* --- LEFT: NAVIGATION --- */}
-        <div className="lg:col-span-3 space-y-2">
-          {['hero', 'about', 'services', 'gallery', 'hours'].map((sec) => (
-            <button 
-              key={sec}
-              onClick={() => setActiveSection(sec)}
-              className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all capitalize font-black text-sm tracking-widest ${
-                activeSection === sec ? "bg-white shadow-md text-indigo-600" : "text-slate-400 hover:bg-slate-50"
-              }`}
-            >
-              {sec} {activeSection === sec && <CheckCircle2 size={16} />}
+      <div className="max-w-5xl mx-auto py-16 px-8 space-y-12">
+        {/* STEP 1: HERO */}
+        <section className="bg-white rounded-[3rem] p-12 shadow-sm border border-slate-100 space-y-10">
+          <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 flex items-center gap-4">
+            <span className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-sm">01</span>
+            Hero Branding
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-3">
+              <label className="text-[11px] font-black uppercase text-slate-400">Business Name</label>
+              <input name="name" value={merchantData.name} onChange={handleChange} className="w-full bg-slate-50 rounded-2xl p-5 text-sm font-bold outline-none border-2 border-transparent focus:border-indigo-500 focus:bg-white transition-all" placeholder="Vogue Luxury" />
+            </div>
+            <div className="space-y-3">
+              <label className="text-[11px] font-black uppercase text-slate-400">Website Slug (URL)</label>
+              <input name="slug" value={merchantData.slug} onChange={handleChange} className="w-full bg-slate-50 rounded-2xl p-5 text-sm font-bold outline-none border-2 border-transparent focus:border-indigo-500 focus:bg-white transition-all" placeholder="vogue-luxury" />
+            </div>
+            <div className="space-y-3 md:col-span-2">
+              <label className="text-[11px] font-black uppercase text-slate-400">Hero Title</label>
+              <input name="hero.title" value={merchantData.hero.title} onChange={handleChange} className="w-full bg-slate-50 rounded-2xl p-5 text-sm font-bold outline-none border-2 border-transparent focus:border-indigo-500 focus:bg-white transition-all" placeholder="Where style meets precision" />
+            </div>
+          </div>
+        </section>
+
+        {/* STEP 2: SERVICES */}
+        <section className="space-y-8">
+          <div className="flex justify-between items-center px-4">
+            <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 flex items-center gap-4">
+              <span className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-sm">02</span>
+              Pricing & Services
+            </h2>
+            <button onClick={() => setMerchantData(p => ({...p, services: [...p.services, {title:"", description:"", price:"", active:true}]}))} className="bg-slate-900 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 flex items-center gap-2">
+              <Plus size={16} /> Add Service
             </button>
-          ))}
-        </div>
-
-        {/* --- CENTER: EDITING FORM --- */}
-        <div className="lg:col-span-9 bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm min-h-[600px]">
-          
-          {activeSection === "hero" && (
-            <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
-              <div className="flex items-center gap-3 border-b border-slate-50 pb-4">
-                <Settings className="text-indigo-600" />
-                <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Hero Section</h3>
-              </div>
-              
-              <div className="grid grid-cols-1 gap-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase px-2 tracking-widest">Headline Title</label>
-                  <input 
-                    type="text" 
-                    value={siteData.hero.title}
-                    onChange={(e) => handleInputChange('hero', 'title', e.target.value)}
-                    className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-indigo-500 outline-none font-bold transition-all"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase px-2 tracking-widest">Slogan / Subtitle</label>
-                  <textarea 
-                    rows="3"
-                    value={siteData.hero.slogan}
-                    onChange={(e) => handleInputChange('hero', 'slogan', e.target.value)}
-                    className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-indigo-500 outline-none font-bold transition-all"
-                  />
-                </div>
-                <div className="p-10 border-4 border-dashed border-slate-100 rounded-[2rem] flex flex-col items-center justify-center text-slate-400 hover:border-indigo-200 transition-all cursor-pointer">
-                  <ImageIcon size={40} className="mb-2" />
-                  <span className="font-black text-xs uppercase">Upload Hero Background</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeSection === "services" && (
-            <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-              <div className="flex justify-between items-center border-b border-slate-50 pb-4">
-                <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Manage Services</h3>
-                <button className="p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-all">
-                  <Plus size={20} />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {merchantData.services.map((service, index) => (
+              <div key={index} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative group hover:border-indigo-200 transition-all">
+                <button onClick={() => setMerchantData(p => ({...p, services: p.services.filter((_,i) => i !== index)}))} className="absolute top-6 right-6 text-slate-300 hover:text-red-500 transition-colors">
+                  <Trash2 size={18} />
                 </button>
-              </div>
-
-              {siteData.services.map((s, idx) => (
-                <div key={idx} className="p-6 bg-slate-50 rounded-3xl border border-slate-100 flex items-center justify-between group">
-                  <div className="flex gap-4 items-center">
-                    <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center font-black text-indigo-600 shadow-sm">
-                      {idx + 1}
-                    </div>
-                    <div>
-                      <h4 className="font-black text-slate-900">{s.title}</h4>
-                      <p className="text-xs text-slate-500 font-bold italic underline">{s.price} TND</p>
-                    </div>
+                <div className="space-y-4">
+                  <div className="flex gap-4">
+                    <input value={service.title} onChange={(e) => updateService(index, 'title', e.target.value)} className="flex-grow bg-slate-50 rounded-xl p-4 text-[11px] font-black uppercase tracking-widest outline-none focus:bg-white" placeholder="Service Name" />
+                    <input value={service.price} onChange={(e) => updateService(index, 'price', e.target.value)} className="w-32 bg-indigo-50 text-indigo-600 rounded-xl p-4 text-[11px] font-black uppercase text-center outline-none" placeholder="Price" />
                   </div>
-                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="p-2 text-slate-400 hover:text-rose-500"><Trash2 size={18} /></button>
-                  </div>
+                  <textarea value={service.description} onChange={(e) => updateService(index, 'description', e.target.value)} className="w-full bg-slate-50 rounded-xl p-4 text-xs font-medium h-24 outline-none border-2 border-transparent focus:border-indigo-500 focus:bg-white transition-all" placeholder="Brief description..." />
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              </div>
+            ))}
+          </div>
+        </section>
+        
+        {/* Note: I've kept the structure but moved to the indigo/slate color palette to match your new professional dashboard theme */}
       </div>
 
-      {/* --- FULLSCREEN LIVE PREVIEW POPUP --- */}
-      {isPreviewOpen && (
-        <div className="fixed inset-0 z-[100] bg-slate-900/90 backdrop-blur-md flex flex-col items-center justify-center p-4 md:p-10">
-          <div className="w-full max-w-6xl h-full bg-white rounded-[3rem] shadow-2xl overflow-hidden flex flex-col">
-            
-            {/* Mockup Toolbar */}
-            <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-              <div className="flex gap-2">
-                <div className="w-3 h-3 bg-rose-400 rounded-full" />
-                <div className="w-3 h-3 bg-amber-400 rounded-full" />
-                <div className="w-3 h-3 bg-emerald-400 rounded-full" />
-              </div>
-              <div className="flex bg-white p-1 rounded-xl border border-slate-200">
-                <button className="p-2 bg-slate-100 rounded-lg text-indigo-600"><Monitor size={16} /></button>
-                <button className="p-2 text-slate-400"><Smartphone size={16} /></button>
-              </div>
-              <button 
-                onClick={() => setIsPreviewOpen(false)}
-                className="p-2 hover:bg-slate-200 rounded-full transition-all text-slate-500"
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            {/* The Live Content Container */}
-            <div className="flex-1 overflow-y-auto bg-white custom-scrollbar">
-              {/* --- MOCK PREVIEW UI START --- */}
-              <div className="relative h-[400px] bg-slate-800 flex items-center justify-center text-center p-10 overflow-hidden">
-                <div className="relative z-10 space-y-4">
-                   <h1 className="text-6xl font-black text-white tracking-tighter">{siteData.hero.title || "Headline Goes Here"}</h1>
-                   <p className="text-xl text-slate-300 font-medium max-w-2xl mx-auto">{siteData.hero.slogan || "Your slogan text will appear here."}</p>
-                   <button className="px-8 py-4 bg-indigo-600 text-white font-black rounded-full uppercase tracking-widest text-sm shadow-xl">Book Appointment</button>
-                </div>
-                {/* Visual Placeholder for background image */}
-                <div className="absolute inset-0 bg-gradient-to-b from-indigo-900/50 to-slate-900 opacity-80" />
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80')] bg-cover bg-center" />
-              </div>
-
-              <div className="p-20 text-center max-w-4xl mx-auto">
-                <h2 className="text-3xl font-black text-slate-900 mb-6 italic underline">{siteData.about.title}</h2>
-                <p className="text-slate-600 leading-relaxed font-medium">
-                  {siteData.about.text || "Start writing your story in the editor to see it appear here live. This helps your customers get to know your brand better."}
-                </p>
-              </div>
-
-              <div className="bg-slate-50 p-20">
-                 <div className="max-w-4xl mx-auto">
-                    <h3 className="text-2xl font-black mb-10 text-center uppercase tracking-[0.3em]">Our Services</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {siteData.services.map((s, i) => (
-                        <div key={i} className="bg-white p-6 rounded-2xl flex justify-between items-center shadow-sm border border-slate-100">
-                          <div>
-                            <p className="font-black text-slate-900">{s.title}</p>
-                            <p className="text-xs text-slate-500 font-medium">{s.description}</p>
-                          </div>
-                          <span className="font-black text-indigo-600">{s.price} TND</span>
-                        </div>
-                      ))}
-                    </div>
-                 </div>
-              </div>
-              {/* --- MOCK PREVIEW UI END --- */}
+      {/* --- PREVIEW MODAL --- */}
+      {showPreview && (
+        <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 md:p-12 animate-in zoom-in duration-300">
+          <div className="bg-white w-full h-full rounded-[3rem] overflow-hidden shadow-2xl relative">
+            <button onClick={() => setShowPreview(false)} className="absolute top-8 right-8 z-[110] bg-slate-900 text-white p-5 rounded-full hover:bg-indigo-600 transition-all shadow-2xl scale-110 active:scale-95">
+              <X size={24} />
+            </button>
+            <div className="h-full w-full overflow-y-auto">
+              {renderLivePreview()}
             </div>
           </div>
         </div>
@@ -220,4 +228,4 @@ const SetupTemplate = () => {
   );
 };
 
-export default SetupTemplate;
+export default TemplateSetupForm;
