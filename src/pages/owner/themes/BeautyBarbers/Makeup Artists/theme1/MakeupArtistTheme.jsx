@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { 
-  Phone, MapPin, Clock, Menu, X, 
-  Instagram, Facebook, Sparkles, Calendar, Heart, Camera
+  Phone, MapPin, Clock, Menu, X
+  , Sparkles, Calendar, Heart, Camera
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -11,6 +11,23 @@ import { motion, AnimatePresence } from "framer-motion";
 const MakeupArtistTheme = ({ data }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const InstagramIcon = ({ size = 20, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+  </svg>
+);
+const TikTokIcon = ({ size = 20, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
+  </svg>
+);
+const FacebookIcon = ({ size = 20, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+  </svg>
+);
 
   if (!data) return null;
 
@@ -247,12 +264,12 @@ const MakeupArtistTheme = ({ data }) => {
             <div className="flex gap-4 pt-6">
               {contact.socials?.instagram && (
                 <a href={contact.socials.instagram} className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-rose-500 transition-colors">
-                  <Instagram size={18} />
+                  <InstagramIcon size={18} />
                 </a>
               )}
               {contact.socials?.facebook && (
                 <a href={contact.socials.facebook} className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-rose-500 transition-colors">
-                  <Facebook size={18} />
+                  <FacebookIcon size={18} />
                 </a>
               )}
             </div>
