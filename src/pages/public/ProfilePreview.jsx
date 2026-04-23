@@ -17,20 +17,59 @@ const ProfilePreview = () => {
     const loadWebsite = async () => {
       setLoading(true);
       if (isDemo) {
-        // --- 1. DEMO MODE LOGIC (Session Storage) ---
+        // --- 1. DEMO MODE LOGIC (Session Storage + Self-Healing Fallback) ---
         try {
-          const demoData = JSON.parse(sessionStorage.getItem("preview_mode_data"));
-          if (demoData) {
-            setData(demoData);
+          // Attempt to get user-specific customizations from session
+          let demoData = JSON.parse(sessionStorage.getItem("preview_mode_data"));
+          
+          // FIX: If session is empty (e.g. direct link/new tab), generate mock data to prevent crash
+          if (!demoData) {
+            const templateIdFromUrl = slug.replace("demo-", ""); 
+            
+            demoData = {
+              templateId: templateIdFromUrl,
+              category: "Preview Mode",
+              hero: { 
+                title: "Template Preview", 
+                slogan: "This is a live preview of the layout. You can customize all this content in your dashboard.",
+                backgroundImage: "" 
+              },
+              about: { 
+                show: true, 
+                title: "Modern Excellence", 
+                text: "This section showcases your professional story and philosophy to your clients." 
+              },
+              services: [
+                { title: "Signature Service", price: "45", description: "A detailed description of your premium offering.", active: true },
+                { title: "Express Treatment", price: "25", description: "Quick quality service for clients on the go.", active: true }
+              ],
+              gallery: { show: true, images: [] },
+              contact: { 
+                phone: "+216 00 000 000", 
+                address: "Your Business Address, Tunis", 
+                socials: { instagram: "#", facebook: "#", tiktok: "#" } 
+              },
+              businessHours: [
+                { day: "Monday", open: "09:00", close: "19:00", isClosed: false },
+                { day: "Tuesday", open: "09:00", close: "19:00", isClosed: false },
+                { day: "Wednesday", open: "09:00", close: "19:00", isClosed: false },
+                { day: "Thursday", open: "09:00", close: "19:00", isClosed: false },
+                { day: "Friday", open: "09:00", close: "19:00", isClosed: false },
+                { day: "Saturday", open: "10:00", close: "15:00", isClosed: false },
+                { day: "Sunday", open: "00:00", close: "00:00", isClosed: true },
+              ],
+              ownerId: { businessName: "Demo Business", ville: "Tunis" }
+            };
           }
+          
+          setData(demoData);
         } catch (err) {
-          console.error("Demo data parse error", err);
+          console.error("Demo data error:", err);
         }
         setLoading(false);
       } else {
         // --- 2. LIVE MODE LOGIC (Backend API) ---
         try {
-          // Calling the new Public API we created
           const res = await API.get(`/public/site/${slug}`);
           if (res.data.success) {
             setData(res.data.data);
@@ -106,14 +145,7 @@ const ProfilePreview = () => {
   return (
     <div className="flex flex-col min-h-screen bg-black">
       
-      {/* --- TOP BRANDING BAR (NOW STICKY & TOP) --- */}
-      {/* Using sticky instead of fixed ensures the content below starts 
-          exactly where this bar ends, preventing overlap. 
-      */}
-      
-
       {/* --- THE ACTUAL THEME INJECTION --- */}
-      {/* Removed absolute positioning or fixed offsets to allow natural flow */}
       <main className="flex-grow"> 
         <SelectedTheme data={data} />
       </main>
