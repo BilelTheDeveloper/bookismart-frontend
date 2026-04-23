@@ -21,6 +21,7 @@ import OnboardingStatus from './pages/public/auth/OnboardingStatus'
 // --- Admin Pages & Layout ---
 import AdminLayout from "./pages/admin/AdminLayout";
 import IdentityVerify from "./pages/admin/IdentityVerify";
+import AdminVerification from "./pages/admin/AdminVerification.jsx";
 
 // --- Owner Pages & Layout ---
 import OwnerDashboardLayout from "./pages/owner/DashboardLayout";
@@ -101,6 +102,8 @@ function App() {
           >
             <Route path="verify-identity" element={<IdentityVerify />} />
             <Route path="dashboard" element={<div className="p-6 font-bold text-slate-800">Admin Statistics</div>} />
+            <Route path="verification" element={<AdminVerification />} />
+
           </Route>
 
           {/* --- 4. Owner Dashboard (Role Protected) --- */}
