@@ -1,8 +1,9 @@
 import ClassicBarber from "./themes/BeautyBarbers/Barbershops/theme1/ClassicBarber";
 import LuxeNailSalon from "./themes/BeautyBarbers/NailSalons/theme1/NailSalons";
 import MakeupArtistTheme from "./themes/BeautyBarbers/Makeup Artists/theme1/MakeupArtistTheme";
-// --- NEW IMPORT ---
 import LuxeSpaTemplate from "./themes/BeautyBarbers/Spas/theme1/spastemplate";
+// --- NEW IMPORT ---
+import HairSalonTemplate from "./themes/BeautyBarbers/HairSalons/theme1/HairSalonTemplate";
 
 export const THEME_REGISTRY = [
   {
@@ -38,7 +39,6 @@ export const THEME_REGISTRY = [
     cardBg: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=2071&auto=format&fit=crop",
     demoPath: "/p/demo-BB_THEME_03"
   },
-  // --- NEW SPA THEME ADDED HERE ---
   {
     id: "BB_THEME_04",
     name: "Pure Serenity Spa",
@@ -49,6 +49,18 @@ export const THEME_REGISTRY = [
     previewImage: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=2070&auto=format&fit=crop",
     cardBg: "https://images.unsplash.com/photo-1540555700478-4be289fbecee?q=80&w=2070&auto=format&fit=crop",
     demoPath: "/p/demo-BB_THEME_04"
+  },
+  // --- NEW HAIR SALON THEME ---
+  {
+    id: "BB_THEME_05",
+    name: "Haute Hair Studio",
+    category: "Beauty & Barbers",
+    tags: ["Avant-Garde", "Editorial", "Modern"],
+    description: "High-contrast, brutalist-inspired design for elite hair stylists and luxury hair studios.",
+    component: HairSalonTemplate,
+    previewImage: "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=2069&auto=format&fit=crop",
+    cardBg: "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=2070&auto=format&fit=crop",
+    demoPath: "/p/demo-BB_THEME_05"
   }
 ];
 
