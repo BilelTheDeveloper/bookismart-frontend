@@ -47,7 +47,7 @@ export const THEME_REGISTRY = [
     description: "A sanctuary-inspired design using soft stone tones and elegant serif fonts for high-end spas and wellness centers.",
     component: LuxeSpaTemplate,
     previewImage: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=2070&auto=format&fit=crop",
-    cardBg: "https://unsplash.com/fr/photos/femme-en-robe-blanche-assise-sur-un-canape-blanc-I3VF9Cu4agc",
+    cardBg: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1600&q=80",
     demoPath: "/p/demo-BB_THEME_04"
   },
   // --- NEW HAIR SALON THEME ---
