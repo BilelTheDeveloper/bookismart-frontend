@@ -56,8 +56,13 @@ export const getThemesByCategory = (category) => {
 
 /**
  * Utility: Get a specific theme by ID (Used by the Profile Engine)
+ * Case-insensitive matching to prevent the "Default Barber" bug.
  * @param {string} id - The templateId stored in the Database
  */
 export const getThemeById = (id) => {
-  return THEME_REGISTRY.find((theme) => theme.id === id);
+  if (!id) return null;
+  
+  return THEME_REGISTRY.find(
+    (theme) => theme.id.trim().toUpperCase() === id.trim().toUpperCase()
+  );
 };

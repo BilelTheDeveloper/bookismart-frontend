@@ -98,6 +98,8 @@ const TemplateSetupForm = () => {
         if (res.data) {
           setMerchantData({
             ...res.data,
+            // 🛡️ FIX: Ensure the templateId stays what was selected in the gallery,
+            // otherwise the database will overwrite your new choice with the old "Barber" ID.
             templateId: themeId,
             category: location.state?.category || res.data.category
           });
@@ -202,7 +204,10 @@ const TemplateSetupForm = () => {
 
     setIsSaving(true);
     try {
-      await API.post('/merchant/website/save', merchantData);
+      // 🛡️ FIX: Force the currently selected themeId into the payload to 
+      // guarantee the backend saves the new choice.
+      const payload = { ...merchantData, templateId: themeId };
+      await API.post('/merchant/website/save', payload);
       alert("🚀 Website published! Your changes are live after review.");
     } catch (error) {
       const errorMsg = error.response?.data?.message || "Backend connection error.";

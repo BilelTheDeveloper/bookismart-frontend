@@ -115,7 +115,7 @@ const ProfilePreview = () => {
     );
   }
 
-  // Safely find the theme, fallback to THEME_01 if the ID is totally broken
+  // 🛡️ UPDATED: Safely find the theme. Case-insensitivity is now handled inside getThemeById.
   const themeConfig = getThemeById(data.templateId) || getThemeById("BB_THEME_01");
   
   if (!themeConfig) {
@@ -134,7 +134,8 @@ const ProfilePreview = () => {
   return (
     <div className="flex flex-col min-h-screen bg-black">
       
-      {/* --- TOP BRANDING BAR (Optional: Add back if needed) --- */}
+      {/* --- TOP BRANDING BAR --- */}
+      {/* You can re-enable your top bar here if you want it visible on public profiles */}
 
       {/* --- THE ACTUAL THEME INJECTION --- */}
       <main className="flex-grow"> 
