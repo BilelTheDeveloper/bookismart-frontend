@@ -1,11 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-// 🛡️ SECURITY UPDATE: Using your custom API instance instead of raw axios
 import API from "../../api/config"; 
 import { 
   Save, ArrowLeft, Eye, EyeOff, X, Camera, 
-  Upload, Link as LinkIcon, MapPin, Phone, Sparkles, Plus, Trash2,
-  Globe, Mail, Clock 
+  Upload, Globe, Mail, Clock, Phone, Sparkles, Plus, Trash2, MapPin
 } from 'lucide-react';
 
 import { getThemeById } from "./ThemeRegistry";
@@ -35,13 +33,14 @@ const TemplateSetupForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
+  // 🛡️ Get the ID from the Gallery selection
   const themeId = location.state?.selectedThemeId || "BB_THEME_01";
   const themeConfig = getThemeById(themeId);
 
   const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [uploadingField, setUploadingField] = useState(null); // Track which image is uploading
-  const [validationErrors, setValidationErrors] = useState([]); // 🛡️ Error Tracking for Viber Effect
+  const [uploadingField, setUploadingField] = useState(null); 
+  const [validationErrors, setValidationErrors] = useState([]); 
   
   const heroFileRef = useRef(null);
   const aboutFileRef = useRef(null);
@@ -51,33 +50,13 @@ const TemplateSetupForm = () => {
     category: location.state?.category || "barbershops",
     slug: "", 
     name: "",
-    hero: {
-      title: "",
-      slogan: "",
-      backgroundImage: ""
-    },
-    about: {
-      show: true,
-      title: "Our Story",
-      text: "",
-      image: ""
-    },
-    services: [
-      { title: "", description: "", price: "", active: true }
-    ],
-    gallery: {
-      show: true,
-      images: ["", "", "", ""]
-    },
+    hero: { title: "", slogan: "", backgroundImage: "" },
+    about: { show: true, title: "Our Story", text: "", image: "" },
+    services: [{ title: "", description: "", price: "", active: true }],
+    gallery: { show: true, images: ["", "", "", ""] },
     contact: {
-      phone: "",
-      email: "",
-      address: "",
-      socials: {
-        instagram: "",
-        facebook: "",
-        tiktok: ""
-      }
+      phone: "", email: "", address: "",
+      socials: { instagram: "", facebook: "", tiktok: "" }
     },
     businessHours: [
       { day: 'Monday', open: '09:00', close: '19:00', isClosed: false },
@@ -90,7 +69,6 @@ const TemplateSetupForm = () => {
     ]
   });
 
-  // 🛡️ LOAD DATA FROM BACKEND ON MOUNT
   useEffect(() => {
     const fetchMySite = async () => {
       try {
@@ -98,14 +76,14 @@ const TemplateSetupForm = () => {
         if (res.data) {
           setMerchantData({
             ...res.data,
-            // 🛡️ FIX: Ensure the templateId stays what was selected in the gallery,
-            // otherwise the database will overwrite your new choice with the old "Barber" ID.
+            // 🛡️ ALWAYS use the themeId from the Gallery state during selection
             templateId: themeId,
-            category: location.state?.category || res.data.category
+            // If the user picked a new category in the gallery, use that. Otherwise use saved.
+            category: location.state?.category || res.data.category || "barbershops"
           });
         }
       } catch (err) {
-        console.log("Starting fresh configuration or unauthorized.");
+        console.log("Starting fresh configuration.");
       }
     };
     fetchMySite();
@@ -113,7 +91,6 @@ const TemplateSetupForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Clear error when user starts typing
     setValidationErrors(prev => prev.filter(err => err !== name));
     
     const keys = name.split('.');
@@ -142,27 +119,20 @@ const TemplateSetupForm = () => {
     setMerchantData({ ...merchantData, services: newServices });
   };
 
-  // ☁️ CLOUDINARY UPLOAD HANDLER
   const handleFileUpload = async (e, targetPath, index = null) => {
     const file = e.target.files[0];
     if (!file) return;
-
     const fieldId = index !== null ? `${targetPath}.${index}` : targetPath;
     setUploadingField(fieldId);
 
     try {
-      // 1. Prepare Multipart Form Data
       const formData = new FormData();
       formData.append('image', file);
-
-      // 2. Upload to our new backend endpoint
       const response = await API.post('/merchant/website/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-
       const secureUrl = response.data.url;
 
-      // 3. Update State with permanent URL
       if (index !== null) {
         const newImgs = [...merchantData.gallery.images];
         newImgs[index] = secureUrl;
@@ -174,20 +144,14 @@ const TemplateSetupForm = () => {
           [keys[0]]: { ...prev[keys[0]], [keys[1]]: secureUrl }
         }));
       }
-      // Remove error if image is uploaded
       setValidationErrors(prev => prev.filter(err => err !== fieldId));
     } catch (err) {
-      alert("Image upload failed. Please try again.");
-    } finally {
-      setUploadingField(null);
-    }
+      alert("Upload failed.");
+    } finally { setUploadingField(null); }
   };
 
-  // 🛡️ ADVANCED VALIDATION & SAVE
   const handleSave = async () => {
     const errors = [];
-
-    // Basic Requirement Check
     if (!merchantData.name) errors.push('name');
     if (!merchantData.slug) errors.push('slug');
     if (!merchantData.hero.title) errors.push('hero.title');
@@ -199,22 +163,22 @@ const TemplateSetupForm = () => {
     if (errors.length > 0) {
       setValidationErrors(errors);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      return; // Block save
+      return;
     }
 
     setIsSaving(true);
     try {
-      // 🛡️ FIX: Force the currently selected themeId into the payload to 
-      // guarantee the backend saves the new choice.
-      const payload = { ...merchantData, templateId: themeId };
+      // 🛡️ THE MASTER FIX: Specifically injecting the current themeId and current category
+      const payload = { 
+        ...merchantData, 
+        templateId: themeId,
+        category: merchantData.category // Ensure category matches the current UI
+      };
       await API.post('/merchant/website/save', payload);
       alert("🚀 Website published! Your changes are live after review.");
     } catch (error) {
-      const errorMsg = error.response?.data?.message || "Backend connection error.";
-      alert(`Save Failed: ${errorMsg}`);
-    } finally {
-      setIsSaving(false);
-    }
+      alert(`Save Failed: ${error.response?.data?.message || "Error"}`);
+    } finally { setIsSaving(false); }
   };
 
   const renderLivePreview = () => {
@@ -222,14 +186,12 @@ const TemplateSetupForm = () => {
     return <SelectedTheme data={merchantData} />;
   };
 
-  // Helper for Error Styling
   const getErrorStyle = (field) => validationErrors.includes(field) 
     ? "border-2 border-rose-500 animate-shake ring-4 ring-rose-50" 
     : "border-none";
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      {/* Dynamic Viber/Shake Keyframes */}
       <style>{`
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
@@ -239,6 +201,7 @@ const TemplateSetupForm = () => {
         .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
       `}</style>
 
+      {/* --- NAVIGATION --- */}
       <nav className="sticky top-0 z-[60] bg-white/80 backdrop-blur-xl border-b border-slate-200 px-8 py-4 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <button onClick={() => navigate(-1)} className="p-3 hover:bg-slate-100 rounded-2xl transition-all">
@@ -263,9 +226,10 @@ const TemplateSetupForm = () => {
         </div>
       </nav>
 
+      {/* --- FORM SECTIONS (Branding, About, Services, etc.) --- */}
       <div className="max-w-5xl mx-auto py-16 px-8 space-y-12">
         
-        {/* SECTION 01: BRANDING */}
+        {/* 01: BRANDING */}
         <section className="bg-white rounded-[3rem] p-12 shadow-sm border border-slate-100 space-y-10">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center font-black">01</div>
@@ -297,7 +261,7 @@ const TemplateSetupForm = () => {
           <div className="space-y-2">
             <label className="text-[11px] font-black uppercase text-slate-400">Hero Background *</label>
             <div className={`flex gap-4 p-2 bg-slate-50 rounded-2xl transition-all ${getErrorStyle('hero.backgroundImage')}`}>
-              <input name="hero.backgroundImage" value={merchantData.hero.backgroundImage} onChange={handleChange} className="flex-grow p-3 bg-transparent text-xs outline-none" placeholder="Cloud URL will appear here after upload..." readOnly />
+              <input name="hero.backgroundImage" value={merchantData.hero.backgroundImage} onChange={handleChange} className="flex-grow p-3 bg-transparent text-xs outline-none" placeholder="Cloud URL..." readOnly />
               <button onClick={() => heroFileRef.current.click()} className="bg-slate-900 text-white px-6 rounded-xl hover:bg-indigo-600 transition-all flex items-center gap-2">
                 {uploadingField === 'hero.backgroundImage' ? '...' : <Upload size={18}/>}
               </button>
@@ -306,7 +270,7 @@ const TemplateSetupForm = () => {
           </div>
         </section>
 
-        {/* SECTION 02: ABOUT */}
+        {/* 02: ABOUT */}
         <section className={`bg-white rounded-[3rem] p-12 shadow-sm border border-slate-100 space-y-10 transition-all ${!merchantData.about.show && 'opacity-60 grayscale'}`}>
           <div className="flex justify-between items-center">
              <div className="flex items-center gap-4">
@@ -332,7 +296,7 @@ const TemplateSetupForm = () => {
           )}
         </section>
 
-        {/* SECTION 03: SERVICES */}
+        {/* 03: SERVICES */}
         <section className="space-y-8">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 flex items-center gap-4">
@@ -361,7 +325,7 @@ const TemplateSetupForm = () => {
           </div>
         </section>
 
-        {/* SECTION 04: CONTACT & SOCIALS */}
+        {/* 04: CONTACT & SOCIALS */}
         <section className="bg-white rounded-[3rem] p-12 shadow-sm border border-slate-100 space-y-10">
           <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 flex items-center gap-4">
             <span className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">04</span>
@@ -399,7 +363,7 @@ const TemplateSetupForm = () => {
           </div>
         </section>
 
-        {/* SECTION 05: WORKING HOURS */}
+        {/* 05: WORKING HOURS */}
         <section className="bg-white rounded-[3rem] p-12 shadow-sm border border-slate-100 space-y-10">
           <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 flex items-center gap-4">
             <span className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center font-black">05</span>
@@ -428,7 +392,7 @@ const TemplateSetupForm = () => {
           </div>
         </section>
 
-        {/* SECTION 06: GALLERY */}
+        {/* 06: GALLERY */}
         <section className="bg-white rounded-[3rem] p-12 shadow-sm border border-slate-100 space-y-10">
            <div className="flex justify-between items-center">
              <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 flex items-center gap-4">

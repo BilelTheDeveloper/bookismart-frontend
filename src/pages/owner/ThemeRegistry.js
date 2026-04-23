@@ -1,8 +1,4 @@
-/**
- * THEME REGISTRY
- * Centralized configuration for the "Web inside Web" engine.
- * Every time you create a new template file, add it here.
- */
+
 
 import ClassicBarber from "./themes/BeautyBarbers/Barbershops/theme1/ClassicBarber";
 import LuxeNailSalon from "./themes/BeautyBarbers/NailSalons/theme1/NailSalons";
