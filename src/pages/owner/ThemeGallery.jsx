@@ -1,27 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle2, Eye, Palette, Sparkles, Layout, ArrowRight } from "lucide-react";
-import API from "../../api/config"; // Ensure this path matches your API config file
-// Import the central registry we created
+import API from "../../api/config"; 
 import { THEME_REGISTRY, getThemesByCategory } from "./ThemeRegistry";
 
 const ThemeGallery = () => {
   const navigate = useNavigate();
 
-  // 1. Get the user's specific category from storage
   const user = JSON.parse(localStorage.getItem("user")) || {
     category: "Beauty & Barbers", 
     businessName: "My Business"
   };
 
-  // 2. THE AUTO-FILTER LOGIC (Using the Registry helper)
   const filteredThemes = getThemesByCategory(user.category);
 
-  // --- FIX 1: State for actual active theme from DB ---
   const [activeThemeId, setActiveThemeId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // --- FIX 2: Load the real saved site data on mount ---
   useEffect(() => {
     const fetchCurrentSite = async () => {
       try {
@@ -38,7 +33,6 @@ const ThemeGallery = () => {
     fetchCurrentSite();
   }, []);
 
-  // --- FIX 3: Pass the selected ID to the next page ---
   const handleApplyTheme = (themeId) => {
     navigate("/owner/theme/customize-site", { 
       state: { 
@@ -48,37 +42,51 @@ const ThemeGallery = () => {
     });
   };
 
-  // --- FULL SCREEN PREVIEW LOGIC ---
+  // --- IMPROVED: DYNAMIC DEMO LOGIC ---
   const handleLiveDemo = (theme) => {
+    // We check the theme ID to provide relevant demo content
+    const isMakeupArtist = theme.id === "BB_THEME_03";
+    const isNailSalon = theme.id === "BB_THEME_02";
+
     const demoData = {
       templateId: theme.id,
+      name: isMakeupArtist ? "Vogue Artistry" : isNailSalon ? "Luxe Polish" : "The Classic Gent",
       hero: { 
-        title: "The Master's Touch", 
-        slogan: "Premium grooming for the modern man. Experience the difference.",
+        title: isMakeupArtist ? "The Signature Glow" : "Elegant Fingertips", 
+        slogan: isMakeupArtist 
+          ? "Professional makeup artistry for your most unforgettable moments."
+          : "Premium care for the modern individual.",
         backgroundImage: theme.cardBg 
       },
       about: { 
         show: true, 
-        title: "Our Heritage", 
-        text: "With over 15 years of experience, we provide the highest quality services in a luxury environment.",
+        title: "Our Story", 
+        text: "With years of industry expertise, we deliver a bespoke experience tailored to your unique style and needs.",
         image: theme.previewImage
       },
-      services: [
-        { title: "Signature Service", description: "Our most popular premium treatment.", price: "35.000", active: true },
-        { title: "Standard Treatment", description: "Quality care for your daily needs.", price: "25.000", active: true }
+      services: isMakeupArtist ? [
+        { title: "Bridal Glam", description: "Full wedding day application including trial.", price: "250", active: true },
+        { title: "Editorial Look", description: "High-fashion makeup for photography.", price: "150", active: true }
+      ] : [
+        { title: "Signature Treatment", description: "Our most popular premium service.", price: "35", active: true },
+        { title: "Standard Package", description: "Quality care for your daily needs.", price: "25", active: true }
       ],
+      gallery: {
+        show: true,
+        images: [theme.previewImage, theme.cardBg, theme.previewImage, theme.cardBg]
+      },
       businessHours: [
         { day: "Monday", open: "09:00", close: "20:00", isClosed: false },
         { day: "Tuesday", open: "09:00", close: "20:00", isClosed: false },
         { day: "Wednesday", open: "09:00", close: "20:00", isClosed: false },
         { day: "Thursday", open: "09:00", close: "20:00", isClosed: false },
-        { day: "Friday", open: "14:00", close: "22:00", isClosed: false },
+        { day: "Friday", open: "09:00", close: "20:00", isClosed: false },
         { day: "Saturday", open: "09:00", close: "22:00", isClosed: false },
         { day: "Sunday", isClosed: true }
       ],
       contact: { 
         phone: "+216 71 000 000", 
-        address: "Les Berges du Lac, Tunis",
+        address: "Tunis, Tunisia",
         socials: { instagram: "@bookiify_demo", facebook: "bookiify.tn" }
       }
     };
@@ -97,7 +105,6 @@ const ThemeGallery = () => {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
-      
       {/* --- HEADER SECTION --- */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
         <div>
@@ -109,27 +116,20 @@ const ThemeGallery = () => {
             {user.category.replace(/([A-Z])/g, ' $1').trim()} <span className="text-slate-400 font-medium italic">Templates</span>
           </h2>
           <p className="text-slate-500 mt-1 font-medium">
-            We've filtered our registry to show only designs optimized for your industry.
+            Designs optimized for your specific industry and brand aesthetic.
           </p>
         </div>
-        <div className="flex gap-3">
-          <div className="bg-slate-50 px-5 py-3 rounded-2xl border border-slate-100 flex items-center gap-3">
-            <div className="p-2 bg-white rounded-lg shadow-sm">
-              <pointer-events-none>
-                <Layout size={18} className="text-indigo-600" />
-              </pointer-events-none>
-            </div>
+        <div className="bg-slate-50 px-5 py-3 rounded-2xl border border-slate-100 flex items-center gap-3">
+            <Layout size={18} className="text-indigo-600" />
             <span className="text-sm font-black text-slate-600 uppercase tracking-tighter">
               {filteredThemes.length} Designs Ready
             </span>
-          </div>
         </div>
       </div>
 
       {/* --- THEMES GRID --- */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredThemes.map((theme) => {
-          // Compare against the ID fetched from the database
           const isLive = activeThemeId === theme.id;
           
           return (
@@ -145,7 +145,6 @@ const ThemeGallery = () => {
                   alt={theme.name} 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                 />
-                
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
                 
                 <div className="absolute top-6 left-6 flex flex-wrap gap-2">
@@ -213,7 +212,6 @@ const ThemeGallery = () => {
         <button className="relative z-10 px-10 py-5 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-500 transition-all shadow-2xl flex items-center gap-3 uppercase tracking-widest text-xs">
           Contact Design Studio <ArrowRight size={18} />
         </button>
-        
         <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-indigo-500/10 rounded-full blur-[100px]"></div>
       </div>
     </div>
