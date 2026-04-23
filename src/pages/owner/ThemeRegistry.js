@@ -4,7 +4,8 @@
  * Every time you create a new template file, add it here.
  */
 
-import ClassicBarber from "../owner/themes/BeautyBarbers/theme1/ClassicBarber";
+import ClassicBarber from "./themes/BeautyBarbers/Barbershops/theme1/ClassicBarber";
+import LuxeNailSalon from "./themes/BeautyBarbers/NailSalons/theme1/NailSalons";
 
 export const THEME_REGISTRY = [
   {
@@ -21,6 +22,21 @@ export const THEME_REGISTRY = [
     cardBg: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=2070&auto=format&fit=crop",
     // --- New: Demo Path for Full Screen Review ---
     demoPath: "/p/demo-BB_THEME_01"
+  },
+  {
+    id: "BB_THEME_02",
+    name: "Luxe Polish & Co.",
+    category: "Beauty & Barbers",
+    tags: ["Minimalist", "Light Mode", "High-Fashion"],
+    description: "Soft pinks, clean whites, and elegant serif typography tailored for high-end nail studios and spas.",
+    // The actual React component
+    component: LuxeNailSalon,
+    // The image shown in the Gallery Card
+    previewImage: "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=1974&auto=format&fit=crop",
+    // Featured background for the Card UI
+    cardBg: "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?q=80&w=2070&auto=format&fit=crop",
+    // --- New: Demo Path for Full Screen Review ---
+    demoPath: "/p/demo-BB_THEME_02"
   }
 ];
 
