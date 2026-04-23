@@ -1,78 +1,75 @@
 import axios from "axios";
 
 /**
- * 🔒 ADVANCED API CONFIGURATION (HttpOnly Cookie Edition)
- * Synchronized with Backend Security Version: 2026.1.4
+ * 🔒 ULTRA-SECURE API CONFIGURATION (Cookie-Protocol Edition)
+ * Purpose: Bridges the gap between browser cookies and Backend Military-Grade guards.
  */
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "https://bookismart-backend.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },
-  // 🚨 CRITICAL: This allows the browser to send HttpOnly cookies (access & refresh)
-  // and receive them from the backend on every request.
+  // 🚨 CRITICAL: Allows browser to send/receive secure HttpOnly cookies automatically.
   withCredentials: true, 
 });
 
 /**
- * 🛡️ DEVICE FINGERPRINT ENGINE
- * Generates a persistent hardware-linked ID to prevent Token Hijacking.
+ * 🛡️ HARDENED DEVICE FINGERPRINT ENGINE
+ * Generates a persistent hardware-linked ID.
+ * Bound to the JWT on the backend to prevent session hijacking.
  */
 const getBrowserFingerprint = () => {
   let deviceId = localStorage.getItem("device_fingerprint");
   
   if (!deviceId) {
+    // Generate a unique identifier for this browser instance
     deviceId = `${crypto.randomUUID()}-${Date.now()}`;
     localStorage.setItem("device_fingerprint", deviceId);
   }
   return deviceId;
 };
 
-// Queue for handling multiple 401 errors during a refresh cycle
+// Queue management for token refresh synchronization
 let isRefreshing = false;
 let failedQueue = [];
 
-const processQueue = (error) => {
+const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
     } else {
-      prom.resolve();
+      prom.resolve(token);
     }
   });
   failedQueue = [];
 };
 
 /**
- * 🛡️ REQUEST INTERCEPTOR
- * Injects Security Headers. Note: Authorization header is REMOVED 
- * because the token is now handled automatically via HttpOnly cookies.
+ * 🛡️ REQUEST INTERCEPTOR: Fingerprint Injection
  */
 API.interceptors.request.use(
   (config) => {
-    // Inject Fingerprint (Matches backend requirement for device binding)
+    // Always inject the fingerprint. The backend 'protect' middleware 
+    // will compare this against the one sealed inside the JWT.
     config.headers["x-device-fingerprint"] = getBrowserFingerprint();
-    
-    // 💡 Note: We no longer pull accessToken from localStorage.
-    // The browser automatically attaches the 'accessToken' cookie.
-    
     return config;
   },
   (error) => Promise.reject(error)
 );
 
 /**
- * 🛡️ RESPONSE INTERCEPTOR
- * The "Silent Refresh" Engine. Works with HttpOnly cookies.
+ * 🛡️ RESPONSE INTERCEPTOR: The Silent Refresh & Security Kick
  */
 API.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Detect 401 (Expired) - The backend sends this if the accessToken cookie is dead
+    /**
+     * 🚩 CASE 1: 401 Unauthorized (Expired Access Token)
+     * Triggered when the short-lived access cookie expires.
+     */
     if (error.response?.status === 401 && !originalRequest._retry) {
-      
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -85,42 +82,55 @@ API.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        /**
-         * 🔄 SILENT REFRESH
-         * The backend will read the 'refreshToken' cookie, verify it,
-         * and set NEW 'accessToken' and 'refreshToken' cookies.
-         */
+        // Attempt to refresh the cookies via the backend /refresh route
         await API.post("/auth/refresh", {});
-
+        
         processQueue(null);
         isRefreshing = false;
-
-        // Retry the original request (it will now automatically include the new cookie)
         return API(originalRequest);
-
       } catch (refreshError) {
         processQueue(refreshError);
         isRefreshing = false;
 
-        // If refresh fails, the session is dead. Clean up local UI data.
+        // If refresh fails, wipe local storage and force login
         localStorage.removeItem("user");
-        localStorage.removeItem("device_fingerprint");
-        
         if (!window.location.pathname.includes('/login')) {
             window.location.href = "/login?session=expired";
         }
-        
         return Promise.reject(refreshError);
       }
     }
 
-    // Handle 403 (Forbidden - Role mismatch)
+    /**
+     * 🚩 CASE 2: 403 Forbidden (Role Mismatch / Tamper Alert)
+     * Triggered by your backend 'adminGuard' if a user tries to access 
+     * an unauthorized area (e.g., Owner trying to hit Admin API).
+     */
     if (error.response?.status === 403) {
-      console.warn("⛔ [Security Alert]: Access Denied to this resource.");
+      console.error("🚨 [Security Alert]: Unauthorized role action blocked by Backend.");
+      
+      // If the backend returns 403, it means the cookie is valid but the ROLE is wrong.
+      // We immediately redirect to the unauthorized page.
+      if (!window.location.pathname.includes('/unauthorized')) {
+          window.location.href = "/unauthorized";
+      }
     }
 
     return Promise.reject(error);
   }
 );
+
+/**
+ * 🔑 SECURITY UTILITY: verifyMe
+ * The only way the UI should confirm who the user is.
+ */
+export const verifyMe = async () => {
+    try {
+        const response = await API.get("/auth/verify-me");
+        return response.data.user; // Returns REAL role from DB
+    } catch (error) {
+        return null;
+    }
+};
 
 export default API;

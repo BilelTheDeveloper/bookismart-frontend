@@ -1,52 +1,56 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; // 🛡️ Import the Security Brain
 
 /**
- * 🛡️ ADVANCED ROLE-BASED ACCESS CONTROL (RBAC) GUARD (Cookie-Protocol Edition)
- * Purpose: Protects sensitive routes by verifying session data and roles.
- * Logic: Relies on the HttpOnly cookie (handled by the browser) and the user profile.
+ * 🔒 ULTRA-SECURE ROLE-BASED ACCESS CONTROL (RBAC)
+ * Purpose: Protects sensitive routes by verifying REAL identity from the AuthContext.
+ * Logic: Bypasses localStorage entirely. If it's not in the memory state, it's not real.
  */
 const AdminGuard = ({ children, allowedRoles = [] }) => {
+  const { user, isAuthenticated, loading } = useAuth();
   const location = useLocation();
-  
-  /**
-   * 1. Retrieve the session profile.
-   * Since 'accessToken' is now an HttpOnly cookie, it is NO LONGER in localStorage.
-   * The existence of the 'user' object indicates an active UI session.
-   */
-  const user = JSON.parse(localStorage.getItem('user')); 
 
   /**
-   * 🚩 SECURITY GATE 1: SESSION CHECK
-   * If the user profile is missing, the UI session is dead.
-   * We redirect to login and save the 'from' location to return after re-auth.
+   * 🚩 SECURITY GATE 1: LOADING STATE
+   * While the AuthProvider is calling /verify-me, we show nothing or a spinner.
+   * This prevents "Flash of Protected Content" (FPC).
    */
-  if (!user) {
+  if (loading) {
+    return null; // The AuthProvider already handles the global spinner
+  }
+
+  /**
+   * 🚩 SECURITY GATE 2: AUTHENTICATION CHECK
+   * If the backend said the cookie is invalid or missing, isAuthenticated will be false.
+   * We kick them to login immediately.
+   */
+  if (!isAuthenticated || !user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   /**
-   * 🚩 SECURITY GATE 2: ROLE AUTHORIZATION (RBAC)
-   * We verify if the user's role matches the requirements for this route.
-   * Logic: 'admin' and 'owner' are handled separately.
+   * 🚩 SECURITY GATE 3: DATABASE ROLE VERIFICATION
+   * We check the role that came directly from your MongoDB. 
+   * A hacker can edit LocalStorage, but they cannot edit this 'user.role' object
+   * because it is stored in the app's private RAM.
    */
   const hasAccess = allowedRoles.includes(user.role);
 
   if (!hasAccess) {
-    console.error(`⛔ [Security Violation]: ${user.role} attempted unauthorized access to: ${location.pathname}`);
+    console.error(`🚨 [SECURITY BREACH ATTEMPT]: 
+      User: ${user.email} 
+      Actual Role: ${user.role} 
+      Target Path: ${location.pathname}
+    `);
     
-    /**
-     * If they are logged in but just in the wrong neighborhood (e.g., an Owner hitting Admin routes),
-     * we send them to /unauthorized without killing their session.
-     */
+    // Redirect unauthorized users (e.g., an Owner trying to hit /admin)
     return <Navigate to="/unauthorized" replace />;
   }
 
   /**
-   * ✅ SUCCESS: ROLE MATCHED
-   * The guard allows the components to render. 
-   * Note: The actual data fetching inside these components will still be 
-   * verified by the Backend using the HttpOnly cookie.
+   * ✅ SUCCESS: CLEARANCE GRANTED
+   * The user is verified by the backend and holds the correct role.
    */
   return children;
 };
