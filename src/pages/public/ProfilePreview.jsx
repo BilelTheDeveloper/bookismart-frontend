@@ -17,54 +17,34 @@ const ProfilePreview = () => {
     const loadWebsite = async () => {
       setLoading(true);
       if (isDemo) {
-        // --- 1. DEMO MODE LOGIC (Session Storage + Self-Healing Fallback) ---
+        // --- 1. DEMO MODE LOGIC (Session Storage + Safety Injection) ---
         try {
-          // Attempt to get user-specific customizations from session
-          let demoData = JSON.parse(sessionStorage.getItem("preview_mode_data"));
-          
-          // FIX: If session is empty (e.g. direct link/new tab), generate mock data to prevent crash
+          const sessionRaw = sessionStorage.getItem("preview_mode_data");
+          let demoData = sessionRaw ? JSON.parse(sessionRaw) : null;
+
+          // CRITICAL FIX: Ensure all required sub-objects exist to prevent ".show" undefined errors
           if (!demoData) {
-            const templateIdFromUrl = slug.replace("demo-", ""); 
-            
-            demoData = {
-              templateId: templateIdFromUrl,
-              category: "Preview Mode",
-              hero: { 
-                title: "Template Preview", 
-                slogan: "This is a live preview of the layout. You can customize all this content in your dashboard.",
-                backgroundImage: "" 
-              },
-              about: { 
-                show: true, 
-                title: "Modern Excellence", 
-                text: "This section showcases your professional story and philosophy to your clients." 
-              },
-              services: [
-                { title: "Signature Service", price: "45", description: "A detailed description of your premium offering.", active: true },
-                { title: "Express Treatment", price: "25", description: "Quick quality service for clients on the go.", active: true }
-              ],
-              gallery: { show: true, images: [] },
-              contact: { 
-                phone: "+216 00 000 000", 
-                address: "Your Business Address, Tunis", 
-                socials: { instagram: "#", facebook: "#", tiktok: "#" } 
-              },
-              businessHours: [
-                { day: "Monday", open: "09:00", close: "19:00", isClosed: false },
-                { day: "Tuesday", open: "09:00", close: "19:00", isClosed: false },
-                { day: "Wednesday", open: "09:00", close: "19:00", isClosed: false },
-                { day: "Thursday", open: "09:00", close: "19:00", isClosed: false },
-                { day: "Friday", open: "09:00", close: "19:00", isClosed: false },
-                { day: "Saturday", open: "10:00", close: "15:00", isClosed: false },
-                { day: "Sunday", open: "00:00", close: "00:00", isClosed: true },
-              ],
-              ownerId: { businessName: "Demo Business", ville: "Tunis" }
-            };
+            const templateIdFromUrl = slug.replace("demo-", "");
+            demoData = { templateId: templateIdFromUrl };
           }
-          
-          setData(demoData);
+
+          // Safety Injection: If these objects are missing in session, create them
+          // This stops the "Cannot read properties of undefined (reading 'show')" crash
+          const safeData = {
+            ...demoData,
+            templateId: demoData.templateId || slug.replace("demo-", "") || "BB_THEME_01",
+            hero: demoData.hero || { title: "Demo Mode", slogan: "Previewing layout" },
+            about: demoData.about || { show: true, title: "Our Story", text: "About us text..." },
+            gallery: demoData.gallery || { show: true, images: [] },
+            services: demoData.services || [],
+            contact: demoData.contact || { phone: "", socials: {} },
+            businessHours: demoData.businessHours || [],
+            ownerId: demoData.ownerId || { businessName: "Professional", ville: "" }
+          };
+
+          setData(safeData);
         } catch (err) {
-          console.error("Demo data error:", err);
+          console.error("Demo data parse error", err);
         }
         setLoading(false);
       } else {
@@ -72,7 +52,15 @@ const ProfilePreview = () => {
         try {
           const res = await API.get(`/public/site/${slug}`);
           if (res.data.success) {
-            setData(res.data.data);
+            // Even with live data, we merge with defaults to be 100% safe
+            const liveData = res.data.data;
+            const safeLiveData = {
+              ...liveData,
+              hero: liveData.hero || {},
+              about: liveData.about || { show: false },
+              gallery: liveData.gallery || { show: false, images: [] }
+            };
+            setData(safeLiveData);
           }
         } catch (err) {
           console.error("Error loading live site:", err);
@@ -127,7 +115,8 @@ const ProfilePreview = () => {
     );
   }
 
-  const themeConfig = getThemeById(data.templateId || "BB_THEME_01");
+  // Safely find the theme, fallback to THEME_01 if the ID is totally broken
+  const themeConfig = getThemeById(data.templateId) || getThemeById("BB_THEME_01");
   
   if (!themeConfig) {
     return (
@@ -145,6 +134,8 @@ const ProfilePreview = () => {
   return (
     <div className="flex flex-col min-h-screen bg-black">
       
+      {/* --- TOP BRANDING BAR (Optional: Add back if needed) --- */}
+
       {/* --- THE ACTUAL THEME INJECTION --- */}
       <main className="flex-grow"> 
         <SelectedTheme data={data} />
