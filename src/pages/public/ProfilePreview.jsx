@@ -104,60 +104,34 @@ const ProfilePreview = () => {
   const SelectedTheme = themeConfig.component;
 
   return (
-    <div className="relative min-h-screen">
+    <div className="flex flex-col min-h-screen bg-black">
       
-      {/* --- TOP BRANDING BAR (Ultra Pro) --- */}
-      <div className={`fixed top-0 left-0 w-full z-[9999] flex items-center justify-between px-6 py-2 backdrop-blur-md border-b ${
-        isDemo 
-        ? "bg-indigo-600 text-white border-indigo-500" 
-        : "bg-black/10 text-white border-white/10"
-      }`}>
-        
-        <div className="flex items-center gap-4">
-          {/* --- EXIT BUTTON: Dynamic behavior --- */}
-          <button 
-            onClick={handleExitPreview}
-            className="flex items-center gap-2 px-3 py-1 bg-white/10 hover:bg-white/20 rounded-lg transition-colors border border-white/20 group"
-          >
-            <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
-            <span className="text-[10px] font-black uppercase tracking-wider">
-              {isDemo ? "Back to Dashboard" : "Discovery Feed"}
-            </span>
-          </button>
-
-          <div className="flex items-center gap-2">
-            <Sparkles size={14} className={isDemo ? "text-white" : "text-indigo-400"} />
-            <span className="text-[9px] font-black uppercase tracking-[0.3em]">
-              {isDemo ? "Live Template Preview" : "Verified Professional"}
-            </span>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-1 opacity-80">
-          <span className="text-[9px] font-black uppercase tracking-[0.2em]">by bookiify.tn</span>
-        </div>
-      </div>
+      {/* --- TOP BRANDING BAR (NOW STICKY & TOP) --- */}
+      {/* Using sticky instead of fixed ensures the content below starts 
+          exactly where this bar ends, preventing overlap. 
+      */}
+      
 
       {/* --- THE ACTUAL THEME INJECTION --- */}
-      {/* Added pt-12 to push content below the branding bar */}
-      <div className="pt-10"> 
+      {/* Removed absolute positioning or fixed offsets to allow natural flow */}
+      <main className="flex-grow"> 
         <SelectedTheme data={data} />
-      </div>
+      </main>
 
       {/* --- BOTTOM FLOATING BRANDING (Only for Public Views) --- */}
       {!isDemo && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-fit px-4">
           <a 
-            href="https://bookiify.tn" 
+            href="https://bookiify.vercel.app/login" 
             target="_blank" 
             rel="noreferrer"
-            className="flex items-center gap-3 px-6 py-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full hover:bg-white/20 transition-all group shadow-2xl shadow-black/50"
+            className="flex items-center gap-3 px-6 py-3 bg-black/60 backdrop-blur-2xl border border-white/10 rounded-full hover:bg-black/80 transition-all group shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
           >
-            <div className="p-2 bg-indigo-600 rounded-lg text-white group-hover:scale-110 transition-transform shadow-lg shadow-indigo-500/50">
+            <div className="p-2 bg-amber-600 rounded-lg text-white group-hover:scale-110 transition-transform shadow-lg shadow-amber-500/20">
               <Globe size={14} />
             </div>
             <div className="pr-2 text-left">
-              <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Create your own</p>
+              <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Create your own</p>
               <p className="text-[10px] font-black text-white uppercase tracking-tighter leading-none">Powered by Bookiify</p>
             </div>
           </a>
