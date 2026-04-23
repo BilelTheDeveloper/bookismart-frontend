@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle2, Eye, Palette, Sparkles, Layout, ArrowRight } from "lucide-react";
+import API from "../../api/config"; // Ensure this path matches your API config file
 // Import the central registry we created
 import { THEME_REGISTRY, getThemesByCategory } from "./ThemeRegistry";
 
@@ -16,17 +17,39 @@ const ThemeGallery = () => {
   // 2. THE AUTO-FILTER LOGIC (Using the Registry helper)
   const filteredThemes = getThemesByCategory(user.category);
 
-  // State to track which theme is active
-  const [activeTheme, setActiveTheme] = useState("BB_THEME_01");
+  // --- FIX 1: State for actual active theme from DB ---
+  const [activeThemeId, setActiveThemeId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // --- FIX 2: Load the real saved site data on mount ---
+  useEffect(() => {
+    const fetchCurrentSite = async () => {
+      try {
+        const res = await API.get('/merchant/website/my-site');
+        if (res.data && res.data.templateId) {
+          setActiveThemeId(res.data.templateId);
+        }
+      } catch (err) {
+        console.log("New user or no site found yet.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCurrentSite();
+  }, []);
+
+  // --- FIX 3: Pass the selected ID to the next page ---
   const handleApplyTheme = (themeId) => {
-    setActiveTheme(themeId);
-    navigate("/owner/theme/customize-site");
+    navigate("/owner/theme/customize-site", { 
+      state: { 
+        selectedThemeId: themeId,
+        category: user.category 
+      } 
+    });
   };
 
-  // --- NEW: FULL SCREEN PREVIEW LOGIC ---
+  // --- FULL SCREEN PREVIEW LOGIC ---
   const handleLiveDemo = (theme) => {
-    // This data populates the theme so the owner sees a "finished" version
     const demoData = {
       templateId: theme.id,
       hero: { 
@@ -60,12 +83,17 @@ const ThemeGallery = () => {
       }
     };
 
-    // Store data for the Previewer to pick up in the new tab
     sessionStorage.setItem("preview_mode_data", JSON.stringify(demoData));
-    
-    // Open the demo path defined in the Registry
     window.open(theme.demoPath, "_blank");
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
@@ -87,7 +115,9 @@ const ThemeGallery = () => {
         <div className="flex gap-3">
           <div className="bg-slate-50 px-5 py-3 rounded-2xl border border-slate-100 flex items-center gap-3">
             <div className="p-2 bg-white rounded-lg shadow-sm">
-              <Layout size={18} className="text-indigo-600" />
+              <pointer-events-none>
+                <Layout size={18} className="text-indigo-600" />
+              </pointer-events-none>
             </div>
             <span className="text-sm font-black text-slate-600 uppercase tracking-tighter">
               {filteredThemes.length} Designs Ready
@@ -99,7 +129,8 @@ const ThemeGallery = () => {
       {/* --- THEMES GRID --- */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredThemes.map((theme) => {
-          const isLive = activeTheme === theme.id;
+          // Compare against the ID fetched from the database
+          const isLive = activeThemeId === theme.id;
           
           return (
             <div 
@@ -158,7 +189,6 @@ const ThemeGallery = () => {
                     )}
                   </button>
                   
-                  {/* FULL SCREEN REVIEW BUTTON LINKED TO DEMO */}
                   <button 
                     onClick={() => handleLiveDemo(theme)}
                     className="w-full flex items-center justify-center gap-2 py-3 text-slate-400 font-black text-[10px] uppercase tracking-widest hover:text-indigo-600 transition-colors"
