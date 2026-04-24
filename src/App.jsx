@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 
 // --- Components ---
 import Navbar from "./components/Navbar";
@@ -11,19 +11,19 @@ import HomeLayout from "./pages/public/Home/HomeLayout";
 import HowItWorksPage from "./pages/public/HowItWorks";
 import ServicesPage from "./pages/public/Services";
 import ProfessionalsPage from "./pages/public/Professionals";
-import ProfilePreview from "./pages/public/ProfilePreview"; // <--- Added the Preview Engine
+import ProfilePreview from "./pages/public/ProfilePreview";
 
-// --- New Onboarding & Auth Pages ---
+// --- Onboarding & Auth ---
 import SignupLayout from "./pages/public/signup/SignupLayout";
 import Login from "./pages/public/auth/Login";
 import OnboardingStatus from './pages/public/auth/OnboardingStatus'
 
-// --- Admin Pages & Layout ---
+// --- Admin Pages ---
 import AdminLayout from "./pages/admin/AdminLayout";
 import IdentityVerify from "./pages/admin/IdentityVerify";
 import AdminVerification from "./pages/admin/AdminVerification.jsx";
 
-// --- Owner Pages & Layout ---
+// --- Owner Pages ---
 import OwnerDashboardLayout from "./pages/owner/DashboardLayout";
 import OwnerOverview from "./pages/owner/Overview";
 import ThemeGallery from "./pages/owner/ThemeGallery"; 
@@ -35,9 +35,31 @@ import Appointments from "./pages/owner/Appointments";
 import Customers from "./pages/owner/Customers";
 import Settings from "./pages/owner/Settings";
 
+/**
+ * 🛡️ SECURITY WATCHDOG
+ * This component listens for the "Security Breach" signal from our API config.
+ * If a fingerprint mismatch happens, it nukes local state to stop redirect loops.
+ */
+function SecurityWatchdog() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleSecurityBreach = () => {
+      console.warn("🚨 Security Breach Detected: Cleaning session...");
+      localStorage.removeItem("user");
+      // Optionally don't remove device_fingerprint so the ID stays consistent
+      navigate("/login?reason=security_violation");
+    };
+
+    window.addEventListener("auth-security-breach", handleSecurityBreach);
+    return () => window.removeEventListener("auth-security-breach", handleSecurityBreach);
+  }, [navigate]);
+
+  return null;
+}
 
 /**
- * ScrollToTop: Ensures every route change starts at the top of the page.
+ * ScrollToTop: Reset scroll position on route change.
  */
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -56,7 +78,7 @@ const LayoutManager = ({ children }) => {
   const isSignupPage = location.pathname === "/signup";
   const isAdminPage = location.pathname.startsWith("/admin");
   const isOwnerPage = location.pathname.startsWith("/owner");
-  const isProfilePreview = location.pathname.startsWith("/p/"); // <--- Added to hide Chrome on previews
+  const isProfilePreview = location.pathname.startsWith("/p/");
   
   const hideChrome = isSignupPage || isAdminPage || isOwnerPage || isProfilePreview;
 
@@ -74,24 +96,23 @@ const LayoutManager = ({ children }) => {
 function App() {
   return (
     <Router>
+      <SecurityWatchdog /> {/* 🛡️ Active Security Monitoring */}
       <ScrollToTop />
       <LayoutManager>
         <Routes>
-          {/* --- 1. Public Routes --- */}
+          {/* --- 1. Public Routes (Always Accessible) --- */}
           <Route path="/" element={<HomeLayout />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/professionals" element={<ProfessionalsPage />} />
-          
-          {/* Universal Profile & Demo Route */}
           <Route path="/p/:slug" element={<ProfilePreview />} />
 
-          {/* --- 2. Advanced Onboarding & Auth --- */}
+          {/* --- 2. Auth Routes --- */}
           <Route path="/signup" element={<SignupLayout />} />
           <Route path="/login" element={<Login />} />
           <Route path="/onboarding-status" element={<OnboardingStatus />} />
           
-          {/* --- 3. Admin Dashboard (Role Protected) --- */}
+          {/* --- 3. Admin Dashboard (Locked) --- */}
           <Route 
             path="/admin" 
             element={
@@ -103,10 +124,9 @@ function App() {
             <Route path="verify-identity" element={<IdentityVerify />} />
             <Route path="dashboard" element={<div className="p-6 font-bold text-slate-800">Admin Statistics</div>} />
             <Route path="verification" element={<AdminVerification />} />
-
           </Route>
 
-          {/* --- 4. Owner Dashboard (Role Protected) --- */}
+          {/* --- 4. Owner Dashboard (Locked) --- */}
           <Route 
             path="/owner" 
             element={
@@ -115,27 +135,18 @@ function App() {
               </AdminGuard>
             } 
           >
-            {/* Main Overview */}
             <Route path="dashboard" element={<OwnerOverview />} />
-            
-            {/* Core Management Routes */}
-            <Route path="/owner/dashboard/bookings" element={<Appointments />} />
-            <Route path="/owner/dashboard/customers" element={<Customers />} />
-            
-            {/* Finance & Billing */}
-            <Route path="/owner/dashboard/finance" element={<Finance />} />
-            <Route path="/owner/dashboard/billing" element={<Billing />} />
-            
-            {/* Website & Themes Section */}
-            <Route path="/owner/dashboard/themes" element={<ThemeGallery />} /> 
-            <Route path="/owner/theme/customize-site" element={<SetupTemplate />} />
-            
-            {/* Settings & Analytics */}
-            <Route path="/owner/dashboard/stats" element={<Analytics />} />
-            <Route path="/owner/dashboard/settings" element={<Settings />} />
+            <Route path="dashboard/bookings" element={<Appointments />} />
+            <Route path="dashboard/customers" element={<Customers />} />
+            <Route path="dashboard/finance" element={<Finance />} />
+            <Route path="dashboard/billing" element={<Billing />} />
+            <Route path="dashboard/themes" element={<ThemeGallery />} /> 
+            <Route path="theme/customize-site" element={<SetupTemplate />} />
+            <Route path="dashboard/stats" element={<Analytics />} />
+            <Route path="dashboard/settings" element={<Settings />} />
           </Route>
           
-          {/* Fallback Redirect */}
+          {/* Fallback */}
           <Route path="*" element={<HomeLayout />} />
         </Routes>
       </LayoutManager>
