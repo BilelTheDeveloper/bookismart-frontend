@@ -2,9 +2,10 @@ import axios from "axios";
 
 /**
  * 🔒 ULTRA-SECURE API CONFIGURATION (Enterprise Edition)
- * Purpose: Bridges the gap between browser cookies and Redis-backed Backend Guards.
+ * Bridges the gap between browser cookies and Redis-backed Backend Guards.
  */
 const API = axios.create({
+  // SYNC: Matches your Render deployment exactly
   baseURL: import.meta.env.VITE_API_URL || "https://bookismart-backend.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
@@ -15,12 +16,13 @@ const API = axios.create({
 
 /**
  * 🛡️ HARDENED DEVICE FINGERPRINT ENGINE
+ * Resolves UUID persistence and handles edge-case string corruption.
  */
 const getBrowserFingerprint = () => {
   let deviceId = localStorage.getItem("device_fingerprint");
   
-  if (!deviceId) {
-    // Enterprise-grade unique identifier
+  // 🚨 SECURITY FIX: Check for 'undefined' or 'null' strings from previous session bugs
+  if (!deviceId || deviceId === "undefined" || deviceId === "null") {
     deviceId = `${crypto.randomUUID()}-${Date.now()}`;
     localStorage.setItem("device_fingerprint", deviceId);
   }
@@ -47,7 +49,7 @@ const processQueue = (error, token = null) => {
  */
 API.interceptors.request.use(
   (config) => {
-    // Every request carries the "Identity Binding" for the Redis check
+    // Every request carries the "Identity Binding" for the Redis/Hardware check
     config.headers["x-device-fingerprint"] = getBrowserFingerprint();
     return config;
   },
@@ -61,12 +63,19 @@ API.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    
+    // 🚨 EMERGENCY BREAK: Prevent infinite loops if /refresh itself fails
+    if (originalRequest.url === "/auth/refresh" || originalRequest.url.includes("refresh")) {
+      isRefreshing = false;
+      return Promise.reject(error);
+    }
+
     const responseData = error.response?.data;
-    const errorCode = responseData?.code; // 🆕 Extract our custom backend codes
+    const errorCode = responseData?.code; 
 
     /**
      * 🚩 CASE 1: Session Expired (TOKEN_EXPIRED)
-     * The short-lived access token is dead. We try a silent refresh.
+     * Attempt silent token rotation.
      */
     if (errorCode === 'TOKEN_EXPIRED' && !originalRequest._retry) {
       if (isRefreshing) {
@@ -81,9 +90,7 @@ API.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Attempt to rotate Refresh Token
         await API.post("/auth/refresh", {});
-        
         processQueue(null);
         isRefreshing = false;
         return API(originalRequest);
@@ -91,31 +98,35 @@ API.interceptors.response.use(
         processQueue(refreshError);
         isRefreshing = false;
 
-        // Total Session Failure: Clear and Boot
+        // Cleanup local UI state
         localStorage.removeItem("user");
-        window.location.href = "/login?session=expired";
+        if (!window.location.pathname.includes('/login')) {
+            window.location.href = "/login?session=expired";
+        }
         return Promise.reject(refreshError);
       }
     }
 
     /**
      * 🚩 CASE 2: Security Breach / Revocation
-     * (TOKEN_REVOKED, TOKEN_INVALID, FINGERPRINT_MISMATCH)
-     * These indicate a session hijack or a blacklisted token in Redis.
-     * ACTION: Immediate Kick-out. No refresh allowed.
+     * (TOKEN_REVOKED, TOKEN_INVALID, FINGERPRINT_MISMATCH, etc.)
      */
     const criticalSecurityCodes = [
         'TOKEN_REVOKED', 
         'TOKEN_INVALID', 
         'FINGERPRINT_MISMATCH', 
-        'TOKEN_MISSING'
+        'TOKEN_MISSING',
+        'FINGERPRINT_MISSING'
     ];
 
     if (criticalSecurityCodes.includes(errorCode)) {
       console.error(`🚨 [Security Alert]: ${errorCode}. Session terminated by Vault.`);
+      
+      // 🛡️ SIGNAL: Notify AuthContext to wipe state immediately
+      window.dispatchEvent(new Event("auth-security-breach"));
+      
       localStorage.removeItem("user");
       
-      // Stop the user immediately
       if (!window.location.pathname.includes('/login')) {
           window.location.href = "/login?reason=security_violation";
       }
@@ -123,7 +134,6 @@ API.interceptors.response.use(
 
     /**
      * 🚩 CASE 3: Account Status Restriction
-     * User is logged in, but backend 'protect' says status is not 'active'.
      */
     if (errorCode === 'ACCOUNT_RESTRICTED') {
         window.location.href = "/onboarding-status";

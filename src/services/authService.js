@@ -2,14 +2,16 @@ import API from "../api/config";
 
 /**
  * 🛡️ AUTH SERVICE - 2026 COOKIE-VAULT EDITION
- * All calls are routed through the secure API instance (Vercel -> Render).
- * Tokens are now managed automatically by the browser via HttpOnly Cookies.
+ * Purpose: Manages all identity-related transactions.
+ * Security: Uses the 'API' instance which automatically attaches 
+ * device fingerprints and handles HttpOnly cookie synchronization.
  */
 
 /**
  * 1. Sends an OTP to the specified target (Email or Phone)
  */
 export const sendOTP = async (type, target) => {
+  // Fingerprint is automatically added via Axios Interceptor
   return await API.post("/auth/send-otp", { type, target });
 };
 
@@ -22,22 +24,18 @@ export const verifyOTP = async (type, target, code) => {
 
 /**
  * 3. Secure Login & Session Initialization
- * Logic: The backend sets 'accessToken' and 'refreshToken' as HttpOnly cookies.
- * We only return the user data to the component.
  */
 export const login = async (credentials) => {
-  // We send sanitized email/password to the fortress
   const response = await API.post("/auth/login", credentials);
   
-  // 💡 Note: We NO LONGER manually store the accessToken in localStorage.
-  // It is now an HttpOnly cookie that JavaScript cannot touch.
-  
+  // 💡 Security Note: Access/Refresh tokens are now handled by the browser.
+  // We only return the user data to the AuthContext.
   return response.data;
 };
 
 /**
- * 4. Finalizes the 5-step registration process.
- * Handles Multipart/Form-Data for Images, Videos, and JSON.
+ * 4. Multi-Step Registration (Multipart/Form-Data)
+ * Handles high-fidelity files like Liveness Videos and Profile Images.
  */
 export const registerUser = async (userData) => {
   let payload;
@@ -47,9 +45,10 @@ export const registerUser = async (userData) => {
   } else {
     payload = new FormData();
     Object.keys(userData).forEach((key) => {
+      // Map frontend keys to backend expectations for liveness checks
       if (key === 'video' || key === 'livenessVideo') {
         payload.append('livenessVideo', userData[key]);
-      } else {
+      } else if (userData[key] !== undefined && userData[key] !== null) {
         payload.append(key, userData[key]);
       }
     });
@@ -63,7 +62,7 @@ export const registerUser = async (userData) => {
 };
 
 /**
- * 5. Identity Verification Status
+ * 5. Identity & Onboarding Status Check
  */
 export const checkOnboardingStatus = async () => {
   return await API.get("/auth/onboarding-status");
@@ -78,28 +77,35 @@ export const reviewProfessional = async (userId, action, reason) => {
 
 /**
  * 7. Secure Logout
- * Logic: Tells the server to clear cookies and wipes the local UI state.
  */
 export const logout = async () => {
   try {
-    // 🛡️ Notifies backend to use res.clearCookie() for both tokens
+    // 🛡️ Notifies backend to use res.clearCookie() and clear Redis blacklists
     await API.post("/auth/logout"); 
   } catch (err) {
-    console.warn("Server-side session already expired or unreachable.");
+    console.warn("Logout notification failed; session may already be dead.");
   } finally {
-    // Local Cleanup: Remove only UI-related data
+    // 100% Cleanup
     localStorage.removeItem("user");
     
-    // Redirect to entry point
-    window.location.href = "/login";
+    // 🔥 SECURITY: Reset the memory state of the entire app
+    window.location.href = "/login?logout=success";
   }
 };
 
 /**
- * 8. Utility: Get Current User Role
- * Logic: Pulls from the saved user object in localStorage.
+ * 8. Utility: Get Current User Role (Fail-Safe Edition)
  */
 export const getCurrentUserRole = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  return user ? user.role : null;
+  try {
+    const userStr = localStorage.getItem("user");
+    if (!userStr || userStr === "undefined") return null;
+    
+    const user = JSON.parse(userStr);
+    return user?.role || null;
+  } catch (error) {
+    console.error("AuthService: Role parsing failed. Clearing corrupted storage.");
+    localStorage.removeItem("user");
+    return null;
+  }
 };

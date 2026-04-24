@@ -1,12 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import API, { verifyMe } from "../api/config"; // 🛡️ Using our updated Enterprise API config
+import API, { verifyMe } from "../api/config"; 
 
 const AuthContext = createContext();
 
 /**
  * 🛡️ ENTERPRISE AUTH PROVIDER (Redis + Fingerprint Edition)
- * Purpose: Centralizes identity and ensures the Frontend state 
- * perfectly mirrors the Backend/Redis security state.
  */
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -14,8 +12,17 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   /**
+   * 🔄 CLEANUP UTILITY
+   * Resets all local states to prevent "Ghost Sessions"
+   */
+  const clearAuthData = useCallback(() => {
+    setUser(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem("user");
+  }, []);
+
+  /**
    * 🔄 INITIALIZE: Real-time Backend Verification
-   * Every page refresh triggers a check against the JWT + Fingerprint + Redis Blacklist.
    */
   const initializeAuth = useCallback(async () => {
     try {
@@ -25,65 +32,70 @@ export const AuthProvider = ({ children }) => {
         setUser(verifiedUser);
         setIsAuthenticated(true);
       } else {
-        setUser(null);
-        setIsAuthenticated(false);
-        localStorage.removeItem("user");
+        clearAuthData();
       }
     } catch (error) {
-      // If the interceptor hasn't already handled it, clean up here.
-      setUser(null);
-      setIsAuthenticated(false);
-      localStorage.removeItem("user");
+      clearAuthData();
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [clearAuthData]);
 
+  /**
+   * 🛡️ SECURITY WATCHDOG
+   * Listens for signals from the Axios Interceptor. If the interceptor
+   * detects a security breach, it forces this context to reset.
+   */
   useEffect(() => {
+    const handleSecurityBreach = () => {
+      console.warn("🛡️ Security Context: Emergency state reset triggered.");
+      clearAuthData();
+    };
+
+    window.addEventListener("auth-security-breach", handleSecurityBreach);
     initializeAuth();
-  }, [initializeAuth]);
+
+    return () => window.removeEventListener("auth-security-breach", handleSecurityBreach);
+  }, [initializeAuth, clearAuthData]);
 
   /**
    * 🔑 LOGIN HANDLER
-   * Called after authController.login successfully sets the HttpOnly cookies.
    */
   const loginUser = (userData) => {
     setUser(userData);
     setIsAuthenticated(true);
-    // LocalStorage is only for non-sensitive UI (Name, Avatar).
-    // The "True" identity is stored in the Secure Cookies.
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
   /**
    * 🚪 SECURE LOGOUT HANDLER
-   * Crucial: Tells the backend to blacklist the current JTI in Redis.
+   * Blacklists the JTI in Redis via the backend.
    */
   const logoutUser = async () => {
     try {
-      // 🛡️ Call the protected logout route
+      // 🛡️ API.post will automatically carry the x-device-fingerprint
       await API.post("/auth/logout");
     } catch (error) {
-      console.error("Logout notification to server failed, clearing local state anyway.");
+      console.error("Logout notification failed, proceeding with local cleanup.");
     } finally {
-      // Always clear local state regardless of server response
-      setUser(null);
-      setIsAuthenticated(false);
-      localStorage.removeItem("user");
-      // Optional: Clear fingerprint on logout if you want a fresh ID next time
+      clearAuthData();
+      // Optional: Clear fingerprint on logout for a 100% fresh start
       // localStorage.removeItem("device_fingerprint"); 
-      
       window.location.href = "/login";
     }
   };
 
   /**
    * 🛠️ REFRESH STATE UTILITY
-   * Can be called manually if a profile update occurs.
    */
   const refreshUser = async () => {
     const updatedUser = await verifyMe();
-    if (updatedUser) setUser(updatedUser);
+    if (updatedUser) {
+      setUser(updatedUser);
+      setIsAuthenticated(true);
+    } else {
+      clearAuthData();
+    }
   };
 
   const value = {

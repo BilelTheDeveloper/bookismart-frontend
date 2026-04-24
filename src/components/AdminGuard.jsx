@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // 🛡️ Import the Security Brain
+import { useAuth } from '../context/AuthContext'; 
 
 /**
  * 🔒 ULTRA-SECURE ROLE-BASED ACCESS CONTROL (RBAC)
@@ -13,44 +13,48 @@ const AdminGuard = ({ children, allowedRoles = [] }) => {
 
   /**
    * 🚩 SECURITY GATE 1: LOADING STATE
-   * While the AuthProvider is calling /verify-me, we show nothing or a spinner.
-   * This prevents "Flash of Protected Content" (FPC).
+   * Ensures we don't accidentally leak protected UI during the initial 
+   * /verify-me handshake with Redis.
    */
   if (loading) {
-    return null; // The AuthProvider already handles the global spinner
+    return null; // AuthProvider handles the enterprise spinner
   }
 
   /**
    * 🚩 SECURITY GATE 2: AUTHENTICATION CHECK
-   * If the backend said the cookie is invalid or missing, isAuthenticated will be false.
-   * We kick them to login immediately.
+   * isAuthenticated is driven by our secure HttpOnly cookie logic.
+   * If the session was revoked via Redis, this becomes 'false' instantly.
    */
   if (!isAuthenticated || !user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   /**
-   * 🚩 SECURITY GATE 3: DATABASE ROLE VERIFICATION
-   * We check the role that came directly from your MongoDB. 
-   * A hacker can edit LocalStorage, but they cannot edit this 'user.role' object
-   * because it is stored in the app's private RAM.
+   * 🚩 SECURITY GATE 3: ROLE & ACCOUNT INTEGRITY
+   * We verify the 'user.role' which is kept in the app's secure memory state.
+   * We also ensure the account is active before rendering children.
    */
-  const hasAccess = allowedRoles.includes(user.role);
+  const rolesArray = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+  const hasAccess = rolesArray.includes(user.role);
+  const isActive = user.accountStatus === 'active';
 
-  if (!hasAccess) {
-    console.error(`🚨 [SECURITY BREACH ATTEMPT]: 
+  if (!hasAccess || !isActive) {
+    // 🚨 INTERNAL FORENSICS
+    console.error(`🚨 [RBAC VIOLATION]: 
       User: ${user.email} 
-      Actual Role: ${user.role} 
-      Target Path: ${location.pathname}
+      Role: ${user.role} 
+      Status: ${user.accountStatus}
+      Path: ${location.pathname}
     `);
     
-    // Redirect unauthorized users (e.g., an Owner trying to hit /admin)
+    // If authenticated but unauthorized (e.g., a 'staff' user hitting /admin),
+    // we send them to /unauthorized instead of /login to prevent loops.
     return <Navigate to="/unauthorized" replace />;
   }
 
   /**
    * ✅ SUCCESS: CLEARANCE GRANTED
-   * The user is verified by the backend and holds the correct role.
+   * The identity is cryptographic, the role is authorized, and the status is active.
    */
   return children;
 };
