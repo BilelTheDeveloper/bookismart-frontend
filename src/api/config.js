@@ -98,8 +98,8 @@ API.interceptors.response.use(
         isRefreshing = false;
 
         localStorage.removeItem("user");
-        if (!window.location.pathname.includes('/login')) {
-            window.location.href = "/login?session=expired";
+        if (!window.location.pathname.includes('/')) {
+            window.location.href = "/";
         }
         return Promise.reject(refreshError);
       }
