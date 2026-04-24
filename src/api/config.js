@@ -1,8 +1,8 @@
 import axios from "axios";
 
 /**
- * 🔒 ULTRA-SECURE API CONFIGURATION (Cookie-Protocol Edition)
- * Purpose: Bridges the gap between browser cookies and Backend Military-Grade guards.
+ * 🔒 ULTRA-SECURE API CONFIGURATION (Enterprise Edition)
+ * Purpose: Bridges the gap between browser cookies and Redis-backed Backend Guards.
  */
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "https://bookismart-backend.onrender.com/api",
@@ -15,14 +15,12 @@ const API = axios.create({
 
 /**
  * 🛡️ HARDENED DEVICE FINGERPRINT ENGINE
- * Generates a persistent hardware-linked ID.
- * Bound to the JWT on the backend to prevent session hijacking.
  */
 const getBrowserFingerprint = () => {
   let deviceId = localStorage.getItem("device_fingerprint");
   
   if (!deviceId) {
-    // Generate a unique identifier for this browser instance
+    // Enterprise-grade unique identifier
     deviceId = `${crypto.randomUUID()}-${Date.now()}`;
     localStorage.setItem("device_fingerprint", deviceId);
   }
@@ -49,8 +47,7 @@ const processQueue = (error, token = null) => {
  */
 API.interceptors.request.use(
   (config) => {
-    // Always inject the fingerprint. The backend 'protect' middleware 
-    // will compare this against the one sealed inside the JWT.
+    // Every request carries the "Identity Binding" for the Redis check
     config.headers["x-device-fingerprint"] = getBrowserFingerprint();
     return config;
   },
@@ -58,18 +55,20 @@ API.interceptors.request.use(
 );
 
 /**
- * 🛡️ RESPONSE INTERCEPTOR: The Silent Refresh & Security Kick
+ * 🛡️ RESPONSE INTERCEPTOR: Precision Security Handling
  */
 API.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const responseData = error.response?.data;
+    const errorCode = responseData?.code; // 🆕 Extract our custom backend codes
 
     /**
-     * 🚩 CASE 1: 401 Unauthorized (Expired Access Token)
-     * Triggered when the short-lived access cookie expires.
+     * 🚩 CASE 1: Session Expired (TOKEN_EXPIRED)
+     * The short-lived access token is dead. We try a silent refresh.
      */
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (errorCode === 'TOKEN_EXPIRED' && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -82,7 +81,7 @@ API.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Attempt to refresh the cookies via the backend /refresh route
+        // Attempt to rotate Refresh Token
         await API.post("/auth/refresh", {});
         
         processQueue(null);
@@ -92,25 +91,48 @@ API.interceptors.response.use(
         processQueue(refreshError);
         isRefreshing = false;
 
-        // If refresh fails, wipe local storage and force login
+        // Total Session Failure: Clear and Boot
         localStorage.removeItem("user");
-        if (!window.location.pathname.includes('/login')) {
-            window.location.href = "/login?session=expired";
-        }
+        window.location.href = "/login?session=expired";
         return Promise.reject(refreshError);
       }
     }
 
     /**
-     * 🚩 CASE 2: 403 Forbidden (Role Mismatch / Tamper Alert)
-     * Triggered by your backend 'adminGuard' if a user tries to access 
-     * an unauthorized area (e.g., Owner trying to hit Admin API).
+     * 🚩 CASE 2: Security Breach / Revocation
+     * (TOKEN_REVOKED, TOKEN_INVALID, FINGERPRINT_MISMATCH)
+     * These indicate a session hijack or a blacklisted token in Redis.
+     * ACTION: Immediate Kick-out. No refresh allowed.
      */
-    if (error.response?.status === 403) {
-      console.error("🚨 [Security Alert]: Unauthorized role action blocked by Backend.");
+    const criticalSecurityCodes = [
+        'TOKEN_REVOKED', 
+        'TOKEN_INVALID', 
+        'FINGERPRINT_MISMATCH', 
+        'TOKEN_MISSING'
+    ];
+
+    if (criticalSecurityCodes.includes(errorCode)) {
+      console.error(`🚨 [Security Alert]: ${errorCode}. Session terminated by Vault.`);
+      localStorage.removeItem("user");
       
-      // If the backend returns 403, it means the cookie is valid but the ROLE is wrong.
-      // We immediately redirect to the unauthorized page.
+      // Stop the user immediately
+      if (!window.location.pathname.includes('/login')) {
+          window.location.href = "/login?reason=security_violation";
+      }
+    }
+
+    /**
+     * 🚩 CASE 3: Account Status Restriction
+     * User is logged in, but backend 'protect' says status is not 'active'.
+     */
+    if (errorCode === 'ACCOUNT_RESTRICTED') {
+        window.location.href = "/onboarding-status";
+    }
+
+    /**
+     * 🚩 CASE 4: Forbidden Role (403)
+     */
+    if (error.response?.status === 403 && errorCode === 'FORBIDDEN') {
       if (!window.location.pathname.includes('/unauthorized')) {
           window.location.href = "/unauthorized";
       }
@@ -122,12 +144,11 @@ API.interceptors.response.use(
 
 /**
  * 🔑 SECURITY UTILITY: verifyMe
- * The only way the UI should confirm who the user is.
  */
 export const verifyMe = async () => {
     try {
         const response = await API.get("/auth/verify-me");
-        return response.data.user; // Returns REAL role from DB
+        return response.data.user; 
     } catch (error) {
         return null;
     }
