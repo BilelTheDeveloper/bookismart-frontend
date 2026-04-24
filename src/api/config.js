@@ -21,8 +21,8 @@ const API = axios.create({
 const getBrowserFingerprint = () => {
   let deviceId = localStorage.getItem("device_fingerprint");
   
-  // 🚨 SECURITY FIX: Check for 'undefined' or 'null' strings from previous session bugs
-  if (!deviceId || deviceId === "undefined" || deviceId === "null") {
+  // 🚨 SECURITY FIX: Added check for empty strings or invalid lengths
+  if (!deviceId || deviceId === "undefined" || deviceId === "null" || deviceId.trim() === "") {
     deviceId = `${crypto.randomUUID()}-${Date.now()}`;
     localStorage.setItem("device_fingerprint", deviceId);
   }
@@ -65,7 +65,7 @@ API.interceptors.response.use(
     const originalRequest = error.config;
     
     // 🚨 EMERGENCY BREAK: Prevent infinite loops if /refresh itself fails
-    if (originalRequest.url === "/auth/refresh" || originalRequest.url.includes("refresh")) {
+    if (originalRequest.url.includes("/auth/refresh")) {
       isRefreshing = false;
       return Promise.reject(error);
     }
@@ -75,7 +75,6 @@ API.interceptors.response.use(
 
     /**
      * 🚩 CASE 1: Session Expired (TOKEN_EXPIRED)
-     * Attempt silent token rotation.
      */
     if (errorCode === 'TOKEN_EXPIRED' && !originalRequest._retry) {
       if (isRefreshing) {
@@ -98,7 +97,6 @@ API.interceptors.response.use(
         processQueue(refreshError);
         isRefreshing = false;
 
-        // Cleanup local UI state
         localStorage.removeItem("user");
         if (!window.location.pathname.includes('/login')) {
             window.location.href = "/login?session=expired";
@@ -109,7 +107,6 @@ API.interceptors.response.use(
 
     /**
      * 🚩 CASE 2: Security Breach / Revocation
-     * (TOKEN_REVOKED, TOKEN_INVALID, FINGERPRINT_MISMATCH, etc.)
      */
     const criticalSecurityCodes = [
         'TOKEN_REVOKED', 
@@ -120,15 +117,13 @@ API.interceptors.response.use(
     ];
 
     if (criticalSecurityCodes.includes(errorCode)) {
-      console.error(`🚨 [Security Alert]: ${errorCode}. Session terminated by Vault.`);
+      console.error(`🚨 [Security Alert]: ${errorCode}. Session terminated.`);
       
-      // 🛡️ SIGNAL: Notify AuthContext to wipe state immediately
       window.dispatchEvent(new Event("auth-security-breach"));
-      
       localStorage.removeItem("user");
       
       if (!window.location.pathname.includes('/login')) {
-          window.location.href = "/login?reason=security_violation";
+          window.location.replace("/login?reason=security_violation");
       }
     }
 
@@ -136,7 +131,7 @@ API.interceptors.response.use(
      * 🚩 CASE 3: Account Status Restriction
      */
     if (errorCode === 'ACCOUNT_RESTRICTED') {
-        window.location.href = "/onboarding-status";
+        window.location.replace("/onboarding-status");
     }
 
     /**
@@ -144,7 +139,7 @@ API.interceptors.response.use(
      */
     if (error.response?.status === 403 && errorCode === 'FORBIDDEN') {
       if (!window.location.pathname.includes('/unauthorized')) {
-          window.location.href = "/unauthorized";
+          window.location.replace("/unauthorized");
       }
     }
 
@@ -154,11 +149,13 @@ API.interceptors.response.use(
 
 /**
  * 🔑 SECURITY UTILITY: verifyMe
+ * Corrected to handle the { success: true, user: {...} } response format.
  */
 export const verifyMe = async () => {
     try {
         const response = await API.get("/auth/verify-me");
-        return response.data.user; 
+        // Accessing .data.user because the backend wraps it in a 'success' object
+        return response.data?.user || null; 
     } catch (error) {
         return null;
     }
