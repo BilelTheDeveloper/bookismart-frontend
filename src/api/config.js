@@ -72,6 +72,7 @@ API.interceptors.response.use(
 
     const responseData = error.response?.data;
     const errorCode = responseData?.code; 
+    const isUserLoggedIn = !!localStorage.getItem("user");
 
     /**
      * 🚩 CASE 1: Session Expired (TOKEN_EXPIRED)
@@ -107,23 +108,28 @@ API.interceptors.response.use(
 
     /**
      * 🚩 CASE 2: Security Breach / Revocation
+     * 🛡️ FIX: We REMOVED 'TOKEN_MISSING' and 'FINGERPRINT_MISSING' from here.
+     * These should not trigger a security breach alert for guests.
      */
     const criticalSecurityCodes = [
         'TOKEN_REVOKED', 
         'TOKEN_INVALID', 
-        'FINGERPRINT_MISMATCH', 
-        'TOKEN_MISSING',
-        'FINGERPRINT_MISSING'
+        'FINGERPRINT_MISMATCH'
     ];
 
     if (criticalSecurityCodes.includes(errorCode)) {
-      console.error(`🚨 [Security Alert]: ${errorCode}. Session terminated.`);
-      
-      window.dispatchEvent(new Event("auth-security-breach"));
-      localStorage.removeItem("user");
-      
-      if (!window.location.pathname.includes('/login')) {
-          window.location.replace("/login?reason=security_violation");
+      // 🛡️ FIX: Only trigger the "Watchdog" if we actually have a user in state.
+      // This stops guests and new sign-ups from getting trapped in loops.
+      if (isUserLoggedIn) {
+        console.error(`🚨 [Security Alert]: ${errorCode}. Session terminated.`);
+        window.dispatchEvent(new Event("auth-security-breach"));
+        localStorage.removeItem("user");
+        
+        if (!window.location.pathname.includes('/login')) {
+            window.location.replace("/login?reason=security_violation");
+        }
+      } else {
+        console.warn(`🛡️ Security Warning: ${errorCode} for Guest.`);
       }
     }
 
@@ -154,9 +160,9 @@ API.interceptors.response.use(
 export const verifyMe = async () => {
     try {
         const response = await API.get("/auth/verify-me");
-        // Accessing .data.user because the backend wraps it in a 'success' object
         return response.data?.user || null; 
     } catch (error) {
+        // If we get a TOKEN_MISSING or 401, we just return null silently
         return null;
     }
 };
