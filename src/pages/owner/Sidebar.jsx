@@ -1,5 +1,6 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import API from "../../api/config"; // Import your hardened API instance
 import { 
   LayoutDashboard, 
   CalendarCheck, 
@@ -12,14 +13,29 @@ import {
   ChevronRight,
   Wallet,
   Palette,
-  Briefcase,
   Power
 } from "lucide-react";
 
 const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
   const location = useLocation();
+  const navigate = useNavigate();
 
-  // Optimized Menu Items for Comprehensive Business Management
+  // --- LOGOUT LOGIC ---
+  const handleLogout = async () => {
+    try {
+      // 1. Call backend to revoke tokens in Redis and clear HttpOnly cookies
+      await API.post("/auth/logout");
+    } catch (error) {
+      console.error("Logout sync failed, clearing local state anyway.");
+    } finally {
+      // 2. Clear local storage
+      localStorage.removeItem("user");
+      // 3. Force redirect to login
+      navigate("/login");
+    }
+  };
+
+  // Optimized Menu Items
   const menuItems = [
     { name: "Overview", icon: <LayoutDashboard size={22} />, path: "/owner/dashboard" },
     { name: "Appointments", icon: <CalendarCheck size={22} />, path: "/owner/dashboard/bookings" },
@@ -67,7 +83,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
           <Power size={18} className={isCollapsed ? "" : "animate-pulse"} />
           {!isCollapsed && <span className="text-sm whitespace-nowrap">SET WORK MODE</span>}
           
-          {/* Tooltip for collapsed mode */}
           {isCollapsed && (
             <div className="absolute left-16 scale-0 group-hover:scale-100 transition-all bg-slate-800 text-white text-[10px] font-black py-1 px-3 rounded-md uppercase tracking-wider whitespace-nowrap pointer-events-none">
               Work Mode
@@ -96,7 +111,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
                   : "hover:bg-slate-800/50 hover:text-white"
               } ${isCollapsed ? "justify-center" : ""}`}
             >
-              {/* Active Indicator Bar */}
               {isActive && (
                 <div className="absolute left-0 w-1 h-6 bg-indigo-500 rounded-r-full" />
               )}
@@ -111,7 +125,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
                 </span>
               )}
 
-              {/* Tooltip for collapsed mode */}
               {isCollapsed && (
                 <div className="absolute left-16 scale-0 group-hover:scale-100 transition-all bg-slate-800 text-white text-xs py-2 px-3 rounded-lg border border-slate-700 whitespace-nowrap pointer-events-none z-50">
                   {item.name}
@@ -124,7 +137,10 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
 
       {/* Logout Section */}
       <div className="p-4 border-t border-slate-800/50">
-        <button className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl text-rose-400 font-bold hover:bg-rose-500/10 transition-all ${isCollapsed ? "justify-center" : ""}`}>
+        <button 
+          onClick={handleLogout}
+          className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl text-rose-400 font-bold hover:bg-rose-500/10 transition-all ${isCollapsed ? "justify-center" : ""}`}
+        >
           <LogOut size={22} />
           {!isCollapsed && <span className="text-sm">Logout</span>}
         </button>
