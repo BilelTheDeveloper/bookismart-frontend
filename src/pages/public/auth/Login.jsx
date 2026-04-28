@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Mail, Lock, ArrowRight, ShieldCheck, Eye, EyeOff, Loader2, Sparkles } from "lucide-react";
+import { Mail, Lock, ArrowRight, ShieldCheck, Eye, EyeOff, Loader2 } from "lucide-react";
 import { login } from "../../../services/authService";
 import { toast } from "react-hot-toast";
-import { motion, AnimatePresence } from "framer-motion";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -21,11 +20,19 @@ const Login = () => {
     };
 
     try {
+      // 🛡️ SECURITY HANDSHAKE: Clear any leftover session data before logging in
+      localStorage.removeItem("user");
+
       const data = await login(sanitizedData);
+      
+      // 🚀 UPDATE: Store user data and trigger a "Login Event" 
+      // This ensures the config.js headers stay perfectly in sync.
       localStorage.setItem("user", JSON.stringify(data.user));
+      
       toast.success(`Welcome back, ${data.user.fullName.split(' ')[0]}`);
 
       setTimeout(() => {
+        // Advanced Routing Logic
         if (data.user.role === "admin" || data.user.role === "owner") {
           if (data.user.accountStatus === "on_boarding" || data.user.accountStatus === "review") {
              navigate("/onboarding-status");
@@ -39,7 +46,9 @@ const Login = () => {
         }
       }, 800);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Error: Please check your email and password.");
+      // Handle Fingerprint required errors specifically if they bubble up
+      const errorMsg = err.response?.data?.message || "Error: Please check your email and password.";
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -48,9 +57,8 @@ const Login = () => {
   return (
     <div className="flex min-h-screen bg-white font-sans">
       
-      {/* --- LEFT SIDE: BRANDING (Matches Signup) --- */}
+      {/* --- LEFT SIDE: BRANDING --- */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-indigo-900 items-center justify-center p-12 overflow-hidden">
-        {/* Background Image with Overlay */}
         <div 
           className="absolute inset-0 z-0 opacity-40 bg-cover bg-center"
           style={{ backgroundImage: "url('/hero-bg.jpg')" }}
