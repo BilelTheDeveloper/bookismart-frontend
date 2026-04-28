@@ -197,9 +197,11 @@ const HairSalonTemplate = ({ data }) => {
                 <h4 className="text-2xl font-black uppercase italic mb-4 group-hover:text-indigo-400 transition-colors">{service.title}</h4>
                 <p className="text-zinc-500 font-medium line-clamp-2">{service.description}</p>
                 <div className="mt-8 pt-8 border-t border-white/5 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Link to={`/book/${merchant?._id}`}>
                    <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-400">
                      Book Now <ArrowRight size={14} />
                    </button>
+                </Link>
                 </div>
               </motion.div>
             ))}

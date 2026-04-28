@@ -12,6 +12,7 @@ import HowItWorksPage from "./pages/public/HowItWorks";
 import ServicesPage from "./pages/public/Services";
 import ProfessionalsPage from "./pages/public/Professionals";
 import ProfilePreview from "./pages/public/ProfilePreview";
+import BookingPage from "./pages/public/BookingPage"; // 🆕 Added Booking Update
 
 // --- Onboarding & Auth ---
 import SignupLayout from "./pages/public/signup/SignupLayout";
@@ -80,8 +81,10 @@ const LayoutManager = ({ children }) => {
   const isAdminPage = location.pathname.startsWith("/admin");
   const isOwnerPage = location.pathname.startsWith("/owner");
   const isProfilePreview = location.pathname.startsWith("/p/");
+  const isBookingPage = location.pathname.startsWith("/book/"); // 🆕 Added for ultra-UI
   
-  const hideChrome = isSignupPage || isAdminPage || isOwnerPage || isProfilePreview;
+  // 🛡️ Hide Chrome for high-immersion pages
+  const hideChrome = isSignupPage || isAdminPage || isOwnerPage || isProfilePreview || isBookingPage;
 
   return (
     <>
@@ -107,6 +110,7 @@ function App() {
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/professionals" element={<ProfessionalsPage />} />
           <Route path="/p/:slug" element={<ProfilePreview />} />
+          <Route path="/book/:merchantId" element={<BookingPage />} /> {/* 🆕 Public Booking Route */}
 
           {/* --- 2. Auth Routes --- */}
           <Route path="/signup" element={<SignupLayout />} />

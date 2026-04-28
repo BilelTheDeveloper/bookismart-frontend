@@ -4,6 +4,7 @@ import {
   , Sparkles, Calendar, Heart, Camera
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom"; // Import Link for navigation
 
 /**
  * 💄 LUXE MAKEUP ARTIST TEMPLATE - VOGUE EDITION
@@ -11,6 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const MakeupArtistTheme = ({ data }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
   const InstagramIcon = ({ size = 20, className = "" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -71,9 +73,11 @@ const FacebookIcon = ({ size = 20, className = "" }) => (
                 {link.name}
               </a>
             ))}
-            <button className="px-8 py-3 bg-slate-900 hover:bg-rose-500 text-white text-[10px] font-bold uppercase tracking-widest rounded-full transition-all active:scale-95 shadow-lg">
-              Inquire Now
-            </button>
+            <Link to={`/book/${ownerId?._id}`}>
+              <button className="px-8 py-3 bg-slate-900 hover:bg-rose-500 text-white text-[10px] font-bold uppercase tracking-widest rounded-full transition-all active:scale-95 shadow-lg">
+                Inquire Now
+              </button>
+            </Link>
           </div>
 
           <button className="md:hidden text-slate-900" onClick={() => setMobileMenuOpen(true)}>
@@ -133,9 +137,12 @@ const FacebookIcon = ({ size = 20, className = "" }) => (
           <p className="text-lg md:text-xl text-white font-medium mb-12 max-w-2xl mx-auto italic opacity-90">
             {hero.slogan || "Enhancing your natural beauty for life's most precious moments."}
           </p>
-          <button className="px-16 py-6 bg-white text-slate-900 font-bold rounded-full uppercase tracking-[0.3em] text-xs transition-all hover:bg-rose-50 hover:scale-105 shadow-2xl">
-            View My Portfolio
-          </button>
+          
+          <Link to={`/book/${ownerId?._id}`}>
+            <button className="px-16 py-6 bg-white text-slate-900 font-bold rounded-full uppercase tracking-[0.3em] text-xs transition-all hover:bg-rose-50 hover:scale-105 shadow-2xl">
+              Book
+            </button>
+          </Link>
         </motion.div>
       </section>
 
@@ -199,12 +206,14 @@ const FacebookIcon = ({ size = 20, className = "" }) => (
                 {about.text || "Every face is a canvas, and every person has a story. I specialize in creating looks that don't just look good in photos, but feel weightless and authentic in person."}
               </p>
               <div className="pt-6">
-                <div className="flex items-center gap-4 group cursor-pointer">
-                  <div className="w-12 h-12 rounded-full border border-rose-200 flex items-center justify-center group-hover:bg-rose-500 group-hover:text-white transition-all">
-                    <Calendar size={18} />
+                <Link to={`/book/${ownerId?._id}`}>
+                  <div className="flex items-center gap-4 group cursor-pointer">
+                    <div className="w-12 h-12 rounded-full border border-rose-200 flex items-center justify-center group-hover:bg-rose-500 group-hover:text-white transition-all">
+                      <Calendar size={18} />
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-widest">Reserve Your Date</span>
                   </div>
-                  <span className="text-xs font-bold uppercase tracking-widest">Reserve Your Date</span>
-                </div>
+                </Link>
               </div>
             </div>
           </div>
@@ -292,9 +301,11 @@ const FacebookIcon = ({ size = 20, className = "" }) => (
           <div className="bg-white p-12 rounded-[3rem] text-slate-900">
             <h4 className="text-3xl font-serif italic mb-4">Start Your Glow.</h4>
             <p className="text-sm text-slate-500 mb-8 leading-relaxed">Book a consultation to discuss your look for weddings, events, or shoots.</p>
-            <button className="w-full py-5 bg-slate-900 text-white font-bold rounded-full uppercase tracking-widest text-[10px] hover:bg-rose-500 transition-all">
-              Book Appointment
-            </button>
+            <Link to={`/book/${ownerId?._id}`}>
+              <button className="w-full py-5 bg-slate-900 text-white font-bold rounded-full uppercase tracking-widest text-[10px] hover:bg-rose-500 transition-all">
+                Book Appointment
+              </button>
+            </Link>
           </div>
 
         </div>

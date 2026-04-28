@@ -10,7 +10,7 @@ import {
   Calendar
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
+import { Link } from "react-router-dom"; 
 /**
  * CUSTOM SVG COMPONENTS (Lucide Replacements)
  */
@@ -85,9 +85,11 @@ const ClassicBarber = ({ data }) => {
                 {link.name}
               </a>
             ))}
+            <Link to={`/book/${ownerId?._id}`}>
             <button className="px-6 py-2.5 bg-amber-600 hover:bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full transition-all active:scale-95">
               Book Now
             </button>
+            </Link>
           </div>
 
           <button className="md:hidden text-white" onClick={() => setMobileMenuOpen(true)}>
@@ -150,9 +152,11 @@ const ClassicBarber = ({ data }) => {
             {hero.slogan || "Redefining the classic barbershop experience for the modern gentleman."}
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <Link to={`/book/${ownerId?._id}`}>
             <button className="w-full sm:w-auto px-12 py-6 bg-amber-600 hover:bg-amber-500 text-white font-black rounded-xl uppercase tracking-[0.2em] text-xs transition-all shadow-2xl shadow-amber-900/40">
-              Schedule Visit
+              Book Now
             </button>
+            </Link>
             <div className="flex items-center gap-4 text-white/60">
               <Phone size={18} className="text-amber-500" />
               <span className="font-bold tracking-widest">{contact.phone}</span>
@@ -316,9 +320,11 @@ const ClassicBarber = ({ data }) => {
             <Calendar className="text-amber-500" size={40} />
             <h4 className="text-2xl font-black text-white uppercase italic tracking-tighter">Ready to cut?</h4>
             <p className="text-slate-400 font-medium">Skip the wait. Book your spot online in less than 30 seconds.</p>
+            <Link to={`/book/${ownerId?._id}`}>
             <button className="w-full py-5 bg-amber-600 text-white font-black rounded-xl uppercase tracking-widest text-xs shadow-xl shadow-amber-600/20">
               Book Appointment Now
             </button>
+            </Link>
           </div>
 
         </div>
