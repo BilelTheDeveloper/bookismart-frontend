@@ -108,8 +108,6 @@ API.interceptors.response.use(
 
     /**
      * 🚩 CASE 2: Security Breach / Revocation
-     * 🛡️ FIX: We REMOVED 'TOKEN_MISSING' and 'FINGERPRINT_MISSING' from here.
-     * These should not trigger a security breach alert for guests.
      */
     const criticalSecurityCodes = [
         'TOKEN_REVOKED', 
@@ -118,8 +116,6 @@ API.interceptors.response.use(
     ];
 
     if (criticalSecurityCodes.includes(errorCode)) {
-      // 🛡️ FIX: Only trigger the "Watchdog" if we actually have a user in state.
-      // This stops guests and new sign-ups from getting trapped in loops.
       if (isUserLoggedIn) {
         console.error(`🚨 [Security Alert]: ${errorCode}. Session terminated.`);
         window.dispatchEvent(new Event("auth-security-breach"));
@@ -149,20 +145,37 @@ API.interceptors.response.use(
       }
     }
 
+    /**
+     * 🚩 CASE 5: Fingerprint Race Condition Fix (Handshake Retry)
+     * FIX: If the backend reports a missing fingerprint, we grab it and retry 
+     * the request immediately. This fixes the "refresh required" bug.
+     */
+    if ((errorCode === 'FINGERPRINT_MISSING' || errorCode === 'FINGERPRINT_REQUIRED') && !originalRequest._retry) {
+      originalRequest._retry = true;
+      console.warn("🛡️ Security Handshake: Re-syncing fingerprint...");
+      
+      // Ensure fingerprint exists in local storage
+      const freshFingerprint = getBrowserFingerprint();
+      
+      // Update the header for the retry
+      originalRequest.headers["x-device-fingerprint"] = freshFingerprint;
+      
+      // Immediate retry of the original request
+      return API(originalRequest);
+    }
+
     return Promise.reject(error);
   }
 );
 
 /**
  * 🔑 SECURITY UTILITY: verifyMe
- * Corrected to handle the { success: true, user: {...} } response format.
  */
 export const verifyMe = async () => {
     try {
         const response = await API.get("/auth/verify-me");
         return response.data?.user || null; 
     } catch (error) {
-        // If we get a TOKEN_MISSING or 401, we just return null silently
         return null;
     }
 };

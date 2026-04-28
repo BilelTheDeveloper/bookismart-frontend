@@ -23,6 +23,8 @@ export const AuthProvider = ({ children }) => {
 
   /**
    * 🔄 INITIALIZE: Real-time Backend Verification
+   * NOTE: The "First-Try" race condition is handled silently by the 
+   * Axios Response Interceptor (Case 5).
    */
   const initializeAuth = useCallback(async () => {
     try {
