@@ -147,14 +147,16 @@ API.interceptors.response.use(
 
     /**
      * 🚩 CASE 5: Fingerprint Race Condition Fix (Handshake Retry)
-     * FIX: If the backend reports a missing fingerprint, we grab it and retry 
-     * the request immediately. This fixes the "refresh required" bug.
+     * UPDATE: Added a 500ms stabilization delay to ensure the browser 
+     * registers the identity before the retry hits the server.
      */
     if ((errorCode === 'FINGERPRINT_MISSING' || errorCode === 'FINGERPRINT_REQUIRED') && !originalRequest._retry) {
       originalRequest._retry = true;
       console.warn("🛡️ Security Handshake: Re-syncing fingerprint...");
       
-      // Ensure fingerprint exists in local storage
+      // Stabilization Delay: Wait 500ms for browser identity sync
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       const freshFingerprint = getBrowserFingerprint();
       
       // Update the header for the retry
