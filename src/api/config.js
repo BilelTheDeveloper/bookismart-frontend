@@ -147,10 +147,13 @@ API.interceptors.response.use(
 
     /**
      * 🚩 CASE 5: Fingerprint Race Condition Fix (Handshake Retry)
-     * UPDATE: Added a 500ms stabilization delay to ensure the browser 
-     * registers the identity before the retry hits the server.
+     * ✅ UPDATE: Added URL Guard to prevent retry-loops on background verification
      */
-    if ((errorCode === 'FINGERPRINT_MISSING' || errorCode === 'FINGERPRINT_REQUIRED') && !originalRequest._retry) {
+    if (
+      (errorCode === 'FINGERPRINT_MISSING' || errorCode === 'FINGERPRINT_REQUIRED') && 
+      !originalRequest._retry &&
+      !originalRequest.url.includes('/auth/verify-me') // 🛡️ URL Guard
+    ) {
       originalRequest._retry = true;
       console.warn("🛡️ Security Handshake: Re-syncing fingerprint...");
       
@@ -178,6 +181,7 @@ export const verifyMe = async () => {
         const response = await API.get("/auth/verify-me");
         return response.data?.user || null; 
     } catch (error) {
+        // Return null instead of throwing to allow AuthContext background check to fail gracefully
         return null;
     }
 };

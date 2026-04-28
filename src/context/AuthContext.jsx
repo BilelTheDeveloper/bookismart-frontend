@@ -4,7 +4,7 @@ import API, { verifyMe } from "../api/config";
 const AuthContext = createContext();
 
 /**
- * 🛡️ ENTERPRISE AUTH PROVIDER (Redis + Fingerprint Edition)
+ * 🛡️ ENTERPRISE AUTH PROVIDER (Redis + Fingerprint + Fast-Path Edition)
  */
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -22,23 +22,47 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   /**
-   * 🔄 INITIALIZE: Real-time Backend Verification
-   * NOTE: The "First-Try" race condition is handled silently by the 
-   * Axios Response Interceptor (Case 5).
+   * 🔄 INITIALIZE: Hydrate-then-Verify Pattern
+   * ⚡ This fixes the race condition: 
+   * 1. Check localStorage first (Fast-Path) to unblock the UI.
+   * 2. Verify with backend in the background to ensure session is still valid.
    */
   const initializeAuth = useCallback(async () => {
     try {
+      // 🚀 STEP 1: FAST-PATH (Hydration)
+      // Immediately trust localStorage so the user sees their dashboard without delay.
+      const cachedUser = localStorage.getItem("user");
+      if (cachedUser) {
+        try {
+          const parsed = JSON.parse(cachedUser);
+          setUser(parsed);
+          setIsAuthenticated(true);
+          setLoading(false); // UI is now unblocked
+        } catch (e) {
+          localStorage.removeItem("user");
+        }
+      }
+
+      // 🛡️ STEP 2: BACKGROUND VERIFICATION (The "Truth" check)
+      // Confirm with the server that the cookie and fingerprint are actually valid.
       const verifiedUser = await verifyMe();
       
       if (verifiedUser) {
         setUser(verifiedUser);
         setIsAuthenticated(true);
+        localStorage.setItem("user", JSON.stringify(verifiedUser));
       } else {
+        // If the backend says no session exists, we must clear local data.
         clearAuthData();
       }
     } catch (error) {
-      clearAuthData();
+      // If we hit a 401/403 or specific auth error, nuke the state.
+      // We check for error.response to avoid clearing on random network flickers.
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        clearAuthData();
+      }
     } finally {
+      // Ensure loading is false even if the network request failed
       setLoading(false);
     }
   }, [clearAuthData]);
@@ -81,8 +105,6 @@ export const AuthProvider = ({ children }) => {
       console.error("Logout notification failed, proceeding with local cleanup.");
     } finally {
       clearAuthData();
-      // Optional: Clear fingerprint on logout for a 100% fresh start
-      // localStorage.removeItem("device_fingerprint"); 
       window.location.href = "/login";
     }
   };
@@ -95,6 +117,7 @@ export const AuthProvider = ({ children }) => {
     if (updatedUser) {
       setUser(updatedUser);
       setIsAuthenticated(true);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
     } else {
       clearAuthData();
     }

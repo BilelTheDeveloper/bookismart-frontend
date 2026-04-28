@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Mail, Lock, ArrowRight, ShieldCheck, Eye, EyeOff, Loader2, Sparkles } from "lucide-react";
+import { Mail, Lock, ArrowRight, ShieldCheck, Eye, EyeOff, Loader2 } from "lucide-react";
 import { login } from "../../../services/authService";
+import { useAuth } from "../../../context/AuthContext"; // 🛡️ Ensure this path is correct
 import { toast } from "react-hot-toast";
-import { motion, AnimatePresence } from "framer-motion";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { loginUser } = useAuth(); // 🛡️ Trigger global state update
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -21,15 +22,23 @@ const Login = () => {
     };
 
     try {
+      // 1. Execute Login API (Sets HttpOnly Cookie on Backend)
       const data = await login(sanitizedData);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      
+      // 2. ✅ FAST-PATH SYNC: Update Context immediately.
+      // This populates state + localStorage so the next page already "knows" we are logged in.
+      loginUser(data.user);
+      
       toast.success(`Welcome back, ${data.user.fullName.split(' ')[0]}`);
 
+      // 3. Precision Navigation with slight delay for State settling
       setTimeout(() => {
-        if (data.user.role === "admin" || data.user.role === "owner") {
-          if (data.user.accountStatus === "on_boarding" || data.user.accountStatus === "review") {
+        const { role, accountStatus } = data.user;
+        
+        if (role === "admin" || role === "owner") {
+          if (accountStatus === "on_boarding" || accountStatus === "review") {
              navigate("/onboarding-status");
-          } else if (data.user.role === "admin") {
+          } else if (role === "admin") {
              navigate("/admin/dashboard");
           } else {
              navigate("/owner/dashboard");
