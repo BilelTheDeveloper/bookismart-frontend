@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { 
   Calendar, 
   Clock, 
@@ -12,9 +13,14 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const BookingPage = () => {
+// Configuration for your Render backend
+const API_BASE_URL = "https://bookismart-backend.onrender.com/api";
+
+const BookingPage = ({ merchantSlug = "vogue-studio-tunis" }) => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [websiteData, setWebsiteData] = useState(null);
   const [formData, setFormData] = useState({
     customerName: "",
     customerEmail: "",
@@ -24,26 +30,63 @@ const BookingPage = () => {
     notes: ""
   });
 
-  // Mock Data - In production, these come from your Merchant/Services API
-  const availableSlots = ["09:00", "10:30", "13:00", "14:30", "16:00"];
-  const service = {
-    title: "Signature Haircut & Styling",
-    price: "45.00",
-    duration: 45
-  };
+  // 1. Fetch Website Content & Services on Mount
+  useEffect(() => {
+    const fetchWebsite = async () => {
+      try {
+        setLoading(true);
+        // Using your public route to get the merchant details by slug
+        const response = await axios.get(`${API_BASE_URL}/public/website/${merchantSlug}`);
+        if (response.data.success) {
+          setWebsiteData(response.data.website);
+        }
+      } catch (err) {
+        console.error("Error fetching merchant data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchWebsite();
+  }, [merchantSlug]);
+
+  // Derived data from websiteData
+  const availableSlots = ["09:00", "10:30", "13:00", "14:30", "16:00"]; // Ideally fetched based on date
+  const activeServices = websiteData?.services?.filter(s => s.active) || [];
+  const selectedService = activeServices[0] || { title: "Service", price: "0", duration: 30 };
 
   const handleNext = () => setStep(step + 1);
   const handleBack = () => setStep(step - 1);
 
+  // 2. Connect to Backend Booking Controller
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    // Logic to call your backend /api/bookings
-    setTimeout(() => {
-      setLoading(false);
-      setStep(3); // Show Success
-    }, 1500);
+    setSubmitting(true);
+
+    try {
+      const bookingPayload = {
+        merchantId: websiteData._id,
+        serviceTitle: selectedService.title,
+        customerName: formData.customerName,
+        customerEmail: formData.customerEmail,
+        customerPhone: formData.customerPhone,
+        appointmentDate: formData.dateString,
+        timeSlot: formData.timeSlot,
+        notes: formData.notes
+      };
+
+      const response = await axios.post(`${API_BASE_URL}/bookings/new`, bookingPayload);
+
+      if (response.data.success) {
+        setStep(3); // Show Success Screen
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || "Booking failed. Please try a different slot.");
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center font-black text-indigo-600">LOADING EXPERIENCE...</div>;
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 md:p-8 font-sans">
@@ -61,8 +104,12 @@ const BookingPage = () => {
                 className="space-y-8"
               >
                 <div>
-                  <h2 className="text-3xl font-black text-slate-900 leading-tight">Pick Your <span className="text-indigo-600">Time.</span></h2>
-                  <p className="text-slate-500 font-medium mt-2">Select your preferred date and available slot.</p>
+                  <h2 className="text-3xl font-black text-slate-900 leading-tight">
+                    Pick Your <span className="text-indigo-600">Time.</span>
+                  </h2>
+                  <p className="text-slate-500 font-medium mt-2">
+                    Booking for <span className="text-slate-900 font-bold">{websiteData?.hero?.title || "our services"}</span>.
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -72,6 +119,7 @@ const BookingPage = () => {
                       <Calendar className="text-slate-400 mr-3" size={20} />
                       <input 
                         type="date" 
+                        min={new Date().toISOString().split('T')[0]}
                         className="bg-transparent outline-none w-full font-bold text-slate-800"
                         onChange={(e) => setFormData({...formData, dateString: e.target.value})}
                       />
@@ -84,6 +132,7 @@ const BookingPage = () => {
                       {availableSlots.map((slot) => (
                         <button
                           key={slot}
+                          type="button"
                           onClick={() => setFormData({...formData, timeSlot: slot})}
                           className={`py-3 px-4 rounded-xl font-bold text-sm transition-all ${
                             formData.timeSlot === slot 
@@ -122,7 +171,7 @@ const BookingPage = () => {
                 
                 <div>
                   <h2 className="text-3xl font-black text-slate-900">Your <span className="text-indigo-600">Information.</span></h2>
-                  <p className="text-slate-500 font-medium mt-1">Tell us who is coming in for the appointment.</p>
+                  <p className="text-slate-500 font-medium mt-1">Directly notifying {websiteData?.hero?.title} of your arrival.</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -165,10 +214,10 @@ const BookingPage = () => {
 
                   <button 
                     type="submit"
-                    disabled={loading}
+                    disabled={submitting}
                     className="w-full py-5 bg-indigo-600 text-white font-black rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all"
                   >
-                    {loading ? "PROCESSING..." : "CONFIRM BOOKING"}
+                    {submitting ? "SYNCHRONIZING..." : "CONFIRM BOOKING"}
                   </button>
                 </form>
               </motion.div>
@@ -186,7 +235,7 @@ const BookingPage = () => {
                 </div>
                 <h2 className="text-4xl font-black text-slate-900">Appointment <span className="text-green-600">Booked!</span></h2>
                 <p className="text-slate-500 font-bold text-lg max-w-sm">
-                  We've sent a confirmation email to <span className="text-slate-900">{formData.customerEmail}</span>. See you soon!
+                  Confirmed for <span className="text-slate-900">{websiteData?.hero?.title}</span>. We've sent details to your email.
                 </p>
                 <button 
                   onClick={() => window.location.reload()}
@@ -199,12 +248,11 @@ const BookingPage = () => {
           </AnimatePresence>
         </div>
 
-        {/* --- RIGHT SIDE: BRANDING & PREVIEW --- */}
+        {/* --- RIGHT SIDE: DYNAMIC BRANDING --- */}
         <div className="hidden lg:flex lg:w-2/5 relative bg-indigo-900 p-12 flex-col justify-between overflow-hidden">
-          {/* Background Image with Mesh Gradient */}
           <div 
             className="absolute inset-0 z-0 opacity-40 bg-cover bg-center grayscale hover:grayscale-0 transition-all duration-1000"
-            style={{ backgroundImage: "url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=2070&auto=format&fit=crop')" }}
+            style={{ backgroundImage: `url(${websiteData?.hero?.backgroundImage || 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=2070&auto=format&fit=crop'})` }}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-indigo-900/90 to-slate-900/90 z-10" />
 
@@ -216,24 +264,27 @@ const BookingPage = () => {
               <span className="text-xl font-black text-white tracking-tighter uppercase">Bookiify Verified</span>
             </div>
 
-            <h1 className="text-5xl font-black text-white leading-none tracking-tight">
-              ELEGANCE <br />
-              <span className="text-indigo-400 italic font-light font-serif text-6xl">Defined.</span>
+            <h1 className="text-5xl font-black text-white leading-none tracking-tight uppercase">
+              {websiteData?.hero?.title || "EXCELLENCE"} <br />
+              <span className="text-indigo-400 italic font-light font-serif text-4xl normal-case">
+                {websiteData?.hero?.slogan || "Defined."}
+              </span>
             </h1>
             <p className="mt-6 text-slate-300 text-lg font-medium leading-relaxed max-w-xs">
-              Experience the pinnacle of service at your favorite merchant. Your time, prioritized.
+              {websiteData?.about?.text?.substring(0, 120) || "Experience the pinnacle of service at your favorite merchant. Your time, prioritized."}...
             </p>
           </div>
 
-          <div className="relative z-20 bg-white/5 backdrop-blur-2xl border border-white/10 p-6 rounded-[2rem] space-y-4">
+          {/* DYNAMIC SERVICE CARD */}
+          <div className="relative z-20 bg-white/5 backdrop-blur-2xl border border-white/10 p-6 rounded-[2rem] space-y-4 shadow-2xl">
              <div className="flex justify-between items-start">
                 <p className="text-xs font-black text-indigo-300 uppercase tracking-widest">Selected Service</p>
-                <p className="text-xl font-black text-white">${service.price}</p>
+                <p className="text-xl font-black text-white">{selectedService.price} TND</p>
              </div>
              <div>
-                <h3 className="text-xl font-bold text-white">{service.title}</h3>
+                <h3 className="text-xl font-bold text-white">{selectedService.title}</h3>
                 <div className="flex items-center gap-2 text-slate-400 mt-1">
-                   <Clock size={14} /> <span className="text-xs font-bold">{service.duration} Minutes</span>
+                   <Clock size={14} /> <span className="text-xs font-bold">{selectedService.duration || 45} Minutes</span>
                 </div>
              </div>
              
