@@ -47,6 +47,7 @@ function SecurityWatchdog() {
     const handleSecurityBreach = () => {
       console.warn("🚨 Security Breach Detected: Cleaning session...");
       localStorage.removeItem("user");
+      localStorage.removeItem("csrf_token");
       // Optionally don't remove device_fingerprint so the ID stays consistent
       navigate("/login?reason=security_violation");
     };

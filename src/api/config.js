@@ -14,6 +14,13 @@ const API = axios.create({
   withCredentials: true, 
 });
 
+const getStoredCsrfToken = () => localStorage.getItem("csrf_token");
+const setStoredCsrfToken = (token) => {
+  if (typeof token === "string" && token.trim()) {
+    localStorage.setItem("csrf_token", token);
+  }
+};
+
 /**
  * 🛡️ HARDENED DEVICE FINGERPRINT ENGINE
  * Resolves UUID persistence and handles edge-case string corruption.
@@ -51,6 +58,13 @@ API.interceptors.request.use(
   (config) => {
     // Every request carries the "Identity Binding" for the Redis/Hardware check
     config.headers["x-device-fingerprint"] = getBrowserFingerprint();
+    const method = (config.method || "get").toUpperCase();
+    if (!["GET", "HEAD", "OPTIONS"].includes(method)) {
+      const csrfToken = getStoredCsrfToken();
+      if (csrfToken) {
+        config.headers["x-csrf-token"] = csrfToken;
+      }
+    }
     return config;
   },
   (error) => Promise.reject(error)
@@ -60,7 +74,13 @@ API.interceptors.request.use(
  * 🛡️ RESPONSE INTERCEPTOR: Precision Security Handling
  */
 API.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const csrfToken = response?.data?.csrfToken;
+    if (csrfToken) {
+      setStoredCsrfToken(csrfToken);
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
     
@@ -99,6 +119,7 @@ API.interceptors.response.use(
         isRefreshing = false;
 
         localStorage.removeItem("user");
+        localStorage.removeItem("csrf_token");
         if (!window.location.pathname.includes('/')) {
             window.location.href = "/";
         }
@@ -120,6 +141,7 @@ API.interceptors.response.use(
         console.error(`🚨 [Security Alert]: ${errorCode}. Session terminated.`);
         window.dispatchEvent(new Event("auth-security-breach"));
         localStorage.removeItem("user");
+        localStorage.removeItem("csrf_token");
         
         if (!window.location.pathname.includes('/login')) {
             window.location.replace("/login?reason=security_violation");

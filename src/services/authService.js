@@ -87,6 +87,7 @@ export const logout = async () => {
   } finally {
     // 100% Cleanup
     localStorage.removeItem("user");
+    localStorage.removeItem("csrf_token");
     
     // 🔥 SECURITY: Reset the memory state of the entire app
     window.location.href = "/login?logout=success";
