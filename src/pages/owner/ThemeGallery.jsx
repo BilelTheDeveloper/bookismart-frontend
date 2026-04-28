@@ -7,12 +7,23 @@ import { THEME_REGISTRY, getThemesByCategory } from "./ThemeRegistry";
 const ThemeGallery = () => {
   const navigate = useNavigate();
 
-  const user = JSON.parse(localStorage.getItem("user")) || {
-    category: "Beauty & Barbers", 
-    businessName: "My Business"
+  let parsedUser = null;
+  try {
+    parsedUser = JSON.parse(localStorage.getItem("user") || "null");
+  } catch {
+    parsedUser = null;
+  }
+
+  const user = {
+    category: parsedUser?.category || "Beauty & Barbers",
+    businessName: parsedUser?.businessName || "My Business",
   };
 
-  const filteredThemes = getThemesByCategory(user.category);
+  const safeCategory = typeof user.category === "string" && user.category.trim()
+    ? user.category
+    : "Beauty & Barbers";
+
+  const filteredThemes = getThemesByCategory(safeCategory);
 
   const [activeThemeId, setActiveThemeId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -113,7 +124,7 @@ const ThemeGallery = () => {
             <span className="text-xs font-black uppercase tracking-widest">Theme Engine v1.0</span>
           </div>
           <h2 className="text-3xl font-black text-slate-900 capitalize">
-            {user.category.replace(/([A-Z])/g, ' $1').trim()} <span className="text-slate-400 font-medium italic">Templates</span>
+            {safeCategory.replace(/([A-Z])/g, ' $1').trim()} <span className="text-slate-400 font-medium italic">Templates</span>
           </h2>
           <p className="text-slate-500 mt-1 font-medium">
             Designs optimized for your specific industry and brand aesthetic.
