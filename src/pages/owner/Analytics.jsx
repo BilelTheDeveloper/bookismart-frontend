@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { 
   BarChart3, 
   TrendingUp, 
@@ -11,15 +11,35 @@ import {
   Clock,
   Filter
 } from "lucide-react";
+import API from "../../api/config";
 
 const Analytics = () => {
-  // Mock data for the UI
-  const stats = [
-    { label: "Total Revenue", value: "1,250.000", sub: "TND", trend: "+12.5%", positive: true, icon: <DollarSign size={20} /> },
-    { label: "Total Bookings", value: "148", sub: "Appointments", trend: "+8.2%", positive: true, icon: <Calendar size={20} /> },
-    { label: "New Customers", value: "32", sub: "This Month", trend: "-2.4%", positive: false, icon: <Users size={20} /> },
-    { label: "Avg. Ticket", value: "45.000", sub: "TND / Visit", trend: "+4.1%", positive: true, icon: <TrendingUp size={20} /> },
-  ];
+  const [summary, setSummary] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    API.get("/merchant/insights/summary").then((res) => {
+      if (!mounted) return;
+      if (res.data?.success) setSummary(res.data.data);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const stats = useMemo(() => {
+    const totalRevenue = summary?.totalRevenue ?? 0;
+    const totalBookings = summary?.totalBookings ?? 0;
+    const newCustomers30d = summary?.newCustomers30d ?? 0;
+    const avgTicket = summary?.avgTicket ?? 0;
+
+    return [
+      { label: "Total Revenue", value: totalRevenue.toFixed(3), sub: "TND", trend: "Live", positive: true, icon: <DollarSign size={20} /> },
+      { label: "Total Bookings", value: String(totalBookings), sub: "Appointments", trend: "Live", positive: true, icon: <Calendar size={20} /> },
+      { label: "New Customers", value: String(newCustomers30d), sub: "Last 30 Days", trend: "Live", positive: true, icon: <Users size={20} /> },
+      { label: "Avg. Ticket", value: avgTicket.toFixed(3), sub: "TND / Visit", trend: "Live", positive: true, icon: <TrendingUp size={20} /> },
+    ];
+  }, [summary]);
 
   const topServices = [
     { name: "Haircut & Beard Trim", usage: 64, revenue: "960.000", color: "bg-indigo-500" },

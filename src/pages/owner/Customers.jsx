@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { 
   Users, 
   Search, 
@@ -12,40 +12,42 @@ import {
   TrendingUp,
   Award
 } from "lucide-react";
+import API from "../../api/config";
+import { useNavigate } from "react-router-dom";
 
 const Customers = () => {
-  const customers = [
-    { 
-      id: "CUS-001", 
-      name: "Ahmed Mansour", 
-      email: "ahmed.m@email.tn", 
-      phone: "+216 22 444 888", 
-      visits: 24, 
-      spend: "1,240.000", 
-      status: "VIP",
-      lastVisit: "2 days ago" 
-    },
-    { 
-      id: "CUS-002", 
-      name: "Selima Gharbi", 
-      email: "selima.g@email.tn", 
-      phone: "+216 50 111 222", 
-      visits: 8, 
-      spend: "420.500", 
-      status: "Regular",
-      lastVisit: "1 week ago" 
-    },
-    { 
-      id: "CUS-003", 
-      name: "Karim Ben Said", 
-      email: "karim.bs@email.tn", 
-      phone: "+216 98 777 666", 
-      visits: 1, 
-      spend: "35.000", 
-      status: "New",
-      lastVisit: "Today" 
-    }
-  ];
+  const navigate = useNavigate();
+  const [q, setQ] = useState("");
+  const [customers, setCustomers] = useState([]);
+
+  useEffect(() => {
+    let mounted = true;
+    API.get("/merchant/insights/customers").then((res) => {
+      if (!mounted) return;
+      if (res.data?.success) setCustomers(res.data.data || []);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const filtered = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    if (!s) return customers;
+    return customers.filter((c) => {
+      return (
+        String(c.name || "").toLowerCase().includes(s) ||
+        String(c.email || "").toLowerCase().includes(s) ||
+        String(c.phone || "").toLowerCase().includes(s)
+      );
+    });
+  }, [customers, q]);
+
+  const totalDatabase = customers.length;
+  const vipCount = customers.filter((c) => c.status === "VIP").length;
+  const avgSpend = totalDatabase
+    ? customers.reduce((sum, c) => sum + (Number(c.spend) || 0), 0) / totalDatabase
+    : 0;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
@@ -55,7 +57,7 @@ const Customers = () => {
         <div className="bg-indigo-600 rounded-[2.5rem] p-8 text-white flex items-center justify-between shadow-xl shadow-indigo-100 relative overflow-hidden">
           <div className="relative z-10">
             <p className="text-indigo-200 text-xs font-black uppercase tracking-widest mb-1">Total Database</p>
-            <h3 className="text-4xl font-black italic">1,284</h3>
+            <h3 className="text-4xl font-black italic">{totalDatabase}</h3>
             <div className="flex items-center gap-2 mt-4 text-xs font-bold bg-white/10 w-fit px-3 py-1.5 rounded-full">
               <TrendingUp size={14} /> +12 this week
             </div>
@@ -69,7 +71,7 @@ const Customers = () => {
           </div>
           <div>
             <p className="text-slate-400 text-xs font-black uppercase tracking-widest">VIP Loyalty</p>
-            <h3 className="text-2xl font-black text-slate-900">86 <span className="text-sm font-medium text-slate-400 italic">Clients</span></h3>
+            <h3 className="text-2xl font-black text-slate-900">{vipCount} <span className="text-sm font-medium text-slate-400 italic">Clients</span></h3>
             <p className="text-slate-500 text-[11px] font-bold mt-1">High retention rate: 94%</p>
           </div>
         </div>
@@ -80,7 +82,7 @@ const Customers = () => {
           </div>
           <div>
             <p className="text-slate-400 text-xs font-black uppercase tracking-widest">Avg. Spend</p>
-            <h3 className="text-2xl font-black text-slate-900">58.400 <span className="text-sm font-medium text-slate-400 tracking-tighter">TND</span></h3>
+            <h3 className="text-2xl font-black text-slate-900">{avgSpend.toFixed(3)} <span className="text-sm font-medium text-slate-400 tracking-tighter">TND</span></h3>
             <p className="text-slate-500 text-[11px] font-bold mt-1">Lifetime Value (LTV) is rising</p>
           </div>
         </div>
@@ -93,6 +95,8 @@ const Customers = () => {
           <input 
             type="text" 
             placeholder="Search by name, phone or email..." 
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
             className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 transition-all outline-none font-medium"
           />
         </div>
@@ -115,12 +119,16 @@ const Customers = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {customers.map((cus) => (
-                <tr key={cus.id} className="group hover:bg-slate-50/50 transition-all cursor-pointer">
+              {filtered.map((cus) => (
+                <tr
+                  key={cus.customerKey}
+                  className="group hover:bg-slate-50/50 transition-all cursor-pointer"
+                  onClick={() => navigate(`/owner/dashboard/customers/${encodeURIComponent(cus.customerKey)}`)}
+                >
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-900 font-black text-sm border border-slate-200 uppercase">
-                        {cus.name.charAt(0)}
+                        {String(cus.name || "C").charAt(0)}
                       </div>
                       <div>
                         <h4 className="font-black text-slate-900 group-hover:text-indigo-600 transition-colors leading-tight">{cus.name}</h4>
@@ -147,7 +155,7 @@ const Customers = () => {
                   </td>
                   <td className="px-8 py-5">
                     <div className="flex flex-col">
-                      <span className="font-black text-indigo-600">{cus.spend} TND</span>
+                      <span className="font-black text-indigo-600">{Number(cus.spend || 0).toFixed(3)} TND</span>
                       <span className="text-[10px] font-bold text-slate-400 uppercase">Lifetime</span>
                     </div>
                   </td>

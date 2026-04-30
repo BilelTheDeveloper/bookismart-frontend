@@ -23,7 +23,6 @@ import OnboardingStatus from './pages/public/auth/OnboardingStatus'
 import AdminLayout from "./pages/admin/AdminLayout";
 import IdentityVerify from "./pages/admin/IdentityVerify";
 import AdminVerification from "./pages/admin/AdminVerification.jsx";
-import ModeratorConsultations from "./pages/admin/ModeratorConsultations.jsx";
 
 // --- Owner Pages ---
 import OwnerDashboardLayout from "./pages/owner/DashboardLayout";
@@ -37,6 +36,7 @@ import Appointments from "./pages/owner/Appointments";
 import Customers from "./pages/owner/Customers";
 import Settings from "./pages/owner/Settings";
 import WorkMode from "./pages/owner/WorkMode";
+import CustomerHistory from "./pages/owner/CustomerHistory";
 
 /**
  * 🛡️ SECURITY WATCHDOG
@@ -123,7 +123,7 @@ function App() {
           <Route 
             path="/admin" 
             element={
-              <AdminGuard allowedRoles={["admin", "moderator"]}>
+              <AdminGuard allowedRoles={["admin"]}>
                 <AdminLayout />
               </AdminGuard>
             }
@@ -131,7 +131,6 @@ function App() {
             <Route path="verify-identity" element={<IdentityVerify />} />
             <Route path="dashboard" element={<div className="p-6 font-bold text-slate-800">Admin Statistics</div>} />
             <Route path="verification" element={<AdminVerification />} />
-            <Route path="consultations" element={<ModeratorConsultations />} />
           </Route>
 
           {/* --- 4. Owner Dashboard (Locked) --- */}
@@ -146,6 +145,7 @@ function App() {
             <Route path="dashboard" element={<OwnerOverview />} />
             <Route path="dashboard/bookings" element={<Appointments />} />
             <Route path="dashboard/customers" element={<Customers />} />
+            <Route path="dashboard/customers/:customerKey" element={<CustomerHistory />} />
             <Route path="dashboard/finance" element={<Finance />} />
             <Route path="dashboard/billing" element={<Billing />} />
             <Route path="dashboard/themes" element={<ThemeGallery />} /> 

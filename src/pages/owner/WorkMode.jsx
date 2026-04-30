@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import API from "../../api/config";
-import { Play, CheckCircle2, Plus, Minus, Send, TimerReset } from "lucide-react";
+import { Play, CheckCircle2, Plus, Minus, Send, TimerReset, UserRound, Briefcase } from "lucide-react";
+import { getSocket } from "../../services/socket";
 
 const formatTimeLeft = (seconds) => {
   const total = Math.max(0, Number(seconds) || 0);
@@ -10,12 +11,14 @@ const formatTimeLeft = (seconds) => {
 };
 
 const WorkMode = () => {
+  const [view, setView] = useState("owner"); // owner | worker
   const [bookings, setBookings] = useState([]);
   const [consultations, setConsultations] = useState([]);
   const [selected, setSelected] = useState(null);
   const [ownerNotes, setOwnerNotes] = useState("");
   const [message, setMessage] = useState("");
   const [history, setHistory] = useState([]);
+  const joinedRoomRef = useRef(null);
 
   const activeConsultation = useMemo(
     () => consultations.find((c) => c.status === "in_progress") || consultations[0] || null,
@@ -39,6 +42,34 @@ const WorkMode = () => {
     const id = setInterval(loadData, 5000);
     return () => clearInterval(id);
   }, []);
+
+  // Real-time sync: join per-consultation room and refresh on events
+  useEffect(() => {
+    const current = selected || activeConsultation;
+    if (!current?._id) return;
+    const socket = getSocket();
+    const room = `consultation:${current._id}`;
+
+    if (joinedRoomRef.current && joinedRoomRef.current !== room) {
+      socket.emit("leave", { room: joinedRoomRef.current });
+    }
+    joinedRoomRef.current = room;
+    socket.emit("join", { room });
+
+    const onMessage = (payload) => {
+      if (payload?.consultationId === String(current._id)) loadData();
+    };
+    const onDone = (payload) => {
+      if (payload?.consultationId === String(current._id)) loadData();
+    };
+    socket.on("consultation:message", onMessage);
+    socket.on("consultation:done", onDone);
+
+    return () => {
+      socket.off("consultation:message", onMessage);
+      socket.off("consultation:done", onDone);
+    };
+  }, [selected, activeConsultation]);
 
   useEffect(() => {
     const c = selected || activeConsultation;
@@ -68,7 +99,13 @@ const WorkMode = () => {
   const sendMessage = async () => {
     const c = selected || activeConsultation;
     if (!c || !message.trim()) return;
-    await API.post(`/merchant/consultations/${c._id}/messages`, { text: message.trim() });
+    await API.post(
+      `/merchant/consultations/${c._id}/messages`,
+      { text: message.trim() },
+      {
+        headers: view === "worker" ? { "x-work-mode-role": "worker" } : undefined,
+      }
+    );
     setMessage("");
     await loadData();
   };
@@ -90,10 +127,36 @@ const WorkMode = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-3xl font-black text-slate-900">Work Mode</h2>
-        <p className="text-slate-500 font-medium">Live consultation console between owner and moderator.</p>
+        <p className="text-slate-500 font-medium">Owner ↔ worker coordination, chat, and auto-history.</p>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-5">
+      <div className="grid lg:grid-cols-4 gap-5">
+        {/* Work Mode Sidebar */}
+        <aside className="bg-white rounded-3xl border p-5 space-y-3">
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Mode</p>
+          <button
+            onClick={() => setView("owner")}
+            className={`w-full flex items-center gap-3 p-3 rounded-2xl border font-black text-sm ${
+              view === "owner" ? "bg-indigo-50 border-indigo-200 text-indigo-700" : "bg-slate-50 border-slate-100 text-slate-700 hover:bg-slate-100"
+            }`}
+          >
+            <UserRound size={18} /> Owner view
+          </button>
+          <button
+            onClick={() => setView("worker")}
+            className={`w-full flex items-center gap-3 p-3 rounded-2xl border font-black text-sm ${
+              view === "worker" ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "bg-slate-50 border-slate-100 text-slate-700 hover:bg-slate-100"
+            }`}
+          >
+            <Briefcase size={18} /> Worker view
+          </button>
+          <div className="pt-3 border-t border-slate-100">
+            <p className="text-xs font-bold text-slate-500">
+              Worker view sends messages as <span className="font-black">worker</span> (no extra role in auth).
+            </p>
+          </div>
+        </aside>
+
         <section className="bg-white rounded-3xl border p-5 space-y-3">
           <h3 className="font-black text-slate-800">Confirmed Bookings</h3>
           {bookings.map((b) => (
@@ -128,21 +191,40 @@ const WorkMode = () => {
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="rounded-2xl border p-3 h-64 overflow-y-auto bg-slate-50">
                   {(current.messages || []).map((m) => (
-                    <div key={m._id} className={`mb-2 p-2 rounded-lg text-sm ${m.senderRole === "owner" ? "bg-indigo-100 text-indigo-800" : "bg-white border text-slate-700"}`}>
+                    <div key={m._id} className={`mb-2 p-2 rounded-lg text-sm ${
+                      m.senderRole === "owner"
+                        ? "bg-indigo-100 text-indigo-800"
+                        : m.senderRole === "worker"
+                          ? "bg-emerald-100 text-emerald-800"
+                          : "bg-white border text-slate-700"
+                    }`}>
                       <p className="text-[10px] font-black uppercase mb-1">{m.senderRole}</p>
                       {m.text}
                     </div>
                   ))}
                 </div>
                 <div className="space-y-3">
-                  <textarea value={ownerNotes} onChange={(e) => setOwnerNotes(e.target.value)} placeholder="Owner private notes for this consultation..." className="w-full h-28 p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm outline-none" />
+                  {view === "owner" ? (
+                    <textarea value={ownerNotes} onChange={(e) => setOwnerNotes(e.target.value)} placeholder="Owner private notes for this consultation..." className="w-full h-28 p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm outline-none" />
+                  ) : (
+                    <div className="w-full h-28 p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-500 font-medium flex items-center">
+                      Worker view: private owner notes are hidden.
+                    </div>
+                  )}
                   <div className="flex gap-2">
-                    <input value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Message moderator..." className="flex-1 p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm outline-none" />
+                    <input
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      placeholder={view === "worker" ? "Message owner..." : "Message worker..."}
+                      className="flex-1 p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm outline-none"
+                    />
                     <button onClick={sendMessage} className="px-4 rounded-xl bg-indigo-600 text-white"><Send size={16} /></button>
                   </div>
-                  <button onClick={completeConsultation} className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm">
-                    <CheckCircle2 size={16} className="inline mr-2" /> Done Consultation
-                  </button>
+                  {view === "owner" && (
+                    <button onClick={completeConsultation} className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm">
+                      <CheckCircle2 size={16} className="inline mr-2" /> Done Consultation
+                    </button>
+                  )}
                 </div>
               </div>
 

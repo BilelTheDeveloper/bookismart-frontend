@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { 
   Wallet, 
   ArrowUpRight, 
@@ -12,15 +12,31 @@ import {
   CreditCard,
   TrendingUp
 } from "lucide-react";
+import API from "../../api/config";
 
 const Finance = () => {
-  // Mock data reflecting the UserSchema.paymentInfo logic
-  const walletData = {
-    balance: "1,840.500",
-    pending: "320.000",
-    currency: "TND",
-    lastPayout: "Apr 15, 2026"
-  };
+  const [summary, setSummary] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    API.get("/merchant/insights/summary").then((res) => {
+      if (!mounted) return;
+      if (res.data?.success) setSummary(res.data.data);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const walletData = useMemo(() => {
+    const balance = summary?.totalRevenue ?? 0;
+    return {
+      balance: balance.toFixed(3),
+      pending: "0.000",
+      currency: "TND",
+      lastPayout: "—",
+    };
+  }, [summary]);
 
   const revenueSplits = [
     { label: "Direct Bookings", value: "70%", amount: "1,288.350", color: "bg-indigo-500" },
