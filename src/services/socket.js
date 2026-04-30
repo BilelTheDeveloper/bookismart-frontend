@@ -17,3 +17,11 @@ export const getSocket = () => {
   return socket;
 };
 
+export const getWorkModeSocket = (workModeToken) => {
+  return io(getSocketUrl(), {
+    withCredentials: true,
+    transports: ["websocket", "polling"],
+    auth: { workModeToken },
+  });
+};
+

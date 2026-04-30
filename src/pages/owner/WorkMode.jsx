@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import API from "../../api/config";
 import { Play, CheckCircle2, Plus, Minus, Send, TimerReset, UserRound, Briefcase } from "lucide-react";
 import { getSocket } from "../../services/socket";
+import { toast } from "react-hot-toast";
 
 const formatTimeLeft = (seconds) => {
   const total = Math.max(0, Number(seconds) || 0);
@@ -18,6 +19,8 @@ const WorkMode = () => {
   const [ownerNotes, setOwnerNotes] = useState("");
   const [message, setMessage] = useState("");
   const [history, setHistory] = useState([]);
+  const [inviteLink, setInviteLink] = useState("");
+  const [inviteBusy, setInviteBusy] = useState(false);
   const joinedRoomRef = useRef(null);
   const inFlightRef = useRef(false);
   const cooldownUntilRef = useRef(0);
@@ -145,6 +148,34 @@ const WorkMode = () => {
     await loadData();
   };
 
+  const createInvite = async () => {
+    setInviteBusy(true);
+    try {
+      const res = await API.post("/work-mode/invite");
+      if (res.data?.success) {
+        setInviteLink(res.data.data.link);
+        toast.success("Worker link generated");
+      }
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to generate link");
+    } finally {
+      setInviteBusy(false);
+    }
+  };
+
+  const rotateInvite = async () => {
+    setInviteBusy(true);
+    try {
+      await API.post("/work-mode/rotate");
+      setInviteLink("");
+      toast.success("Link revoked. Generate a new one.");
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to rotate link");
+    } finally {
+      setInviteBusy(false);
+    }
+  };
+
   const current = selected || activeConsultation;
 
   return (
@@ -178,6 +209,38 @@ const WorkMode = () => {
             <p className="text-xs font-bold text-slate-500">
               Worker view sends messages as <span className="font-black">worker</span> (no extra role in auth).
             </p>
+          </div>
+
+          <div className="pt-3 border-t border-slate-100 space-y-2">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Worker Invite Link</p>
+            <button
+              disabled={inviteBusy}
+              onClick={createInvite}
+              className="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white font-black text-sm"
+            >
+              Generate Link
+            </button>
+            <button
+              disabled={inviteBusy}
+              onClick={rotateInvite}
+              className="w-full py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 disabled:opacity-60 text-slate-700 font-black text-sm"
+            >
+              Revoke / Rotate
+            </button>
+            {inviteLink && (
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200">
+                <p className="text-xs font-bold text-slate-600 break-all">{inviteLink}</p>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(inviteLink);
+                    toast.success("Copied");
+                  }}
+                  className="mt-2 w-full py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-black text-xs"
+                >
+                  Copy link
+                </button>
+              </div>
+            )}
           </div>
         </aside>
 

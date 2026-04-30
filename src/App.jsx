@@ -37,6 +37,7 @@ import Customers from "./pages/owner/Customers";
 import Settings from "./pages/owner/Settings";
 import WorkMode from "./pages/owner/WorkMode";
 import CustomerHistory from "./pages/owner/CustomerHistory";
+import WorkerWorkMode from "./pages/workmode/WorkerWorkMode";
 
 /**
  * 🛡️ SECURITY WATCHDOG
@@ -113,6 +114,7 @@ function App() {
           <Route path="/professionals" element={<ProfessionalsPage />} />
           <Route path="/p/:slug" element={<ProfilePreview />} />
           <Route path="/book/:merchantId" element={<BookingPage />} /> {/* 🆕 Public Booking Route */}
+          <Route path="/work-mode/worker" element={<WorkerWorkMode />} />
 
           {/* --- 2. Auth Routes --- */}
           <Route path="/signup" element={<SignupLayout />} />
