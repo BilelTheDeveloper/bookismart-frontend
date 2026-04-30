@@ -66,7 +66,13 @@ const TemplateSetupForm = () => {
       { day: 'Friday', open: '09:00', close: '19:00', isClosed: false },
       { day: 'Saturday', open: '09:00', close: '19:00', isClosed: false },
       { day: 'Sunday', open: '09:00', close: '19:00', isClosed: true },
-    ]
+    ],
+    setupConfig: {
+      maxCustomersPerDay: 25,
+      restMinutesBetweenConsultations: 0,
+      pauseWindows: [{ label: "Lunch break", start: "12:00", end: "13:00" }],
+      localization: { country: "", city: "", address: "", timezone: "UTC" }
+    }
   });
 
   useEffect(() => {
@@ -74,12 +80,26 @@ const TemplateSetupForm = () => {
       try {
         const res = await API.get('/merchant/website/my-site');
         if (res.data) {
+          const incomingConfig = res.data.setupConfig || {};
           setMerchantData({
             ...res.data,
             // 🛡️ ALWAYS use the themeId from the Gallery state during selection
             templateId: themeId,
             // If the user picked a new category in the gallery, use that. Otherwise use saved.
-            category: location.state?.category || res.data.category || "barbershops"
+            category: location.state?.category || res.data.category || "barbershops",
+            setupConfig: {
+              maxCustomersPerDay: incomingConfig.maxCustomersPerDay ?? 25,
+              restMinutesBetweenConsultations: incomingConfig.restMinutesBetweenConsultations ?? 0,
+              pauseWindows: incomingConfig.pauseWindows?.length
+                ? incomingConfig.pauseWindows
+                : [{ label: "Lunch break", start: "12:00", end: "13:00" }],
+              localization: {
+                country: incomingConfig.localization?.country || "",
+                city: incomingConfig.localization?.city || "",
+                address: incomingConfig.localization?.address || "",
+                timezone: incomingConfig.localization?.timezone || "UTC"
+              }
+            }
           });
         }
       } catch (err) {
@@ -117,6 +137,43 @@ const TemplateSetupForm = () => {
     const newServices = [...merchantData.services];
     newServices[index][field] = value;
     setMerchantData({ ...merchantData, services: newServices });
+  };
+
+  const updateSetupConfig = (field, value) => {
+    setMerchantData(prev => ({
+      ...prev,
+      setupConfig: {
+        ...prev.setupConfig,
+        [field]: value
+      }
+    }));
+  };
+
+  const updatePauseWindow = (index, field, value) => {
+    setMerchantData(prev => {
+      const next = [...(prev.setupConfig?.pauseWindows || [])];
+      next[index] = { ...next[index], [field]: value };
+      return {
+        ...prev,
+        setupConfig: {
+          ...prev.setupConfig,
+          pauseWindows: next
+        }
+      };
+    });
+  };
+
+  const updateLocalization = (field, value) => {
+    setMerchantData(prev => ({
+      ...prev,
+      setupConfig: {
+        ...prev.setupConfig,
+        localization: {
+          ...prev.setupConfig.localization,
+          [field]: value
+        }
+      }
+    }));
   };
 
   const handleFileUpload = async (e, targetPath, index = null) => {
@@ -423,6 +480,107 @@ const TemplateSetupForm = () => {
               ))}
             </div>
           )}
+        </section>
+
+        {/* 07: BOOKING CONFIGURATION */}
+        <section className="bg-white rounded-[3rem] p-12 shadow-sm border border-slate-100 space-y-10">
+          <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 flex items-center gap-4">
+            <span className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">07</span>
+            Booking Configuration
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-2">
+              <label className="text-[11px] font-black uppercase text-slate-400">Max Customers / Day</label>
+              <input
+                type="number"
+                min="1"
+                max="500"
+                value={merchantData.setupConfig?.maxCustomersPerDay ?? 25}
+                onChange={(e) => updateSetupConfig('maxCustomersPerDay', Number(e.target.value))}
+                className="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[11px] font-black uppercase text-slate-400">Rest Between Consultations (Minutes)</label>
+              <input
+                type="number"
+                min="0"
+                max="180"
+                value={merchantData.setupConfig?.restMinutesBetweenConsultations ?? 0}
+                onChange={(e) => updateSetupConfig('restMinutesBetweenConsultations', Number(e.target.value))}
+                className="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-sm font-black uppercase text-slate-700 tracking-widest">Pause Windows</h3>
+              <button
+                onClick={() => setMerchantData(prev => ({
+                  ...prev,
+                  setupConfig: {
+                    ...prev.setupConfig,
+                    pauseWindows: [...(prev.setupConfig?.pauseWindows || []), { label: "Pause", start: "12:00", end: "13:00" }]
+                  }
+                }))}
+                className="bg-slate-900 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest"
+              >
+                Add Pause
+              </button>
+            </div>
+
+            {(merchantData.setupConfig?.pauseWindows || []).map((pause, idx) => (
+              <div key={idx} className="grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl items-center">
+                <input
+                  value={pause.label || ""}
+                  onChange={(e) => updatePauseWindow(idx, 'label', e.target.value)}
+                  className="md:col-span-2 bg-white rounded-xl px-4 py-3 text-sm font-bold outline-none"
+                  placeholder="Pause label"
+                />
+                <input
+                  type="time"
+                  value={pause.start || "12:00"}
+                  onChange={(e) => updatePauseWindow(idx, 'start', e.target.value)}
+                  className="bg-white rounded-xl px-4 py-3 text-sm font-bold outline-none"
+                />
+                <div className="flex gap-2">
+                  <input
+                    type="time"
+                    value={pause.end || "13:00"}
+                    onChange={(e) => updatePauseWindow(idx, 'end', e.target.value)}
+                    className="w-full bg-white rounded-xl px-4 py-3 text-sm font-bold outline-none"
+                  />
+                  <button
+                    onClick={() => setMerchantData(prev => ({
+                      ...prev,
+                      setupConfig: {
+                        ...prev.setupConfig,
+                        pauseWindows: (prev.setupConfig?.pauseWindows || []).filter((_, i) => i !== idx)
+                      }
+                    }))}
+                    className="p-3 rounded-xl bg-rose-100 text-rose-600"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 08: LOCALIZATION */}
+        <section className="bg-white rounded-[3rem] p-12 shadow-sm border border-slate-100 space-y-10">
+          <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 flex items-center gap-4">
+            <span className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">08</span>
+            Localization
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <input value={merchantData.setupConfig?.localization?.country || ""} onChange={(e) => updateLocalization('country', e.target.value)} className="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none" placeholder="Country" />
+            <input value={merchantData.setupConfig?.localization?.city || ""} onChange={(e) => updateLocalization('city', e.target.value)} className="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none" placeholder="City" />
+            <input value={merchantData.setupConfig?.localization?.address || ""} onChange={(e) => updateLocalization('address', e.target.value)} className="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none md:col-span-2" placeholder="Address" />
+            <input value={merchantData.setupConfig?.localization?.timezone || "UTC"} onChange={(e) => updateLocalization('timezone', e.target.value)} className="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none md:col-span-2" placeholder="Timezone (e.g. Africa/Tunis)" />
+          </div>
         </section>
       </div>
 

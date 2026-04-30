@@ -270,6 +270,7 @@ const BookingPage = () => {
   const [slots, setSlots] = useState([]);
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [dayIsClosed, setDayIsClosed] = useState(false);
+  const [dayLimitReached, setDayLimitReached] = useState(false);
 
   // --- Form State ---
   const [form, setForm] = useState({ name: "", email: "", phone: "", notes: "" });
@@ -313,9 +314,11 @@ const BookingPage = () => {
       if (res.data.success) {
         if (res.data.data.isClosed) {
           setDayIsClosed(true);
+            setDayLimitReached(false);
           setSlots([]);
         } else {
           setDayIsClosed(false);
+            setDayLimitReached(Boolean(res.data.data.isFullyBookedByLimit));
           setSlots(res.data.data.slots);
           // Auto-select first available slot
           const first = res.data.data.slots.find((s) => s.available);
@@ -370,6 +373,7 @@ const BookingPage = () => {
       if (code === "SLOT_CONFLICT") {
         setSubmitError("This slot was just taken! Please go back and pick another time.");
       } else {
+        setDayLimitReached(false);
         setSubmitError(msg);
       }
     } finally {
@@ -531,6 +535,9 @@ const BookingPage = () => {
           <div>
             <h2 className="font-black text-white text-lg leading-tight">{merchant?.businessName}</h2>
             <p className="text-white/40 text-xs">{merchant?.category} · {merchant?.ville}</p>
+            <p className="text-white/25 text-[11px] mt-1">
+              {merchant?.setupConfig?.localization?.address || merchant?.contact?.address || "Location not specified"}
+            </p>
           </div>
         </div>
 
@@ -629,6 +636,12 @@ const BookingPage = () => {
                   <p className="text-white/40 text-sm font-medium">Closed on this day</p>
                   <p className="text-white/20 text-xs mt-1">Pick another date from the calendar</p>
                 </div>
+              ) : dayLimitReached ? (
+                <div className="text-center py-8 bg-white/3 border border-white/8 rounded-2xl">
+                  <X className="w-8 h-8 text-white/20 mx-auto mb-2" />
+                  <p className="text-white/40 text-sm font-medium">Maximum customers reached for this day</p>
+                  <p className="text-white/20 text-xs mt-1">Please choose another date</p>
+                </div>
               ) : (
                 <div className="bg-white/3 border border-white/8 rounded-2xl p-4">
                   <TimeSlotGrid
@@ -642,11 +655,11 @@ const BookingPage = () => {
             </div>
 
             <button
-              disabled={!selectedTime || dayIsClosed}
+              disabled={!selectedTime || dayIsClosed || dayLimitReached}
               onClick={() => setStep(2)}
               className={`
                 w-full py-4 rounded-2xl font-black text-sm tracking-wide transition-all duration-200
-                ${selectedTime && !dayIsClosed
+                ${selectedTime && !dayIsClosed && !dayLimitReached
                   ? "bg-amber-400 text-black hover:bg-amber-300 shadow-lg shadow-amber-400/20"
                   : "bg-white/5 text-white/20 cursor-not-allowed"
                 }
