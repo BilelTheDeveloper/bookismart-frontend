@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { 
   Users, 
   CalendarCheck, 
@@ -7,21 +7,43 @@ import {
   CheckCircle2, 
   AlertCircle 
 } from "lucide-react";
+import API from "../../api/config";
 
 const Overview = () => {
-  // Mock data for the dashboard - later we will fetch this from the backend
-  const stats = [
-    { label: "Total Bookings", value: "124", icon: <CalendarCheck className="text-indigo-600" />, change: "+12%", color: "bg-indigo-50" },
-    { label: "New Customers", value: "48", icon: <Users className="text-emerald-600" />, change: "+18%", color: "bg-emerald-50" },
-    { label: "Revenue (TND)", value: "3,420", icon: <TrendingUp className="text-amber-600" />, change: "+7%", color: "bg-amber-50" },
-    { label: "Pending Tasks", value: "12", icon: <Clock className="text-rose-600" />, change: "Critical", color: "bg-rose-50" },
-  ];
+  const [summary, setSummary] = useState(null);
+  const [upcoming, setUpcoming] = useState([]);
 
-  const recentBookings = [
-    { id: 1, customer: "Sami Ben Ali", service: "Barbering", date: "Today, 2:00 PM", status: "Confirmed" },
-    { id: 2, customer: "Ines Mahmoud", service: "Yoga Session", date: "Today, 4:30 PM", status: "Pending" },
-    { id: 3, customer: "Yassine Trabelsi", service: "Consultation", date: "Tomorrow, 10:00 AM", status: "Confirmed" },
-  ];
+  useEffect(() => {
+    let mounted = true;
+    Promise.all([
+      API.get("/merchant/insights/summary"),
+      API.get("/merchant/bookings?status=confirmed&limit=5"),
+    ])
+      .then(([s, b]) => {
+        if (!mounted) return;
+        if (s.data?.success) setSummary(s.data.data);
+        if (b.data?.success) setUpcoming(b.data.data || []);
+      })
+      .catch((err) => {
+        console.error("Overview load failed", err);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const stats = useMemo(() => {
+    const totalBookings = summary?.totalBookings ?? "—";
+    const newCustomers30d = summary?.newCustomers30d ?? "—";
+    const revenue = summary?.totalRevenue != null ? Number(summary.totalRevenue).toFixed(3) : "—";
+    const completed = summary?.bookingsCompleted ?? "—";
+    return [
+      { label: "Total Bookings", value: String(totalBookings), icon: <CalendarCheck className="text-indigo-600" />, change: "Live", color: "bg-indigo-50" },
+      { label: "New Customers", value: String(newCustomers30d), icon: <Users className="text-emerald-600" />, change: "30d", color: "bg-emerald-50" },
+      { label: "Revenue (TND)", value: String(revenue), icon: <TrendingUp className="text-amber-600" />, change: "Live", color: "bg-amber-50" },
+      { label: "Completed", value: String(completed), icon: <Clock className="text-rose-600" />, change: "Live", color: "bg-rose-50" },
+    ];
+  }, [summary]);
 
   return (
     <div className="space-y-8">
@@ -74,21 +96,21 @@ const Overview = () => {
             <button className="text-indigo-600 font-bold text-sm hover:underline">View Calendar</button>
           </div>
           <div className="divide-y divide-slate-50">
-            {recentBookings.map((booking) => (
-              <div key={booking.id} className="p-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
+            {upcoming.map((booking) => (
+              <div key={booking._id} className="p-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-600">
-                    {booking.customer.charAt(0)}
+                    {String(booking.customerName || "C").charAt(0)}
                   </div>
                   <div>
-                    <p className="font-bold text-slate-900">{booking.customer}</p>
-                    <p className="text-sm text-slate-500">{booking.service}</p>
+                    <p className="font-bold text-slate-900">{booking.customerName}</p>
+                    <p className="text-sm text-slate-500">{booking.service?.title}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-slate-900 text-sm">{booking.date}</p>
+                  <p className="font-bold text-slate-900 text-sm">{booking.dateString} {booking.timeSlot}</p>
                   <span className={`text-[10px] uppercase font-black px-2 py-1 rounded-full ${
-                    booking.status === 'Confirmed' ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                    booking.status === 'confirmed' ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
                   }`}>
                     {booking.status}
                   </span>

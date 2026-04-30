@@ -19,27 +19,47 @@ const WorkMode = () => {
   const [message, setMessage] = useState("");
   const [history, setHistory] = useState([]);
   const joinedRoomRef = useRef(null);
+  const inFlightRef = useRef(false);
+  const cooldownUntilRef = useRef(0);
 
   const activeConsultation = useMemo(
     () => consultations.find((c) => c.status === "in_progress") || consultations[0] || null,
     [consultations]
   );
 
-  const loadData = async () => {
-    const [bookingRes, consultationRes] = await Promise.all([
-      API.get("/merchant/bookings?status=confirmed&limit=20"),
-      API.get("/merchant/consultations?status=active"),
-    ]);
-    if (bookingRes.data?.success) setBookings(bookingRes.data.data || []);
-    if (consultationRes.data?.success) {
-      setConsultations(consultationRes.data.data || []);
-      setSelected((consultationRes.data.data || [])[0] || null);
+  const loadData = async ({ force = false } = {}) => {
+    const now = Date.now();
+    if (!force && now < cooldownUntilRef.current) return;
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
+    try {
+      const [bookingRes, consultationRes] = await Promise.all([
+        API.get("/merchant/bookings?status=confirmed&limit=20"),
+        API.get("/merchant/consultations?status=active"),
+      ]);
+      if (bookingRes.data?.success) setBookings(bookingRes.data.data || []);
+      if (consultationRes.data?.success) {
+        setConsultations(consultationRes.data.data || []);
+        setSelected((consultationRes.data.data || [])[0] || null);
+      }
+    } catch (err) {
+      if (err?.response?.status === 429) {
+        // back off for 30 seconds to avoid rate-limit loops
+        cooldownUntilRef.current = Date.now() + 30_000;
+      }
+      // swallow to avoid "Uncaught (in promise)" console spam
+      console.error("WorkMode load failed", err);
+    } finally {
+      inFlightRef.current = false;
     }
   };
 
   useEffect(() => {
-    loadData();
-    const id = setInterval(loadData, 5000);
+    loadData({ force: true });
+    // Socket provides realtime updates; keep a light fallback refresh.
+    const id = setInterval(() => {
+      if (!document.hidden) loadData();
+    }, 30_000);
     return () => clearInterval(id);
   }, []);
 
@@ -57,10 +77,10 @@ const WorkMode = () => {
     socket.emit("join", { room });
 
     const onMessage = (payload) => {
-      if (payload?.consultationId === String(current._id)) loadData();
+      if (payload?.consultationId === String(current._id)) loadData({ force: true });
     };
     const onDone = (payload) => {
-      if (payload?.consultationId === String(current._id)) loadData();
+      if (payload?.consultationId === String(current._id)) loadData({ force: true });
     };
     socket.on("consultation:message", onMessage);
     socket.on("consultation:done", onDone);
@@ -99,15 +119,19 @@ const WorkMode = () => {
   const sendMessage = async () => {
     const c = selected || activeConsultation;
     if (!c || !message.trim()) return;
-    await API.post(
-      `/merchant/consultations/${c._id}/messages`,
-      { text: message.trim() },
-      {
-        headers: view === "worker" ? { "x-work-mode-role": "worker" } : undefined,
-      }
-    );
-    setMessage("");
-    await loadData();
+    try {
+      await API.post(
+        `/merchant/consultations/${c._id}/messages`,
+        { text: message.trim() },
+        {
+          headers: view === "worker" ? { "x-work-mode-role": "worker" } : undefined,
+        }
+      );
+      setMessage("");
+      await loadData({ force: true });
+    } catch (err) {
+      console.error("WorkMode send failed", err);
+    }
   };
 
   const completeConsultation = async () => {
