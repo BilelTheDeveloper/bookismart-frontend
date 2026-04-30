@@ -52,7 +52,7 @@ const TemplateSetupForm = () => {
     name: "",
     hero: { title: "", slogan: "", backgroundImage: "" },
     about: { show: true, title: "Our Story", text: "", image: "" },
-    services: [{ title: "", description: "", price: "", active: true }],
+    services: [{ title: "", description: "", price: "", duration: 30, active: true }],
     gallery: { show: true, images: ["", "", "", ""] },
     contact: {
       phone: "", email: "", address: "",
@@ -360,7 +360,7 @@ const TemplateSetupForm = () => {
               <span className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">03</span>
               Price List
             </h2>
-            <button onClick={() => setMerchantData(p => ({...p, services: [...p.services, {title:"", description:"", price:"", active:true}]}))} className="bg-slate-900 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 flex items-center gap-2">
+            <button onClick={() => setMerchantData(p => ({...p, services: [...p.services, {title:"", description:"", price:"", duration:30, active:true}]}))} className="bg-slate-900 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 flex items-center gap-2">
               <Plus size={16} /> Add Service
             </button>
           </div>
@@ -374,6 +374,7 @@ const TemplateSetupForm = () => {
                   <div className="flex gap-3">
                     <input value={s.title} onChange={(e) => updateService(idx, 'title', e.target.value)} className="flex-grow bg-slate-50 rounded-xl p-4 font-bold text-sm border-none outline-none" placeholder="Service Name" />
                     <input value={s.price} onChange={(e) => updateService(idx, 'price', e.target.value)} className="w-28 bg-indigo-50 text-indigo-600 rounded-xl p-4 font-black text-center border-none outline-none" placeholder="Price" />
+                    <input type="number" min="5" max="480" value={s.duration || 30} onChange={(e) => updateService(idx, 'duration', Number(e.target.value))} className="w-24 bg-slate-100 text-slate-700 rounded-xl p-4 font-black text-center border-none outline-none" placeholder="Min" />
                   </div>
                   <textarea value={s.description} onChange={(e) => updateService(idx, 'description', e.target.value)} className="w-full bg-slate-50 rounded-xl p-4 text-xs h-20 border-none outline-none resize-none" placeholder="Description..." />
                 </div>

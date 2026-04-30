@@ -23,6 +23,7 @@ import OnboardingStatus from './pages/public/auth/OnboardingStatus'
 import AdminLayout from "./pages/admin/AdminLayout";
 import IdentityVerify from "./pages/admin/IdentityVerify";
 import AdminVerification from "./pages/admin/AdminVerification.jsx";
+import ModeratorConsultations from "./pages/admin/ModeratorConsultations.jsx";
 
 // --- Owner Pages ---
 import OwnerDashboardLayout from "./pages/owner/DashboardLayout";
@@ -35,6 +36,7 @@ import Finance from "./pages/owner/Finance";
 import Appointments from "./pages/owner/Appointments";
 import Customers from "./pages/owner/Customers";
 import Settings from "./pages/owner/Settings";
+import WorkMode from "./pages/owner/WorkMode";
 
 /**
  * 🛡️ SECURITY WATCHDOG
@@ -121,7 +123,7 @@ function App() {
           <Route 
             path="/admin" 
             element={
-              <AdminGuard allowedRoles={["admin"]}>
+              <AdminGuard allowedRoles={["admin", "moderator"]}>
                 <AdminLayout />
               </AdminGuard>
             }
@@ -129,6 +131,7 @@ function App() {
             <Route path="verify-identity" element={<IdentityVerify />} />
             <Route path="dashboard" element={<div className="p-6 font-bold text-slate-800">Admin Statistics</div>} />
             <Route path="verification" element={<AdminVerification />} />
+            <Route path="consultations" element={<ModeratorConsultations />} />
           </Route>
 
           {/* --- 4. Owner Dashboard (Locked) --- */}
@@ -149,6 +152,7 @@ function App() {
             <Route path="theme/customize-site" element={<SetupTemplate />} />
             <Route path="dashboard/stats" element={<Analytics />} />
             <Route path="dashboard/settings" element={<Settings />} />
+            <Route path="dashboard/work-mode" element={<WorkMode />} />
           </Route>
           
           {/* Fallback */}

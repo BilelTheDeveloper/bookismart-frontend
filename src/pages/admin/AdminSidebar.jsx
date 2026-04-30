@@ -7,6 +7,7 @@ const AdminSidebar = () => {
   const menuItems = [
     { name: "Dashboard", path: "/admin/dashboard", icon: "📊" },
     { name: "KYC Review", path: "/admin/verify-identity", icon: "🛡️" },
+    { name: "Consultations", path: "/admin/consultations", icon: "💬" },
     { name: "User Management", path: "/admin/users", icon: "👥" },
     { name: "Subscriptions", path: "/admin/plans", icon: "💳" },
     { name: "Verification", path: "/admin/verification", icon: "💳" },

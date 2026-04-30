@@ -75,7 +75,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
 
       {/* --- PREMIUM FEATURE: WORK MODE BUTTON --- */}
       <div className={`px-4 mb-4 ${isCollapsed ? "flex justify-center" : ""}`}>
-        <button className={`flex items-center gap-3 transition-all duration-300 group ${
+        <Link to="/owner/dashboard/work-mode" className={`flex items-center gap-3 transition-all duration-300 group ${
           isCollapsed 
           ? "w-10 h-10 bg-emerald-500/10 text-emerald-500 rounded-xl justify-center hover:bg-emerald-500 hover:text-white" 
           : "w-full px-4 py-3 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg shadow-indigo-900/40 hover:bg-indigo-500"
@@ -88,7 +88,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
               Work Mode
             </div>
           )}
-        </button>
+        </Link>
       </div>
 
       {/* Navigation Links */}
