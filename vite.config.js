@@ -7,4 +7,9 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  // Add this to force absolute paths for assets
+  base: '/', 
+  build: {
+    outDir: 'dist',
+  }
 })
