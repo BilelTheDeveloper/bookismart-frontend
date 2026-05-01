@@ -7,9 +7,13 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  // Add this to force absolute paths for assets
+  // 🚨 Add this line
   base: '/', 
   build: {
+    // Ensures the output matches what Vercel expects
     outDir: 'dist',
+    assetsDir: 'assets',
+    // Generates a manifest to help debug pathing
+    manifest: true 
   }
 })
