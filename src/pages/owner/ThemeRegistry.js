@@ -6,7 +6,7 @@ import LuxeSpaTemplate from "./themes/BeautyBarbers/Spas/theme1/spastemplate";
 import HairSalonTemplate from "./themes/BeautyBarbers/HairSalons/theme1/HairSalonTemplate";
 import HealthMedicalTheme from "./themes/HealthMedical/theme1/HealthMedicalTheme";
 import FitnessTheme from "./themes/FitnessGyms/theme1/FitnessTheme";
-import CreativeMediaTheme from "./themes/CreativeMedia/theme1/CreativeMediaTheme";
+import CreativeMediaTheme from "./themes/CreativeMedia/Photographers/theme1/CreativeMediaTheme";
 import CarServicesTheme from "./themes/CarServices/theme1/CarServicesTheme";
 import MaintenanceTheme from "./themes/Maintenance/theme1/MaintenanceTheme";
 import CoachingTutorsTheme from "./themes/CoachingTutors/theme1/CoachingTutorsTheme";
