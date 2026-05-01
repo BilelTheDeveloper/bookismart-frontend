@@ -95,7 +95,7 @@ export const THEME_REGISTRY = [
   },
   {
     id: "CM_THEME_01",
-    name: "Studio Narrative",
+    name: "photographer",
     category: "Creative & Media",
     tags: ["Portfolio", "Visual", "Modern"],
     description: "Perfect for photographers, videographers, and creative studios.",
