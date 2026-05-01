@@ -7,13 +7,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  // 🚨 Add this line
   base: '/', 
   build: {
-    // Ensures the output matches what Vercel expects
     outDir: 'dist',
+    emptyOutDir: true, // 🚨 Add this to wipe old files before building
     assetsDir: 'assets',
-    // Generates a manifest to help debug pathing
     manifest: true 
   }
 })
