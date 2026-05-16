@@ -42,6 +42,23 @@ import WorkMode from "./pages/owner/WorkMode";
 import CustomerHistory from "./pages/owner/CustomerHistory";
 import WorkerWorkMode from "./pages/workmode/WorkerWorkMode";
 
+// --- Customer Portal ---
+import CustomerLogin from "./pages/customer/CustomerLogin";
+import CustomerRegisterLayout from "./pages/customer/CustomerRegisterLayout";
+import CustomerLayout from "./pages/customer/portal/CustomerLayout";
+import CustomerProfile from "./pages/customer/portal/CustomerProfile";
+import CustomerAppointments from "./pages/customer/portal/CustomerAppointments";
+import CustomerInvoices from "./pages/customer/portal/CustomerInvoices";
+import CustomerLoyalty from "./pages/customer/portal/CustomerLoyalty";
+import CustomerBooking from "./pages/customer/portal/CustomerBooking";
+import { CustomerAuthProvider } from "./context/CustomerAuthContext";
+
+// --- Owner: Customer access ---
+import CustomerAccessPage from "./pages/owner/CustomerAccessPage";
+
+// --- Admin: Customer review ---
+import AdminCustomers from "./pages/admin/AdminCustomers";
+
 /**
  * 🛡️ SECURITY WATCHDOG
  * This component listens for the "Security Breach" signal from our API config.
@@ -83,14 +100,15 @@ function ScrollToTop() {
 const LayoutManager = ({ children }) => {
   const location = useLocation();
   
-  const isSignupPage = location.pathname === "/signup";
-  const isAdminPage = location.pathname.startsWith("/admin");
-  const isOwnerPage = location.pathname.startsWith("/owner");
+  const isSignupPage    = location.pathname === "/signup";
+  const isAdminPage     = location.pathname.startsWith("/admin");
+  const isOwnerPage     = location.pathname.startsWith("/owner");
   const isProfilePreview = location.pathname.startsWith("/p/");
-  const isBookingPage = location.pathname.startsWith("/book/"); // 🆕 Added for ultra-UI
-  
+  const isBookingPage   = location.pathname.startsWith("/book/");
+  const isCustomerPage  = location.pathname.startsWith("/customer");
+
   // 🛡️ Hide Chrome for high-immersion pages
-  const hideChrome = isSignupPage || isAdminPage || isOwnerPage || isProfilePreview || isBookingPage;
+  const hideChrome = isSignupPage || isAdminPage || isOwnerPage || isProfilePreview || isBookingPage || isCustomerPage;
 
   return (
     <>
@@ -105,6 +123,7 @@ const LayoutManager = ({ children }) => {
 
 function App() {
   return (
+    <CustomerAuthProvider>
     <Router>
       <SecurityWatchdog /> {/* 🛡️ Active Security Monitoring */}
       <ScrollToTop />
@@ -134,9 +153,10 @@ function App() {
             }
           >
             <Route path="verify-identity" element={<IdentityVerify />} />
-            <Route path="dashboard" element={<div className="p-6 font-bold text-slate-800">Admin Statistics</div>} />
-            <Route path="verification" element={<AdminVerification />} />
+            <Route path="dashboard"       element={<div className="p-6 font-bold text-slate-800">Admin Statistics</div>} />
+            <Route path="verification"    element={<AdminVerification />} />
             <Route path="security-alerts" element={<SecurityAlerts />} />
+            <Route path="customers"       element={<AdminCustomers />} />
           </Route>
 
           {/* --- 4. Owner Dashboard (Locked) --- */}
@@ -163,11 +183,38 @@ function App() {
             <Route path="dashboard/work-mode" element={<WorkMode />} />
           </Route>
           
+          {/* --- 5. Customer Registration (public, no auth) --- */}
+          <Route path="/customer/login"              element={<CustomerLogin />} />
+          <Route path="/customer/register/:token"    element={<CustomerRegisterLayout />} />
+
+          {/* --- 6. Customer Portal (protected by CustomerAuthContext) --- */}
+          <Route path="/customer/portal" element={<CustomerLayout />}>
+            <Route index                  element={<CustomerProfile />} />
+            <Route path="profile"         element={<CustomerProfile />} />
+            <Route path="appointments"    element={<CustomerAppointments />} />
+            <Route path="invoices"        element={<CustomerInvoices />} />
+            <Route path="loyalty"         element={<CustomerLoyalty />} />
+            <Route path="booking"         element={<CustomerBooking />} />
+          </Route>
+
+          {/* --- 7. Owner: Customer access management --- */}
+          <Route
+            path="/owner/dashboard/customers/:id/access"
+            element={
+              <AdminGuard allowedRoles={["owner"]}>
+                <OwnerDashboardLayout />
+              </AdminGuard>
+            }
+          >
+            <Route index element={<CustomerAccessPage />} />
+          </Route>
+
           {/* Fallback */}
           <Route path="*" element={<HomeLayout />} />
         </Routes>
       </LayoutManager>
     </Router>
+    </CustomerAuthProvider>
   );
 }
 

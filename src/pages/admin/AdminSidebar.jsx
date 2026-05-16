@@ -5,11 +5,11 @@ const AdminSidebar = () => {
   const location = useLocation();
 
   const menuItems = [
-    { name: "Dashboard", path: "/admin/dashboard", icon: "📊" },
-    { name: "KYC Review", path: "/admin/verify-identity", icon: "🛡️" },
+    { name: "Dashboard",       path: "/admin/dashboard",       icon: "📊" },
+    { name: "KYC Review",      path: "/admin/verify-identity", icon: "🛡️" },
+    { name: "Customers",       path: "/admin/customers",        icon: "👤" },
     { name: "Security Alerts", path: "/admin/security-alerts", icon: "🔐" },
-    { name: "Verification", path: "/admin/verification", icon: "💳" },
-
+    { name: "Verification",    path: "/admin/verification",     icon: "💳" },
   ];
 
   return (
