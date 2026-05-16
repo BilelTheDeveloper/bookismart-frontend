@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import API from "../../api/config";
+import CompletionFlowModal from "../../components/CompletionFlowModal";
 import {
   CalendarCheck,
   Clock,
@@ -343,7 +344,7 @@ const RescheduleModal = ({ booking, onClose, onSuccess }) => {
 /* ─────────────────────────────────────────────────────────────────────────────
    BOOKING DETAIL DRAWER
    ───────────────────────────────────────────────────────────────────────────── */
-const BookingDrawer = ({ booking, onClose, onStatusChange, onReschedule }) => {
+const BookingDrawer = ({ booking, onClose, onStatusChange, onReschedule, onComplete }) => {
   const [actionLoading, setActionLoading] = useState(null);
 
   const handleStatus = async (status) => {
@@ -488,9 +489,9 @@ const BookingDrawer = ({ booking, onClose, onStatusChange, onReschedule }) => {
             )}
             {booking.status !== 'completed' && booking.status !== 'cancelled' && booking.status !== 'no-show' && (
               <ActionButton
-                label={actionLoading === 'completed' ? "Saving..." : "Complete"}
+                label="Complete"
                 icon={<Check size={13} />}
-                onClick={() => handleStatus('completed')}
+                onClick={() => onComplete(booking)}
                 color="bg-indigo-100 text-indigo-700 hover:bg-indigo-600 hover:text-white"
                 disabled={!!actionLoading}
               />
@@ -623,9 +624,10 @@ const Appointments = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   // UI state
-  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [selectedBooking, setSelectedBooking]     = useState(null);
   const [rescheduleBooking, setRescheduleBooking] = useState(null);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [completionBooking, setCompletionBooking] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen]           = useState(false);
 
   const searchTimeout = useRef(null);
 
@@ -959,6 +961,10 @@ const Appointments = () => {
           onClose={() => { setIsDrawerOpen(false); setSelectedBooking(null); }}
           onStatusChange={handleBookingUpdated}
           onReschedule={() => setRescheduleBooking(selectedBooking)}
+          onComplete={(booking) => {
+            setIsDrawerOpen(false);
+            setCompletionBooking(booking);
+          }}
         />
       )}
 
@@ -972,6 +978,20 @@ const Appointments = () => {
           onSuccess={(updated) => {
             setRescheduleBooking(null);
             handleBookingUpdated(updated);
+          }}
+        />
+      )}
+
+      {/* ══════════════════════════════════════════════
+          COMPLETION FLOW MODAL
+          ══════════════════════════════════════════════ */}
+      {completionBooking && (
+        <CompletionFlowModal
+          booking={completionBooking}
+          onClose={() => setCompletionBooking(null)}
+          onCompleted={(updatedBooking) => {
+            handleBookingUpdated(updatedBooking);
+            setCompletionBooking(null);
           }}
         />
       )}

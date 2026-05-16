@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Outlet, NavLink, Navigate } from "react-router-dom";
 import {
   User, Calendar, FileText, Gift, BookOpen,
-  LogOut, Menu, X, ChevronRight, Loader2
+  LogOut, Menu, X, ChevronRight, Loader2, Zap,
 } from "lucide-react";
 import { useCustomerAuth } from "../../../context/CustomerAuthContext";
+import CAPI from "../../../api/customerConfig";
 
 const ALL_PAGES = [
   { key: "profile",      label: "My Profile",      icon: User,      path: "profile",      always: true },
@@ -12,12 +13,30 @@ const ALL_PAGES = [
   { key: "invoices",     label: "Invoices",         icon: FileText,  path: "invoices" },
   { key: "loyalty",      label: "Loyalty Points",   icon: Gift,      path: "loyalty" },
   { key: "booking",      label: "Book a Service",   icon: BookOpen,  path: "booking" },
+  { key: "session",      label: "My Session",       icon: Zap,       path: "session",      always: true },
 ];
 
 const CustomerLayout = () => {
   const { customer, loading, isAuthenticated, logoutCustomer } = useCustomerAuth();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [loggingOut, setLoggingOut] = useState(false);
+  const [mobileOpen,   setMobileOpen]   = useState(false);
+  const [loggingOut,   setLoggingOut]   = useState(false);
+  const [liveSession,  setLiveSession]  = useState(false);
+  const pollRef = useRef(null);
+
+  // Poll for an active session every 30 s so the nav dot stays fresh
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const check = async () => {
+      try {
+        const res = await CAPI.get("/customer/consultation/active");
+        const d = res.data?.data;
+        setLiveSession(!!d && d.status !== "done");
+      } catch { /* ignore */ }
+    };
+    check();
+    pollRef.current = setInterval(check, 30_000);
+    return () => clearInterval(pollRef.current);
+  }, [isAuthenticated]);
 
   if (loading) return (
     <div className="h-screen bg-slate-950 flex items-center justify-center">
@@ -70,6 +89,7 @@ const CustomerLayout = () => {
       <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
         {navItems.map(item => {
           const Icon = item.icon;
+          const isSessionItem = item.key === "session";
           return (
             <NavLink
               key={item.key}
@@ -85,8 +105,19 @@ const CustomerLayout = () => {
             >
               {({ isActive }) => (
                 <>
-                  <Icon size={18} className={isActive ? "text-white" : "text-slate-500 group-hover:text-slate-300 transition-colors"} />
+                  <span className="relative">
+                    <Icon size={18} className={isActive ? "text-white" : "text-slate-500 group-hover:text-slate-300 transition-colors"} />
+                    {isSessionItem && liveSession && (
+                      <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                      </span>
+                    )}
+                  </span>
                   <span className="flex-1">{item.label}</span>
+                  {isSessionItem && liveSession && (
+                    <span className="text-xs font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-1.5 py-0.5 rounded-full">LIVE</span>
+                  )}
                   {isActive && <ChevronRight size={14} className="opacity-60" />}
                 </>
               )}

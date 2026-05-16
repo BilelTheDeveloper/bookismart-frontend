@@ -54,6 +54,7 @@ import CustomerAppointments from "./pages/customer/portal/CustomerAppointments";
 import CustomerInvoices from "./pages/customer/portal/CustomerInvoices";
 import CustomerLoyalty from "./pages/customer/portal/CustomerLoyalty";
 import CustomerBooking from "./pages/customer/portal/CustomerBooking";
+import CustomerSession from "./pages/customer/portal/CustomerSession";
 import { CustomerAuthProvider } from "./context/CustomerAuthContext";
 
 // --- Owner: Customer access ---
@@ -209,6 +210,7 @@ function App() {
             <Route path="invoices"        element={<CustomerInvoices />} />
             <Route path="loyalty"         element={<CustomerLoyalty />} />
             <Route path="booking"         element={<CustomerBooking />} />
+            <Route path="session"         element={<CustomerSession />} />
           </Route>
 
           {/* --- 7. Owner: Customer access management --- */}

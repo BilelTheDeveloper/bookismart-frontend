@@ -7,22 +7,44 @@ const NotificationContext = createContext();
 
 export const NotificationProvider = ({ children }) => {
   const { user, isAuthenticated } = useAuth();
-  const [notifications, setNotifications]   = useState([]);
-  const [unreadCount, setUnreadCount]        = useState(0);
-  const [loading, setLoading]                = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount]     = useState(0);
+  const [loading, setLoading]             = useState(false);
+  const [toasts, setToasts]               = useState([]);
   const socketRef = useRef(null);
+
+  /* ── Toast helpers ── */
+  const addToast = useCallback((notif) => {
+    const id = notif._id || `toast-${Date.now()}`;
+    setToasts(prev => {
+      if (prev.some(t => t.id === id)) return prev; // dedup
+      return [...prev.slice(-2), { // max 3 toasts
+        id,
+        type:     notif.type || 'system',
+        title:    notif.title,
+        body:     notif.body,
+        duration: 5000,
+      }];
+    });
+    // Auto-dismiss
+    setTimeout(() => dismissToast(id), 5200);
+  }, []);
+
+  const dismissToast = useCallback((id) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  }, []);
 
   /* ── Fetch from API ── */
   const fetchNotifications = useCallback(async () => {
     if (!isAuthenticated) return;
     setLoading(true);
     try {
-      const { data } = await API.get('/merchant/notifications?limit=30');
+      const { data } = await API.get('/merchant/notifications?limit=50');
       if (data.success) {
         setNotifications(data.notifications);
         setUnreadCount(data.unreadCount);
       }
-    } catch { /* swallow */ }
+    } catch {}
     finally { setLoading(false); }
   }, [isAuthenticated]);
 
@@ -41,6 +63,7 @@ export const NotificationProvider = ({ children }) => {
     socket.on('notification:new', (notif) => {
       setNotifications(prev => [notif, ...prev].slice(0, 50));
       setUnreadCount(prev => prev + 1);
+      addToast(notif);
     });
 
     fetchNotifications();
@@ -49,7 +72,7 @@ export const NotificationProvider = ({ children }) => {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [isAuthenticated, user?._id, fetchNotifications]);
+  }, [isAuthenticated, user?._id, fetchNotifications, addToast]);
 
   /* ── Actions ── */
   const markRead = async (id) => {
@@ -78,7 +101,11 @@ export const NotificationProvider = ({ children }) => {
   };
 
   return (
-    <NotificationContext.Provider value={{ notifications, unreadCount, loading, markRead, markAllRead, deleteNotif, clearAll, fetchNotifications }}>
+    <NotificationContext.Provider value={{
+      notifications, unreadCount, loading,
+      markRead, markAllRead, deleteNotif, clearAll, fetchNotifications,
+      toasts, dismissToast,
+    }}>
       {children}
     </NotificationContext.Provider>
   );
