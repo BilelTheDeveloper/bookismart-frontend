@@ -1,19 +1,21 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import API from "../../api/config"; // Import your hardened API instance
-import { 
-  LayoutDashboard, 
-  CalendarCheck, 
-  Users, 
-  Settings, 
-  CreditCard, 
+import {
+  LayoutDashboard,
+  CalendarCheck,
+  Users,
+  Settings,
+  CreditCard,
   BarChart3,
   LogOut,
   ChevronLeft,
   ChevronRight,
   Wallet,
   Palette,
-  Power
+  Power,
+  FileText,
+  Star
 } from "lucide-react";
 
 const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
@@ -41,6 +43,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
     { name: "Appointments", icon: <CalendarCheck size={22} />, path: "/owner/dashboard/bookings" },
     { name: "Customers", icon: <Users size={22} />, path: "/owner/dashboard/customers" },
     { name: "Financials", icon: <Wallet size={22} />, path: "/owner/dashboard/finance" },
+    { name: "Invoices", icon: <FileText size={22} />, path: "/owner/dashboard/invoices" },
+    { name: "Loyalty", icon: <Star size={22} />, path: "/owner/dashboard/loyalty" },
     { name: "Analytics", icon: <BarChart3 size={22} />, path: "/owner/dashboard/stats" },
     { name: "Website Themes", icon: <Palette size={22} />, path: "/owner/dashboard/themes" },
     { name: "Subscription", icon: <CreditCard size={22} />, path: "/owner/dashboard/billing" },

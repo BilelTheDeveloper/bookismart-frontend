@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import API from "../../api/config"; 
-import { 
-  Save, ArrowLeft, Eye, EyeOff, X, Camera, 
-  Upload, Globe, Mail, Clock, Phone, Sparkles, Plus, Trash2, MapPin
+import {
+  Save, ArrowLeft, Eye, EyeOff, X, Camera,
+  Upload, Globe, Mail, Clock, Phone, Sparkles, Plus, Trash2, MapPin,
+  CalendarRange, Timer
 } from 'lucide-react';
 
 import { getThemeById } from "./ThemeRegistry";
@@ -52,7 +53,7 @@ const TemplateSetupForm = () => {
     name: "",
     hero: { title: "", slogan: "", backgroundImage: "" },
     about: { show: true, title: "Our Story", text: "", image: "" },
-    services: [{ title: "", description: "", price: "", duration: 30, active: true }],
+    services: [{ title: "", description: "", price: "", duration: 30, bufferTime: 0, active: true }],
     gallery: { show: true, images: ["", "", "", ""] },
     contact: {
       phone: "", email: "", address: "",
@@ -67,6 +68,7 @@ const TemplateSetupForm = () => {
       { day: 'Saturday', open: '09:00', close: '19:00', isClosed: false },
       { day: 'Sunday', open: '09:00', close: '19:00', isClosed: true },
     ],
+    seasonalHours: [],
     setupConfig: {
       maxCustomersPerDay: 25,
       restMinutesBetweenConsultations: 0,
@@ -83,10 +85,9 @@ const TemplateSetupForm = () => {
           const incomingConfig = res.data.setupConfig || {};
           setMerchantData({
             ...res.data,
-            // 🛡️ ALWAYS use the themeId from the Gallery state during selection
             templateId: themeId,
-            // If the user picked a new category in the gallery, use that. Otherwise use saved.
             category: location.state?.category || res.data.category || "barbershops",
+            seasonalHours: res.data.seasonalHours || [],
             setupConfig: {
               maxCustomersPerDay: incomingConfig.maxCustomersPerDay ?? 25,
               restMinutesBetweenConsultations: incomingConfig.restMinutesBetweenConsultations ?? 0,
@@ -174,6 +175,31 @@ const TemplateSetupForm = () => {
         }
       }
     }));
+  };
+
+  const addSeasonalHour = () => {
+    setMerchantData(prev => ({
+      ...prev,
+      seasonalHours: [
+        ...(prev.seasonalHours || []),
+        { label: 'Special Period', startDate: '', endDate: '', isClosed: false, open: '09:00', close: '18:00' }
+      ]
+    }));
+  };
+
+  const removeSeasonalHour = (idx) => {
+    setMerchantData(prev => ({
+      ...prev,
+      seasonalHours: (prev.seasonalHours || []).filter((_, i) => i !== idx)
+    }));
+  };
+
+  const updateSeasonalHour = (idx, field, value) => {
+    setMerchantData(prev => {
+      const next = [...(prev.seasonalHours || [])];
+      next[idx] = { ...next[idx], [field]: value };
+      return { ...prev, seasonalHours: next };
+    });
   };
 
   const handleFileUpload = async (e, targetPath, index = null) => {
@@ -360,7 +386,7 @@ const TemplateSetupForm = () => {
               <span className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">03</span>
               Price List
             </h2>
-            <button onClick={() => setMerchantData(p => ({...p, services: [...p.services, {title:"", description:"", price:"", duration:30, active:true}]}))} className="bg-slate-900 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 flex items-center gap-2">
+            <button onClick={() => setMerchantData(p => ({...p, services: [...p.services, {title:"", description:"", price:"", duration:30, bufferTime:0, active:true}]}))} className="bg-slate-900 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 flex items-center gap-2">
               <Plus size={16} /> Add Service
             </button>
           </div>
@@ -374,7 +400,16 @@ const TemplateSetupForm = () => {
                   <div className="flex gap-3">
                     <input value={s.title} onChange={(e) => updateService(idx, 'title', e.target.value)} className="flex-grow bg-slate-50 rounded-xl p-4 font-bold text-sm border-none outline-none" placeholder="Service Name" />
                     <input value={s.price} onChange={(e) => updateService(idx, 'price', e.target.value)} className="w-28 bg-indigo-50 text-indigo-600 rounded-xl p-4 font-black text-center border-none outline-none" placeholder="Price" />
-                    <input type="number" min="5" max="480" value={s.duration || 30} onChange={(e) => updateService(idx, 'duration', Number(e.target.value))} className="w-24 bg-slate-100 text-slate-700 rounded-xl p-4 font-black text-center border-none outline-none" placeholder="Min" />
+                  </div>
+                  <div className="flex gap-3">
+                    <div className="flex-1 space-y-1">
+                      <label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-1"><Clock size={10} /> Duration (min)</label>
+                      <input type="number" min="5" max="480" value={s.duration || 30} onChange={(e) => updateService(idx, 'duration', Number(e.target.value))} className="w-full bg-slate-100 text-slate-700 rounded-xl p-3 font-black text-center border-none outline-none" placeholder="30" />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-1"><Timer size={10} /> Buffer (min)</label>
+                      <input type="number" min="0" max="120" value={s.bufferTime ?? 0} onChange={(e) => updateService(idx, 'bufferTime', Number(e.target.value))} className="w-full bg-amber-50 text-amber-700 rounded-xl p-3 font-black text-center border-none outline-none" placeholder="0" />
+                    </div>
                   </div>
                   <textarea value={s.description} onChange={(e) => updateService(idx, 'description', e.target.value)} className="w-full bg-slate-50 rounded-xl p-4 text-xs h-20 border-none outline-none resize-none" placeholder="Description..." />
                 </div>
@@ -450,11 +485,115 @@ const TemplateSetupForm = () => {
           </div>
         </section>
 
-        {/* 06: GALLERY */}
+        {/* 06: SEASONAL HOURS */}
+        <section className="bg-white rounded-[3rem] p-12 shadow-sm border border-slate-100 space-y-8">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 flex items-center gap-4">
+              <span className="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center">
+                <CalendarRange size={22} />
+              </span>
+              Special Periods
+            </h2>
+            <button
+              onClick={addSeasonalHour}
+              className="bg-amber-500 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-600 flex items-center gap-2 transition-all"
+            >
+              <Plus size={16} /> Add Period
+            </button>
+          </div>
+
+          <p className="text-sm text-slate-500 font-medium -mt-2">
+            Override your weekly hours for holidays, vacations, or special events. These take priority over regular business hours.
+          </p>
+
+          {(merchantData.seasonalHours || []).length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-slate-200 rounded-3xl text-center">
+              <CalendarRange size={40} className="text-slate-300 mb-3" />
+              <p className="text-sm font-bold text-slate-400">No special periods configured</p>
+              <p className="text-xs text-slate-400 mt-1">Add a period for holidays, vacations, or events</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {(merchantData.seasonalHours || []).map((sh, idx) => (
+                <div key={idx} className="bg-slate-50 rounded-2xl p-6 space-y-4 relative border border-slate-100">
+                  <button
+                    onClick={() => removeSeasonalHour(idx)}
+                    className="absolute top-4 right-4 text-slate-300 hover:text-rose-500 transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pr-8">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black uppercase text-slate-400">Period Label</label>
+                      <input
+                        value={sh.label || ''}
+                        onChange={(e) => updateSeasonalHour(idx, 'label', e.target.value)}
+                        className="w-full bg-white rounded-xl px-4 py-3 text-sm font-bold outline-none border border-slate-200"
+                        placeholder="e.g. Summer Vacation"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black uppercase text-slate-400">Start Date</label>
+                      <input
+                        type="date"
+                        value={sh.startDate || ''}
+                        onChange={(e) => updateSeasonalHour(idx, 'startDate', e.target.value)}
+                        className="w-full bg-white rounded-xl px-4 py-3 text-sm font-bold outline-none border border-slate-200"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black uppercase text-slate-400">End Date</label>
+                      <input
+                        type="date"
+                        value={sh.endDate || ''}
+                        onChange={(e) => updateSeasonalHour(idx, 'endDate', e.target.value)}
+                        className="w-full bg-white rounded-xl px-4 py-3 text-sm font-bold outline-none border border-slate-200"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={() => updateSeasonalHour(idx, 'isClosed', !sh.isClosed)}
+                      className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                        sh.isClosed
+                          ? 'bg-rose-100 text-rose-600 border border-rose-200'
+                          : 'bg-emerald-100 text-emerald-600 border border-emerald-200'
+                      }`}
+                    >
+                      {sh.isClosed ? 'Closed All Day' : 'Open — Custom Hours'}
+                    </button>
+
+                    {!sh.isClosed && (
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="time"
+                          value={sh.open || '09:00'}
+                          onChange={(e) => updateSeasonalHour(idx, 'open', e.target.value)}
+                          className="bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold outline-none"
+                        />
+                        <span className="text-slate-400 text-xs font-bold">to</span>
+                        <input
+                          type="time"
+                          value={sh.close || '18:00'}
+                          onChange={(e) => updateSeasonalHour(idx, 'close', e.target.value)}
+                          className="bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold outline-none"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* 07: GALLERY */}
         <section className="bg-white rounded-[3rem] p-12 shadow-sm border border-slate-100 space-y-10">
            <div className="flex justify-between items-center">
              <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 flex items-center gap-4">
-                <span className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">06</span>
+                <span className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">07</span>
                 Gallery Showcase
              </h2>
              <button onClick={() => setMerchantData(p => ({...p, gallery: {...p.gallery, show: !p.gallery.show}}))} className={`p-3 rounded-xl ${merchantData.gallery.show ? 'bg-indigo-600 text-white' : 'bg-slate-200'}`}>
@@ -486,7 +625,7 @@ const TemplateSetupForm = () => {
         {/* 07: BOOKING CONFIGURATION */}
         <section className="bg-white rounded-[3rem] p-12 shadow-sm border border-slate-100 space-y-10">
           <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 flex items-center gap-4">
-            <span className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">07</span>
+            <span className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">08</span>
             Booking Configuration
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -573,7 +712,7 @@ const TemplateSetupForm = () => {
         {/* 08: LOCALIZATION */}
         <section className="bg-white rounded-[3rem] p-12 shadow-sm border border-slate-100 space-y-10">
           <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 flex items-center gap-4">
-            <span className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">08</span>
+            <span className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">09</span>
             Localization
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

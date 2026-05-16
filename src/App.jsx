@@ -33,6 +33,8 @@ import SetupTemplate from "./pages/owner/SetupTemplate";
 import Billing from "./pages/owner/Billing";
 import Analytics from "./pages/owner/Analytics";
 import Finance from "./pages/owner/Finance";
+import Invoices from "./pages/owner/Invoices";
+import Loyalty from "./pages/owner/Loyalty";
 import Appointments from "./pages/owner/Appointments";
 import Customers from "./pages/owner/Customers";
 import Settings from "./pages/owner/Settings";
@@ -151,6 +153,8 @@ function App() {
             <Route path="dashboard/customers" element={<Customers />} />
             <Route path="dashboard/customers/:customerKey" element={<CustomerHistory />} />
             <Route path="dashboard/finance" element={<Finance />} />
+            <Route path="dashboard/invoices" element={<Invoices />} />
+            <Route path="dashboard/loyalty" element={<Loyalty />} />
             <Route path="dashboard/billing" element={<Billing />} />
             <Route path="dashboard/themes" element={<ThemeGallery />} /> 
             <Route path="theme/customize-site" element={<SetupTemplate />} />
