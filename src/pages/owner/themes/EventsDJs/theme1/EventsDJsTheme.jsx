@@ -804,15 +804,11 @@ const EventsDJsTheme = ({ data }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-3.5 rounded-full border border-white/10 text-white/50 hover:text-pink-400 hover:border-pink-500/50 transition-all duration-300"
-                  style={{
-                    ["--hover-shadow" as string]: "0 0 14px rgba(236,72,153,0.4)",
-                  }}
                   onMouseEnter={(e) =>
-                    ((e.currentTarget as HTMLAnchorElement).style.boxShadow =
-                      "0 0 14px rgba(236,72,153,0.4)")
+                    (e.currentTarget.style.boxShadow = "0 0 14px rgba(236,72,153,0.4)")
                   }
                   onMouseLeave={(e) =>
-                    ((e.currentTarget as HTMLAnchorElement).style.boxShadow = "none")
+                    (e.currentTarget.style.boxShadow = "none")
                   }
                 >
                   <InstagramIcon size={18} />
@@ -825,11 +821,10 @@ const EventsDJsTheme = ({ data }) => {
                   rel="noopener noreferrer"
                   className="p-3.5 rounded-full border border-white/10 text-white/50 hover:text-violet-400 hover:border-violet-500/50 transition-all duration-300"
                   onMouseEnter={(e) =>
-                    ((e.currentTarget as HTMLAnchorElement).style.boxShadow =
-                      "0 0 14px rgba(139,92,246,0.4)")
+                    (e.currentTarget.style.boxShadow = "0 0 14px rgba(139,92,246,0.4)")
                   }
                   onMouseLeave={(e) =>
-                    ((e.currentTarget as HTMLAnchorElement).style.boxShadow = "none")
+                    (e.currentTarget.style.boxShadow = "none")
                   }
                 >
                   <FacebookIcon size={18} />
@@ -842,11 +837,10 @@ const EventsDJsTheme = ({ data }) => {
                   rel="noopener noreferrer"
                   className="p-3.5 rounded-full border border-white/10 text-white/50 hover:text-pink-400 hover:border-pink-500/50 transition-all duration-300"
                   onMouseEnter={(e) =>
-                    ((e.currentTarget as HTMLAnchorElement).style.boxShadow =
-                      "0 0 14px rgba(236,72,153,0.4)")
+                    (e.currentTarget.style.boxShadow = "0 0 14px rgba(236,72,153,0.4)")
                   }
                   onMouseLeave={(e) =>
-                    ((e.currentTarget as HTMLAnchorElement).style.boxShadow = "none")
+                    (e.currentTarget.style.boxShadow = "none")
                   }
                 >
                   <TikTokIcon size={18} />
