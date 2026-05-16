@@ -40,6 +40,9 @@ import Customers from "./pages/owner/Customers";
 import Settings from "./pages/owner/Settings";
 import WorkMode from "./pages/owner/WorkMode";
 import CustomerHistory from "./pages/owner/CustomerHistory";
+import Recruitment from "./pages/owner/Recruitment";
+import Staff from "./pages/owner/Staff";
+import Chat from "./pages/owner/Chat";
 import WorkerWorkMode from "./pages/workmode/WorkerWorkMode";
 
 // --- Customer Portal ---
@@ -58,6 +61,11 @@ import CustomerAccessPage from "./pages/owner/CustomerAccessPage";
 
 // --- Admin: Customer review ---
 import AdminCustomers from "./pages/admin/AdminCustomers";
+import AdminRecruitment from "./pages/admin/AdminRecruitment";
+
+// --- Public: Find Work ---
+import FindWorkPage from "./pages/public/FindWork/FindWorkPage";
+import JobDetailPage from "./pages/public/FindWork/JobDetailPage";
 
 /**
  * 🛡️ SECURITY WATCHDOG
@@ -135,8 +143,10 @@ function App() {
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/professionals" element={<ProfessionalsPage />} />
           <Route path="/p/:slug" element={<ProfilePreview />} />
-          <Route path="/book/:merchantId" element={<BookingPage />} /> {/* 🆕 Public Booking Route */}
+          <Route path="/book/:merchantId" element={<BookingPage />} />
           <Route path="/work-mode/worker" element={<WorkerWorkMode />} />
+          <Route path="/find-work" element={<FindWorkPage />} />
+          <Route path="/find-work/:id" element={<JobDetailPage />} />
 
           {/* --- 2. Auth Routes --- */}
           <Route path="/signup" element={<SignupLayout />} />
@@ -157,6 +167,7 @@ function App() {
             <Route path="verification"    element={<AdminVerification />} />
             <Route path="security-alerts" element={<SecurityAlerts />} />
             <Route path="customers"       element={<AdminCustomers />} />
+            <Route path="recruitment"     element={<AdminRecruitment />} />
           </Route>
 
           {/* --- 4. Owner Dashboard (Locked) --- */}
@@ -181,6 +192,9 @@ function App() {
             <Route path="dashboard/stats" element={<Analytics />} />
             <Route path="dashboard/settings" element={<Settings />} />
             <Route path="dashboard/work-mode" element={<WorkMode />} />
+            <Route path="dashboard/recruitment" element={<Recruitment />} />
+            <Route path="dashboard/staff"       element={<Staff />} />
+            <Route path="dashboard/chat"        element={<Chat />} />
           </Route>
           
           {/* --- 5. Customer Registration (public, no auth) --- */}

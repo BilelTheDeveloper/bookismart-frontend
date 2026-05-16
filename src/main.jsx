@@ -8,7 +8,8 @@ import App from './App.jsx';
  * Provides the "Source of Truth" for user identity.
  * Bypasses localStorage and relies on HttpOnly cookies.
  */
-import { AuthProvider } from './context/AuthContext'; 
+import { AuthProvider } from './context/AuthContext';
+import { NotificationProvider } from './context/NotificationContext';
 
 /**
  * 🚀 THE THEME ENGINE (CategoryProvider)
@@ -23,16 +24,9 @@ createRoot(document.getElementById('root')).render(
         If no user is verified, it handles the redirect safely.
     */}
     <AuthProvider>
-      
-      {/* Step 2: Theme/Category Engine (Uncomment when ready) 
-          This allows the merchants to see their specific tools.
-      */}
-      {/* <CategoryProvider> */}
-        
+      <NotificationProvider>
         <App />
-        
-      {/* </CategoryProvider> */}
-
+      </NotificationProvider>
     </AuthProvider>
   </StrictMode>,
 );

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import {
   CreditCard, Zap, CheckCircle2, Clock, ArrowUpRight,
   ShieldCheck, Loader2, RefreshCw, CalendarDays, AlertTriangle,
-  TrendingUp, Crown, Sparkles,
+  TrendingUp, Crown, Sparkles, X, ExternalLink,
 } from "lucide-react";
 import API from "../../api/config";
 
@@ -47,9 +47,125 @@ const fmtDate = (dateStr) => {
   return new Date(dateStr).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 };
 
+/* ─── Plan picker config ─── */
+const PLANS = [
+  {
+    id: "basic",
+    name: "Basic",
+    price: 29,
+    icon: <TrendingUp size={22} className="text-emerald-400" />,
+    color: "from-emerald-500 to-teal-600",
+    border: "border-emerald-500/40",
+    features: ["Up to 3 staff members", "Unlimited bookings", "Basic analytics", "Email notifications"],
+  },
+  {
+    id: "premium",
+    name: "Premium",
+    price: 79,
+    icon: <Crown size={22} className="text-indigo-400" />,
+    color: "from-indigo-500 to-violet-600",
+    border: "border-indigo-500/40",
+    badge: "Most Popular",
+    features: ["Up to 10 staff members", "Advanced analytics", "Priority support", "Custom domain", "Loyalty programs"],
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    price: 149,
+    icon: <Sparkles size={22} className="text-violet-400" />,
+    color: "from-violet-500 to-purple-700",
+    border: "border-violet-500/40",
+    features: ["Unlimited staff members", "Full analytics suite", "Dedicated support", "White-label option", "API access", "All integrations"],
+  },
+];
+
+function PlanPickerModal({ onClose }) {
+  const [checkingOut, setCheckingOut] = useState(null);
+
+  const handleCheckout = async (planId) => {
+    setCheckingOut(planId);
+    try {
+      const { data } = await API.post("/payments/checkout", { plan: planId });
+      if (data?.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      }
+    } catch {
+      alert("Checkout failed. Please try again.");
+    } finally {
+      setCheckingOut(null);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-[#0d1117] rounded-[2rem] w-full max-w-3xl border border-slate-800 shadow-2xl overflow-hidden">
+        {/* Modal header */}
+        <div className="flex items-center justify-between px-8 py-6 border-b border-slate-800">
+          <div>
+            <h3 className="text-2xl font-black text-white">Choose Your Plan</h3>
+            <p className="text-slate-400 text-sm mt-1">Billed monthly · Cancel anytime</p>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-all">
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Plans grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-8">
+          {PLANS.map((plan) => (
+            <div
+              key={plan.id}
+              className={`relative bg-slate-900 border ${plan.border} rounded-2xl p-6 flex flex-col`}
+            >
+              {plan.badge && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full">
+                  {plan.badge}
+                </span>
+              )}
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`p-2.5 rounded-xl bg-gradient-to-br ${plan.color} bg-opacity-10`}>
+                  {plan.icon}
+                </div>
+                <div>
+                  <p className="text-white font-black">{plan.name}</p>
+                  <p className="text-slate-400 text-xs">/month</p>
+                </div>
+              </div>
+
+              <p className="text-3xl font-black text-white mb-5">${plan.price}</p>
+
+              <ul className="space-y-2 mb-6 flex-1">
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-xs text-slate-300 font-medium">
+                    <CheckCircle2 size={13} className="text-indigo-400 shrink-0 mt-0.5" /> {f}
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={() => handleCheckout(plan.id)}
+                disabled={!!checkingOut}
+                className={`w-full py-3 rounded-xl font-black text-sm transition-all flex items-center justify-center gap-2 bg-gradient-to-r ${plan.color} text-white hover:opacity-90 disabled:opacity-50`}
+              >
+                {checkingOut === plan.id ? (
+                  <><Loader2 size={14} className="animate-spin" /> Processing…</>
+                ) : (
+                  <>Get {plan.name} <ArrowUpRight size={15} /></>
+                )}
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const Billing = () => {
-  const [billing, setBilling] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [billing, setBilling]         = useState(null);
+  const [loading, setLoading]         = useState(true);
+  const [showPlans, setShowPlans]     = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
 
   const fetchBilling = () => {
     setLoading(true);
@@ -61,6 +177,18 @@ const Billing = () => {
 
   useEffect(() => { fetchBilling(); }, []);
 
+  const openPortal = async () => {
+    setPortalLoading(true);
+    try {
+      const { data } = await API.post("/payments/portal");
+      if (data?.portalUrl) window.location.href = data.portalUrl;
+    } catch {
+      alert("Could not open billing portal. Please try again.");
+    } finally {
+      setPortalLoading(false);
+    }
+  };
+
   const sub = billing?.subscription || {};
   const plan = PLAN_CONFIG[sub.plan] || PLAN_CONFIG.free_trial;
   const statusLabel = STATUS_LABEL[sub.status] || "Unknown";
@@ -68,6 +196,7 @@ const Billing = () => {
   const daysLeft = daysUntil(sub.trialEndsAt);
   const currency = billing?.currency || "TND";
   const transactions = billing?.transactionHistory || [];
+  const isPaid = sub.plan && sub.plan !== "free_trial";
 
   const trialBarPct = useMemo(() => {
     if (!sub.trialEndsAt) return 0;
@@ -83,6 +212,7 @@ const Billing = () => {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {showPlans && <PlanPickerModal onClose={() => setShowPlans(false)} />}
 
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -181,23 +311,46 @@ const Billing = () => {
           <div className="absolute bottom-0 left-0 w-40 h-40 bg-blue-500/10 rounded-full blur-2xl -ml-10 -mb-10 pointer-events-none" />
         </div>
 
-        {/* Upgrade CTA */}
+        {/* Upgrade / Manage CTA */}
         <div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-[2.5rem] p-8 text-white flex flex-col justify-between shadow-xl shadow-indigo-200">
           <div>
             <div className="p-3 bg-white/10 rounded-2xl w-fit mb-4"><Crown size={24} /></div>
-            <h3 className="text-2xl font-black leading-tight">Switch to Pro &<br />Scale Faster</h3>
-            <ul className="mt-4 space-y-2 text-sm text-indigo-100 font-medium">
-              {["Unlimited staff members", "Advanced analytics", "Priority support", "Custom domain"].map((f) => (
-                <li key={f} className="flex items-center gap-2">
-                  <CheckCircle2 size={13} className="text-indigo-300 shrink-0" /> {f}
-                </li>
-              ))}
-            </ul>
+            {isPaid ? (
+              <>
+                <h3 className="text-2xl font-black leading-tight">Manage Your<br />Subscription</h3>
+                <p className="mt-3 text-indigo-100 text-sm font-medium">Update payment method, download invoices, or cancel your plan from the Stripe billing portal.</p>
+              </>
+            ) : (
+              <>
+                <h3 className="text-2xl font-black leading-tight">Switch to Pro &<br />Scale Faster</h3>
+                <ul className="mt-4 space-y-2 text-sm text-indigo-100 font-medium">
+                  {["Unlimited staff members", "Advanced analytics", "Priority support", "Custom domain"].map((f) => (
+                    <li key={f} className="flex items-center gap-2">
+                      <CheckCircle2 size={13} className="text-indigo-300 shrink-0" /> {f}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </div>
-          <button className="w-full py-4 bg-white text-indigo-600 font-black rounded-2xl hover:bg-indigo-50 transition-all flex items-center justify-center gap-2 group mt-6">
-            Upgrade Now
-            <ArrowUpRight size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-          </button>
+
+          {isPaid ? (
+            <button
+              onClick={openPortal}
+              disabled={portalLoading}
+              className="w-full py-4 bg-white text-indigo-600 font-black rounded-2xl hover:bg-indigo-50 transition-all flex items-center justify-center gap-2 group mt-6 disabled:opacity-60"
+            >
+              {portalLoading ? <><Loader2 size={16} className="animate-spin" /> Opening…</> : <><ExternalLink size={16} /> Billing Portal</>}
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowPlans(true)}
+              className="w-full py-4 bg-white text-indigo-600 font-black rounded-2xl hover:bg-indigo-50 transition-all flex items-center justify-center gap-2 group mt-6"
+            >
+              Upgrade Now
+              <ArrowUpRight size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -208,15 +361,34 @@ const Billing = () => {
             <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
               <CreditCard className="text-indigo-600" /> Payment Method
             </h3>
+            {isPaid && (
+              <button
+                onClick={openPortal}
+                disabled={portalLoading}
+                className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-700 px-3 py-1.5 rounded-xl border border-indigo-200 hover:bg-indigo-50 transition-all disabled:opacity-50"
+              >
+                {portalLoading ? <Loader2 size={12} className="animate-spin" /> : <ExternalLink size={12} />}
+                Manage
+              </button>
+            )}
           </div>
           <div className="flex items-center gap-4 p-5 rounded-2xl bg-slate-50 border border-dashed border-slate-200">
             <div className="w-12 h-8 bg-slate-200 rounded-lg flex items-center justify-center text-[9px] font-black text-slate-500 uppercase">Card</div>
             <div>
-              <p className="text-sm font-black text-slate-600 italic">No payment method added yet</p>
-              <p className="text-xs text-slate-400 font-medium mt-0.5">Your trial is currently free of charge.</p>
+              {isPaid ? (
+                <>
+                  <p className="text-sm font-black text-slate-700">Payment method on file</p>
+                  <p className="text-xs text-slate-400 font-medium mt-0.5">Managed securely via Stripe. Click "Manage" to update.</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-black text-slate-600 italic">No payment method added yet</p>
+                  <p className="text-xs text-slate-400 font-medium mt-0.5">Your trial is currently free of charge.</p>
+                </>
+              )}
             </div>
           </div>
-          <p className="text-[10px] text-slate-400 font-bold mt-4 uppercase tracking-widest">Payment integration coming soon for Tunisia.</p>
+          <p className="text-[10px] text-slate-400 font-bold mt-4 uppercase tracking-widest">Payments processed securely via Stripe.</p>
         </div>
 
         <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm flex items-center gap-6">
