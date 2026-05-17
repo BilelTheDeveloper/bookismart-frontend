@@ -10,7 +10,8 @@ import {
   Search, Bell, ChevronDown, Settings as SettingsIcon,
   LogOut, Globe, X, CheckCheck, Trash2, BookOpen, Star,
   ShieldCheck, Zap, MessageSquare, Users, AlertCircle, CreditCard,
-  FileText, CheckCircle2, XCircle, Loader2, Command,
+  FileText, CheckCircle2, XCircle, Loader2, Command, BadgeCheck,
+  Moon, Sun, HelpCircle, ChevronRight,
 } from "lucide-react";
 
 /* ── Notification type meta ── */
@@ -232,6 +233,187 @@ function NotificationDropdown({ onClose }) {
   );
 }
 
+/* ══ FAQ DATA ══════════════════════════════════════════════════════════════ */
+const LANGS = [
+  { code: "FR", flag: "🇫🇷", label: "Français" },
+  { code: "EN", flag: "🇬🇧", label: "English"  },
+  { code: "AR", flag: "🇹🇳", label: "عربية"    },
+];
+
+const FAQ = [
+  {
+    category: "Getting Started", color: "indigo",
+    items: [
+      { q: "How do I verify my identity (KYC)?",
+        a: "Click 'GET VERIFIED' in the sidebar. Upload a clear photo of your ID card (front and back), then complete the 5-second biometric scan. Our team reviews your dossier within 24 hours and notifies you by email." },
+      { q: "How do I set up my online booking page?",
+        a: "Go to Website in the sidebar, choose a theme, add your services with prices and durations, set your opening hours, and publish. You'll get a unique link to share with customers on WhatsApp, Instagram, or your website." },
+      { q: "What is Work Mode?",
+        a: "Work Mode is a simplified daily interface. Track today's queue, mark appointments as done, manage walk-ins, and let staff log in via a secure invite link — all optimized for phone use at your business." },
+    ]
+  },
+  {
+    category: "Bookings", color: "emerald",
+    items: [
+      { q: "How do customers book with me?",
+        a: "Share your Bookiify link. Customers choose a service, pick an available time slot, and confirm. You get an instant notification and the booking appears in Appointments." },
+      { q: "How do I confirm or cancel a booking?",
+        a: "In Appointments, click any booking to open its details. Use the action buttons to Confirm, Reschedule, or Cancel. The customer automatically receives an email notification." },
+      { q: "Can I block time off / set my schedule?",
+        a: "Yes. In your settings you can define working days and hours, add breaks, and block specific dates for holidays or personal time." },
+    ]
+  },
+  {
+    category: "Finance", color: "amber",
+    items: [
+      { q: "How do I track my revenue?",
+        a: "The Finance page shows earnings by day, week, or month. Filter by service type or staff member. All transactions are logged automatically when a booking is completed." },
+      { q: "How do I send an invoice?",
+        a: "In Invoices, click 'New Invoice', select the customer and services, then hit Send. The invoice is emailed as a PDF with your business branding and a payment reference." },
+      { q: "How does the loyalty program work?",
+        a: "Customers earn points per visit or total spend. In Loyalty settings, define your point-to-reward rules. Customers can redeem points for free services or discounts on their next booking." },
+    ]
+  },
+  {
+    category: "Security", color: "rose",
+    items: [
+      { q: "How do I enable two-factor authentication?",
+        a: "Settings → Security → Enable Two-Factor Auth. Scan the QR code with Google Authenticator or Authy. From then on, every login requires your 6-digit app code after your password." },
+      { q: "How do I change my password?",
+        a: "Settings → Security → Change Password. Enter your current password then choose a new strong password (min 8 characters, must include uppercase, a number, and a special character)." },
+      { q: "What is device fingerprinting?",
+        a: "Bookiify ties your session to the device you logged in from. If someone steals your token and tries to use it from a different device, the session is rejected automatically." },
+    ]
+  },
+];
+
+const COLOR_MAP = {
+  indigo: { pill: "bg-indigo-100 text-indigo-700 border border-indigo-200", active: "bg-indigo-600 text-white border border-indigo-600" },
+  emerald: { pill: "bg-emerald-100 text-emerald-700 border border-emerald-200", active: "bg-emerald-600 text-white border border-emerald-600" },
+  amber:  { pill: "bg-amber-100 text-amber-700 border border-amber-200",  active: "bg-amber-500 text-white border border-amber-500"  },
+  rose:   { pill: "bg-rose-100 text-rose-700 border border-rose-200",     active: "bg-rose-600 text-white border border-rose-600"   },
+};
+
+/* ── Help Panel ── */
+function HelpPanel({ onClose }) {
+  const [openIdx, setOpenIdx]           = useState(null);
+  const [activeCategory, setActiveCategory] = useState(0);
+  const cat = FAQ[activeCategory];
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-[60]" onClick={onClose} />
+      <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl z-[70] flex flex-col animate-in slide-in-from-right duration-300">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
+              <HelpCircle size={20} className="text-indigo-600" />
+            </div>
+            <div>
+              <h2 className="font-black text-slate-900 dark:text-white text-base">Help Center</h2>
+              <p className="text-[11px] text-slate-500 font-bold">Frequently asked questions</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Category tabs */}
+        <div className="flex items-center gap-2 px-6 py-3 overflow-x-auto border-b border-slate-100 dark:border-slate-800" style={{ scrollbarWidth: "none" }}>
+          {FAQ.map((f, i) => (
+            <button
+              key={f.category}
+              onClick={() => { setActiveCategory(i); setOpenIdx(null); }}
+              className={`flex-shrink-0 px-3.5 py-1.5 rounded-xl text-[11px] font-black transition-all ${
+                activeCategory === i ? COLOR_MAP[f.color].active : COLOR_MAP[f.color].pill + " hover:opacity-80"
+              }`}
+            >
+              {f.category}
+            </button>
+          ))}
+        </div>
+
+        {/* Accordion */}
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2" style={{ scrollbarWidth: "none" }}>
+          {cat.items.map((item, i) => (
+            <div key={i} className="border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden">
+              <button
+                onClick={() => setOpenIdx(openIdx === i ? null : i)}
+                className="w-full flex items-center justify-between gap-3 px-4 py-3.5 text-left text-sm font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all"
+              >
+                <span className="leading-snug">{item.q}</span>
+                <ChevronDown size={15} className={`flex-shrink-0 text-slate-400 transition-transform ${openIdx === i ? "rotate-180" : ""}`} />
+              </button>
+              {openIdx === i && (
+                <div className="px-4 pb-4 pt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium border-t border-slate-50 dark:border-slate-800/60">
+                  {item.a}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 text-center">
+          <p className="text-xs text-slate-400 font-bold">
+            Still need help?{" "}
+            <a href="mailto:support@bookiify.com" className="text-indigo-600 font-black hover:underline">
+              Contact Support
+            </a>
+          </p>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ── KYC Status Banner ── */
+function KYCBanner({ accountStatus }) {
+  if (!accountStatus || accountStatus === "active") return null;
+
+  const banners = {
+    pending_kyc: {
+      bg: "bg-amber-50 border-amber-200",
+      text: "text-amber-800",
+      icon: <ShieldCheck size={16} className="text-amber-600 flex-shrink-0" />,
+      message: "Your account is not yet verified.",
+      cta: { label: "Complete KYC Verification →", to: "/owner/dashboard/kyc" },
+    },
+    review: {
+      bg: "bg-blue-50 border-blue-200",
+      text: "text-blue-800",
+      icon: <CheckCircle2 size={16} className="text-blue-500 flex-shrink-0" />,
+      message: "Your identity documents are under review. We'll notify you by email within 24 hours.",
+      cta: null,
+    },
+    rejected: {
+      bg: "bg-rose-50 border-rose-200",
+      text: "text-rose-800",
+      icon: <XCircle size={16} className="text-rose-500 flex-shrink-0" />,
+      message: "Your KYC was rejected. Please resubmit with correct documents.",
+      cta: { label: "Resubmit Documents →", to: "/owner/dashboard/kyc" },
+    },
+  };
+
+  const b = banners[accountStatus];
+  if (!b) return null;
+
+  return (
+    <div className={`flex items-center gap-3 px-8 py-3 border-b ${b.bg} ${b.text} text-sm font-bold`}>
+      {b.icon}
+      <span>{b.message}</span>
+      {b.cta && (
+        <Link to={b.cta.to} className="ml-1 underline hover:no-underline font-black whitespace-nowrap">
+          {b.cta.label}
+        </Link>
+      )}
+    </div>
+  );
+}
+
 /* ══════════════════════════════════════════════════════════════════════════════
    DASHBOARD LAYOUT
    ══════════════════════════════════════════════════════════════════════════════ */
@@ -244,15 +426,27 @@ const DashboardLayout = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotifOpen,   setIsNotifOpen]   = useState(false);
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  const [isHelpOpen,    setIsHelpOpen]    = useState(false);
+  const [isLangOpen,    setIsLangOpen]    = useState(false);
+  const [lang,          setLang]          = useState(() => localStorage.getItem("bookiify_lang") || "FR");
+  const [isDark,        setIsDark]        = useState(() => localStorage.getItem("bookiify_theme") === "dark");
 
   const profileRef = useRef(null);
   const notifRef   = useRef(null);
+  const langRef    = useRef(null);
+
+  /* Dark mode effect */
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", isDark);
+    localStorage.setItem("bookiify_theme", isDark ? "dark" : "light");
+  }, [isDark]);
 
   /* Close dropdowns on outside click */
   useEffect(() => {
     const handler = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) setIsProfileOpen(false);
       if (notifRef.current   && !notifRef.current.contains(e.target))   setIsNotifOpen(false);
+      if (langRef.current    && !langRef.current.contains(e.target))    setIsLangOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -278,7 +472,7 @@ const DashboardLayout = () => {
   const displayUser = user || { fullName: "Owner", role: "owner" };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 flex">
       {/* SIDEBAR */}
       <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
@@ -286,22 +480,61 @@ const DashboardLayout = () => {
       <main className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${isCollapsed ? "ml-20" : "ml-64"}`}>
 
         {/* ── HEADER ── */}
-        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 px-8 flex items-center justify-between gap-4">
+        <header className="h-20 bg-white/80 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 px-8 flex items-center justify-between gap-4">
 
           {/* Command search bar (opens palette) */}
           <button
             onClick={() => setIsPaletteOpen(true)}
-            className="relative w-80 flex items-center gap-3 pl-4 pr-3 py-2.5 bg-slate-100 hover:bg-slate-200 border-2 border-transparent hover:border-indigo-200 rounded-2xl text-sm transition-all group text-left"
+            className="relative w-80 flex items-center gap-3 pl-4 pr-3 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border-2 border-transparent hover:border-indigo-200 rounded-2xl text-sm transition-all group text-left"
           >
             <Search className="h-4 w-4 text-slate-400 flex-shrink-0" />
-            <span className="text-slate-400 font-medium flex-1">Search anything…</span>
-            <kbd className="hidden sm:flex items-center gap-0.5 px-2 py-1 bg-white border border-slate-200 text-slate-400 text-[10px] font-black rounded-lg shadow-sm flex-shrink-0">
+            <span className="text-slate-400 dark:text-slate-500 font-medium flex-1">Search anything…</span>
+            <kbd className="hidden sm:flex items-center gap-0.5 px-2 py-1 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 text-[10px] font-black rounded-lg shadow-sm flex-shrink-0">
               <Command size={10} /> K
             </kbd>
           </button>
 
           {/* Right side */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+
+            {/* Language toggle */}
+            <div className="relative" ref={langRef}>
+              <button
+                onClick={() => setIsLangOpen(p => !p)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all text-sm font-black"
+              >
+                <Globe size={16} />
+                <span>{lang}</span>
+              </button>
+              {isLangOpen && (
+                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-black/40 py-1.5 z-50">
+                  {LANGS.map(l => (
+                    <button
+                      key={l.code}
+                      onClick={() => { setLang(l.code); localStorage.setItem("bookiify_lang", l.code); setIsLangOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 ${
+                        lang === l.code ? "text-indigo-600" : "text-slate-700 dark:text-slate-300"
+                      }`}
+                    >
+                      <span>{l.flag}</span>
+                      <span>{l.label}</span>
+                      {lang === l.code && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-500" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Dark mode toggle */}
+            <button
+              onClick={() => setIsDark(p => !p)}
+              className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {isDark ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} />}
+            </button>
+
+            <div className="h-8 w-[1px] bg-slate-200 dark:bg-slate-700" />
 
             {/* Notification bell */}
             <div className="relative" ref={notifRef}>
@@ -321,7 +554,7 @@ const DashboardLayout = () => {
               {isNotifOpen && <NotificationDropdown onClose={() => setIsNotifOpen(false)} />}
             </div>
 
-            <div className="h-8 w-[1px] bg-slate-200" />
+            <div className="h-8 w-[1px] bg-slate-200 dark:bg-slate-700" />
 
             {/* Profile */}
             <div className="relative" ref={profileRef}>
@@ -357,7 +590,7 @@ const DashboardLayout = () => {
 
               {/* Profile dropdown */}
               {isProfileOpen && (
-                <div className="absolute right-0 mt-3 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-200/50 py-2 z-50">
+                <div className="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-black/40 py-2 z-50">
                   <div className="px-4 py-2 border-b border-slate-50 mb-1">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Account Status</p>
                     <p className="text-xs font-bold text-emerald-600 flex items-center gap-1 mt-1">
@@ -396,8 +629,11 @@ const DashboardLayout = () => {
           </div>
         </header>
 
+        {/* ── KYC STATUS BANNER ── */}
+        <KYCBanner accountStatus={displayUser.accountStatus} />
+
         {/* ── PAGE CONTENT ── */}
-        <div className="p-8 flex-1">
+        <div className="p-8 flex-1 dark:bg-slate-950">
           <div className="max-w-7xl mx-auto">
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
               <Outlet />
@@ -409,6 +645,26 @@ const DashboardLayout = () => {
       {/* ── GLOBAL OVERLAYS ── */}
       <CommandPalette open={isPaletteOpen} onClose={() => setIsPaletteOpen(false)} />
       <NotificationToast toasts={toasts} onDismiss={dismissToast} />
+
+      {/* ── HELP PANEL ── */}
+      {isHelpOpen && <HelpPanel onClose={() => setIsHelpOpen(false)} />}
+
+      {/* ── FLOATING HELP BUBBLE ── */}
+      <button
+        onClick={() => setIsHelpOpen(p => !p)}
+        className="fixed bottom-7 right-7 z-50 w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-2xl shadow-indigo-400/30 flex items-center justify-center transition-all hover:scale-110 active:scale-95 group"
+        title="Help & FAQ"
+      >
+        {isHelpOpen ? <X size={22} /> : <HelpCircle size={22} />}
+        {!isHelpOpen && (
+          <span className="absolute bottom-16 right-0 bg-slate-900 dark:bg-slate-700 text-white text-[10px] font-black px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg">
+            Help & FAQ
+          </span>
+        )}
+        {!isHelpOpen && (
+          <span className="absolute inset-0 rounded-full bg-indigo-400 animate-ping opacity-20 pointer-events-none" />
+        )}
+      </button>
     </div>
   );
 };

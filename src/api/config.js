@@ -14,10 +14,11 @@ const API = axios.create({
   withCredentials: true, 
 });
 
-const getStoredCsrfToken = () => localStorage.getItem("csrf_token");
+// CSRF stored in sessionStorage (cleared on tab close, not persisted to disk)
+const getStoredCsrfToken = () => sessionStorage.getItem("csrf_token");
 const setStoredCsrfToken = (token) => {
   if (typeof token === "string" && token.trim()) {
-    localStorage.setItem("csrf_token", token);
+    sessionStorage.setItem("csrf_token", token);
   }
 };
 
@@ -91,8 +92,8 @@ API.interceptors.response.use(
     }
 
     const responseData = error.response?.data;
-    const errorCode = responseData?.code; 
-    const isUserLoggedIn = !!localStorage.getItem("user");
+    const errorCode = responseData?.code;
+    const isUserLoggedIn = !!getStoredCsrfToken();
 
     /**
      * 🚩 CASE 1: Session Expired (TOKEN_EXPIRED)
@@ -118,8 +119,7 @@ API.interceptors.response.use(
         processQueue(refreshError);
         isRefreshing = false;
 
-        localStorage.removeItem("user");
-        localStorage.removeItem("csrf_token");
+        sessionStorage.removeItem("csrf_token");
         if (!window.location.pathname.includes('/')) {
             window.location.href = "/";
         }
@@ -138,16 +138,12 @@ API.interceptors.response.use(
 
     if (criticalSecurityCodes.includes(errorCode)) {
       if (isUserLoggedIn) {
-        console.error(`🚨 [Security Alert]: ${errorCode}. Session terminated.`);
         window.dispatchEvent(new Event("auth-security-breach"));
-        localStorage.removeItem("user");
-        localStorage.removeItem("csrf_token");
+        sessionStorage.removeItem("csrf_token");
         
         if (!window.location.pathname.includes('/login')) {
             window.location.replace("/login?reason=security_violation");
         }
-      } else {
-        console.warn(`🛡️ Security Warning: ${errorCode} for Guest.`);
       }
     }
 
@@ -177,8 +173,6 @@ API.interceptors.response.use(
       !originalRequest.url.includes('/auth/verify-me') // 🛡️ URL Guard
     ) {
       originalRequest._retry = true;
-      console.warn("🛡️ Security Handshake: Re-syncing fingerprint...");
-      
       // Stabilization Delay: Wait 500ms for browser identity sync
       await new Promise(resolve => setTimeout(resolve, 500));
       

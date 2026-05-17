@@ -18,8 +18,7 @@ export const AuthProvider = ({ children }) => {
   const clearAuthData = useCallback(() => {
     setUser(null);
     setIsAuthenticated(false);
-    localStorage.removeItem("user");
-    localStorage.removeItem("csrf_token");
+    sessionStorage.removeItem("csrf_token");
   }, []);
 
   /**
@@ -30,40 +29,19 @@ export const AuthProvider = ({ children }) => {
    */
   const initializeAuth = useCallback(async () => {
     try {
-      // 🚀 STEP 1: FAST-PATH (Hydration)
-      // Immediately trust localStorage so the user sees their dashboard without delay.
-      const cachedUser = localStorage.getItem("user");
-      if (cachedUser) {
-        try {
-          const parsed = JSON.parse(cachedUser);
-          setUser(parsed);
-          setIsAuthenticated(true);
-          setLoading(false); // UI is now unblocked
-        } catch (e) {
-          localStorage.removeItem("user");
-        }
-      }
-
-      // 🛡️ STEP 2: BACKGROUND VERIFICATION (The "Truth" check)
-      // Confirm with the server that the cookie and fingerprint are actually valid.
+      // Single server call — httpOnly cookie is the session, no localStorage shortcut
       const verifiedUser = await verifyMe();
-      
       if (verifiedUser) {
         setUser(verifiedUser);
         setIsAuthenticated(true);
-        localStorage.setItem("user", JSON.stringify(verifiedUser));
       } else {
-        // If the backend says no session exists, we must clear local data.
         clearAuthData();
       }
     } catch (error) {
-      // If we hit a 401/403 or specific auth error, nuke the state.
-      // We check for error.response to avoid clearing on random network flickers.
       if (error.response?.status === 401 || error.response?.status === 403) {
         clearAuthData();
       }
     } finally {
-      // Ensure loading is false even if the network request failed
       setLoading(false);
     }
   }, [clearAuthData]);
@@ -75,7 +53,6 @@ export const AuthProvider = ({ children }) => {
    */
   useEffect(() => {
     const handleSecurityBreach = () => {
-      console.warn("🛡️ Security Context: Emergency state reset triggered.");
       clearAuthData();
     };
 
@@ -91,7 +68,6 @@ export const AuthProvider = ({ children }) => {
   const loginUser = (userData) => {
     setUser(userData);
     setIsAuthenticated(true);
-    localStorage.setItem("user", JSON.stringify(userData));
   };
 
   /**
@@ -102,8 +78,8 @@ export const AuthProvider = ({ children }) => {
     try {
       // 🛡️ API.post will automatically carry the x-device-fingerprint
       await API.post("/auth/logout");
-    } catch (error) {
-      console.error("Logout notification failed, proceeding with local cleanup.");
+    } catch {
+      // silent — local cleanup proceeds regardless
     } finally {
       clearAuthData();
       window.location.href = "/login";
@@ -118,7 +94,6 @@ export const AuthProvider = ({ children }) => {
     if (updatedUser) {
       setUser(updatedUser);
       setIsAuthenticated(true);
-      localStorage.setItem("user", JSON.stringify(updatedUser));
     } else {
       clearAuthData();
     }

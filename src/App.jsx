@@ -17,6 +17,8 @@ import BookingPage from "./pages/public/BookingPage"; // 🆕 Added Booking Upda
 // --- Onboarding & Auth ---
 import SignupLayout from "./pages/public/signup/SignupLayout";
 import Login from "./pages/public/auth/Login";
+import ForgotPassword from "./pages/public/auth/ForgotPassword";
+import ResetPassword from "./pages/public/auth/ResetPassword";
 import OnboardingStatus from './pages/public/auth/OnboardingStatus'
 
 // --- Admin Pages ---
@@ -38,6 +40,7 @@ import Loyalty from "./pages/owner/Loyalty";
 import Appointments from "./pages/owner/Appointments";
 import Customers from "./pages/owner/Customers";
 import Settings from "./pages/owner/Settings";
+import KYCVerification from "./pages/owner/KYCVerification";
 import WorkMode from "./pages/owner/WorkMode";
 import CustomerHistory from "./pages/owner/CustomerHistory";
 import Recruitment from "./pages/owner/Recruitment";
@@ -110,6 +113,7 @@ const LayoutManager = ({ children }) => {
   const location = useLocation();
   
   const isSignupPage    = location.pathname === "/signup";
+  const isAuthPage      = ["/login", "/forgot-password", "/reset-password", "/onboarding-status"].includes(location.pathname);
   const isAdminPage     = location.pathname.startsWith("/admin");
   const isOwnerPage     = location.pathname.startsWith("/owner");
   const isProfilePreview = location.pathname.startsWith("/p/");
@@ -117,7 +121,7 @@ const LayoutManager = ({ children }) => {
   const isCustomerPage  = location.pathname.startsWith("/customer");
 
   // 🛡️ Hide Chrome for high-immersion pages
-  const hideChrome = isSignupPage || isAdminPage || isOwnerPage || isProfilePreview || isBookingPage || isCustomerPage;
+  const hideChrome = isSignupPage || isAuthPage || isAdminPage || isOwnerPage || isProfilePreview || isBookingPage || isCustomerPage;
 
   return (
     <>
@@ -152,6 +156,8 @@ function App() {
           {/* --- 2. Auth Routes --- */}
           <Route path="/signup" element={<SignupLayout />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password"  element={<ResetPassword />} />
           <Route path="/onboarding-status" element={<OnboardingStatus />} />
           
           {/* --- 3. Admin Dashboard (Locked) --- */}
@@ -192,6 +198,7 @@ function App() {
             <Route path="theme/customize-site" element={<SetupTemplate />} />
             <Route path="dashboard/stats" element={<Analytics />} />
             <Route path="dashboard/settings" element={<Settings />} />
+            <Route path="dashboard/kyc"      element={<KYCVerification />} />
             <Route path="dashboard/work-mode" element={<WorkMode />} />
             <Route path="dashboard/recruitment" element={<Recruitment />} />
             <Route path="dashboard/staff"       element={<Staff />} />

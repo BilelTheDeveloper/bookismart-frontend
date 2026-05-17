@@ -36,19 +36,15 @@ const AdminGuard = ({ children, allowedRoles = [] }) => {
    */
   const rolesArray = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
   const hasAccess = rolesArray.includes(user.role);
-  const isActive = user.accountStatus === 'active';
 
-  if (!hasAccess || !isActive) {
-    // 🚨 INTERNAL FORENSICS
-    console.error(`🚨 [RBAC VIOLATION]: 
-      User: ${user.email} 
-      Role: ${user.role} 
-      Status: ${user.accountStatus}
-      Path: ${location.pathname}
-    `);
-    
-    // If authenticated but unauthorized (e.g., a 'staff' user hitting /admin),
-    // we send them to /unauthorized instead of /login to prevent loops.
+  // Owners in any non-suspended status can access the dashboard (sidebar handles feature locks).
+  // Admins must be active.
+  const OWNER_OK_STATUSES = ['active', 'pending_kyc', 'review', 'rejected'];
+  const isStatusOk = user.role === 'owner'
+    ? OWNER_OK_STATUSES.includes(user.accountStatus)
+    : user.accountStatus === 'active';
+
+  if (!hasAccess || !isStatusOk) {
     return <Navigate to="/unauthorized" replace />;
   }
 

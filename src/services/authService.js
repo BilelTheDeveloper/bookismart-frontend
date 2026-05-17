@@ -95,7 +95,41 @@ export const logout = async () => {
 };
 
 /**
- * 8. Utility: Get Current User Role (Fail-Safe Edition)
+ * 8. Password Reset
+ */
+export const forgotPassword = async (email) => {
+  const response = await API.post("/auth/forgot-password", { email });
+  return response.data;
+};
+
+export const resetPassword = async (token, password) => {
+  const response = await API.post("/auth/reset-password", { token, password });
+  return response.data;
+};
+
+/**
+ * 9. KYC Verification
+ */
+export const getKYCStatus = async () => (await API.get('/kyc/status')).data;
+
+export const submitKYC = async (formData) => {
+  const response = await API.post('/kyc/submit', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+};
+
+/**
+ * 10. Two-Factor Authentication
+ */
+export const twoFaSetup   = async ()           => (await API.get("/auth/2fa/setup")).data;
+export const twoFaEnable  = async (totpCode)   => (await API.post("/auth/2fa/enable",  { totpCode })).data;
+export const twoFaDisable = async (payload)    => (await API.post("/auth/2fa/disable", payload)).data;
+export const twoFaVerify  = async (twoFaToken, totpCode) =>
+  (await API.post("/auth/2fa/verify", { twoFaToken, totpCode })).data;
+
+/**
+ * 11. Utility: Get Current User Role (Fail-Safe Edition)
  */
 export const getCurrentUserRole = () => {
   try {
