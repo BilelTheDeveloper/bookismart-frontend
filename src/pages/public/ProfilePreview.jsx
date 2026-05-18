@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getThemeById } from "../owner/ThemeRegistry";
-import { Sparkles, Globe, ArrowLeft, Loader2 } from "lucide-react";
+import { Sparkles, Globe, ArrowLeft, Loader2, MapPin, Navigation } from "lucide-react";
 import API from "../../api/config"; // Ensure this points to your axios instance
 
 const ProfilePreview = () => {
@@ -131,16 +131,59 @@ const ProfilePreview = () => {
 
   const SelectedTheme = themeConfig.component;
 
+  // Build a displayable address from localization fields or contact.address
+  const loc = data.setupConfig?.localization || {};
+  const addressParts = [loc.address, loc.city, loc.country].filter(Boolean);
+  const fullAddress = addressParts.length > 0 ? addressParts.join(", ") : (data.contact?.address || "");
+  const mapsQuery = encodeURIComponent(fullAddress);
+
   return (
     <div className="flex flex-col min-h-screen bg-black">
-      
+
       {/* --- TOP BRANDING BAR --- */}
       {/* You can re-enable your top bar here if you want it visible on public profiles */}
 
       {/* --- THE ACTUAL THEME INJECTION --- */}
-      <main className="flex-grow"> 
+      <main className="flex-grow">
         <SelectedTheme data={data} />
       </main>
+
+      {/* --- LOCATION / GOOGLE MAPS SECTION --- */}
+      {!isDemo && fullAddress && (
+        <section className="bg-slate-900 border-t border-slate-800 py-10 px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-9 h-9 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center">
+                <MapPin size={16} className="text-rose-400" />
+              </div>
+              <div>
+                <p className="text-white font-black text-base">Find Us</p>
+                <p className="text-slate-400 text-xs font-medium">{fullAddress}</p>
+              </div>
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${mapsQuery}`}
+                target="_blank"
+                rel="noreferrer"
+                className="ml-auto flex items-center gap-2 px-4 py-2 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 hover:bg-rose-500/20 transition-all font-bold text-sm"
+              >
+                <Navigation size={14} />
+                Get Directions
+              </a>
+            </div>
+            <div className="w-full rounded-2xl overflow-hidden border border-slate-700" style={{ height: 320 }}>
+              <iframe
+                title="Business Location"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                src={`https://maps.google.com/maps?q=${mapsQuery}&output=embed`}
+              />
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* --- BOTTOM FLOATING BRANDING (Only for Public Views) --- */}
       {!isDemo && (

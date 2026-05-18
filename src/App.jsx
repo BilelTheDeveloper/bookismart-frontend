@@ -73,6 +73,7 @@ import StaffRegisterLayout from "./pages/staff/StaffRegisterLayout";
 import StaffLogin from "./pages/staff/StaffLogin";
 import StaffLayout from "./pages/staff/portal/StaffLayout";
 import StaffDashboard from "./pages/staff/portal/StaffDashboard";
+import StaffBookings from "./pages/staff/portal/StaffBookings";
 import { StaffAuthProvider } from "./context/StaffAuthContext";
 
 // --- Public: Find Work ---
@@ -237,7 +238,7 @@ function App() {
           <Route path="/staff/portal"          element={<StaffLayout />}>
             <Route index element={<StaffDashboard />} />
             {/* Dynamic pages — rendered inside StaffLayout, content loaded per route */}
-            <Route path="bookings"    element={<div className="text-white p-8 font-bold">Bookings — coming soon</div>} />
+            <Route path="bookings"    element={<StaffBookings />} />
             <Route path="customers"   element={<div className="text-white p-8 font-bold">Customers — coming soon</div>} />
             <Route path="finance"     element={<div className="text-white p-8 font-bold">Finance — coming soon</div>} />
             <Route path="chat"        element={<div className="text-white p-8 font-bold">Chat — coming soon</div>} />
