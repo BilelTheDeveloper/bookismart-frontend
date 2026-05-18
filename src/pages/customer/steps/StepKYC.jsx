@@ -240,7 +240,7 @@ const FileUpload = ({ label, hint, onCapture, captured }) => {
 };
 
 /* ── Main Step Component ── */
-const StepKYC = ({ token, onSuccess }) => {
+const StepKYC = ({ token, onSuccess, api = CAPI, pathBase = "/customer/register" }) => {
   const [liveness, setLiveness] = useState(null);
   const [idFront,  setIdFront]  = useState(null);
   const [idBack,   setIdBack]   = useState(null);
@@ -256,7 +256,7 @@ const StepKYC = ({ token, onSuccess }) => {
     setLoading(true);
     setError("");
     try {
-      await CAPI.post(`/customer/register/${token}/kyc`, {
+      await api.post(`${pathBase}/${token}/kyc`, {
         livenessPhotoBase64: liveness,
         idFrontBase64: idFront,
         idBackBase64: idBack,

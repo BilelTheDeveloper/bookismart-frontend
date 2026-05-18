@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Loader2, RefreshCw, ShieldCheck } from "lucide-react";
 import CAPI from "../../../api/customerConfig";
 
-const StepOTP = ({ token, email, onSuccess }) => {
+const StepOTP = ({ token, email, onSuccess, api = CAPI, pathBase = "/customer/register" }) => {
   const [otp, setOtp]           = useState(["", "", "", "", "", ""]);
   const [loading, setLoading]   = useState(false);
   const [resending, setResending] = useState(false);
@@ -51,7 +51,7 @@ const StepOTP = ({ token, email, onSuccess }) => {
     setLoading(true);
     setError("");
     try {
-      await CAPI.post(`/customer/register/${token}/verify-otp`, { otp: code });
+      await api.post(`${pathBase}/${token}/verify-otp`, { otp: code });
       onSuccess();
     } catch (err) {
       setError(err.response?.data?.message || "Incorrect code. Please try again.");
@@ -67,7 +67,7 @@ const StepOTP = ({ token, email, onSuccess }) => {
     setResendMsg("");
     setError("");
     try {
-      await CAPI.post(`/customer/register/${token}/resend-otp`);
+      await api.post(`${pathBase}/${token}/resend-otp`);
       setResendMsg("A new code has been sent to your email.");
       setCountdown(60);
     } catch (err) {

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Eye, EyeOff, Lock, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import CAPI from "../../../api/customerConfig";
 
-const rules = [
+export const rules = [
   { id: "len",    label: "At least 8 characters",         check: p => p.length >= 8 },
   { id: "upper",  label: "One uppercase letter",          check: p => /[A-Z]/.test(p) },
   { id: "number", label: "One number",                    check: p => /\d/.test(p) },
@@ -18,7 +18,7 @@ const getStrength = (p) => {
   return              { label: "Strong",        color: "bg-emerald-500", pct: 100 };
 };
 
-const StepPassword = ({ token, onSuccess }) => {
+const StepPassword = ({ token, onSuccess, api = CAPI, pathBase = "/customer/register" }) => {
   const [password, setPassword]   = useState("");
   const [confirm,  setConfirm]    = useState("");
   const [showPw,   setShowPw]     = useState(false);
@@ -37,7 +37,7 @@ const StepPassword = ({ token, onSuccess }) => {
     setLoading(true);
     setError("");
     try {
-      await CAPI.post(`/customer/register/${token}/set-password`, { password });
+      await api.post(`${pathBase}/${token}/set-password`, { password });
       onSuccess();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to set password. Please try again.");

@@ -63,9 +63,17 @@ import { CustomerAuthProvider } from "./context/CustomerAuthContext";
 // --- Owner: Customer access ---
 import CustomerAccessPage from "./pages/owner/CustomerAccessPage";
 
-// --- Admin: Customer review ---
+// --- Admin: Customer + Staff review ---
 import AdminCustomers from "./pages/admin/AdminCustomers";
 import AdminRecruitment from "./pages/admin/AdminRecruitment";
+import AdminStaff from "./pages/admin/AdminStaff";
+
+// --- Staff: Registration + Login + Portal ---
+import StaffRegisterLayout from "./pages/staff/StaffRegisterLayout";
+import StaffLogin from "./pages/staff/StaffLogin";
+import StaffLayout from "./pages/staff/portal/StaffLayout";
+import StaffDashboard from "./pages/staff/portal/StaffDashboard";
+import { StaffAuthProvider } from "./context/StaffAuthContext";
 
 // --- Public: Find Work ---
 import FindWorkPage from "./pages/public/FindWork/FindWorkPage";
@@ -119,9 +127,10 @@ const LayoutManager = ({ children }) => {
   const isProfilePreview = location.pathname.startsWith("/p/");
   const isBookingPage   = location.pathname.startsWith("/book/");
   const isCustomerPage  = location.pathname.startsWith("/customer");
+  const isStaffPage     = location.pathname.startsWith("/staff");
 
   // 🛡️ Hide Chrome for high-immersion pages
-  const hideChrome = isSignupPage || isAuthPage || isAdminPage || isOwnerPage || isProfilePreview || isBookingPage || isCustomerPage;
+  const hideChrome = isSignupPage || isAuthPage || isAdminPage || isOwnerPage || isProfilePreview || isBookingPage || isCustomerPage || isStaffPage;
 
   return (
     <>
@@ -136,6 +145,7 @@ const LayoutManager = ({ children }) => {
 
 function App() {
   return (
+    <StaffAuthProvider>
     <CustomerAuthProvider>
     <Router>
       <SecurityWatchdog /> {/* 🛡️ Active Security Monitoring */}
@@ -175,6 +185,7 @@ function App() {
             <Route path="security-alerts" element={<SecurityAlerts />} />
             <Route path="customers"       element={<AdminCustomers />} />
             <Route path="recruitment"     element={<AdminRecruitment />} />
+            <Route path="staff"           element={<AdminStaff />} />
           </Route>
 
           {/* --- 4. Owner Dashboard (Locked) --- */}
@@ -220,7 +231,24 @@ function App() {
             <Route path="session"         element={<CustomerSession />} />
           </Route>
 
-          {/* --- 7. Owner: Customer access management --- */}
+          {/* --- 7. Staff Registration + Login + Portal --- */}
+          <Route path="/staff/register/:token" element={<StaffRegisterLayout />} />
+          <Route path="/staff/login"           element={<StaffLogin />} />
+          <Route path="/staff/portal"          element={<StaffLayout />}>
+            <Route index element={<StaffDashboard />} />
+            {/* Dynamic pages — rendered inside StaffLayout, content loaded per route */}
+            <Route path="bookings"    element={<div className="text-white p-8 font-bold">Bookings — coming soon</div>} />
+            <Route path="customers"   element={<div className="text-white p-8 font-bold">Customers — coming soon</div>} />
+            <Route path="finance"     element={<div className="text-white p-8 font-bold">Finance — coming soon</div>} />
+            <Route path="chat"        element={<div className="text-white p-8 font-bold">Chat — coming soon</div>} />
+            <Route path="invoices"    element={<div className="text-white p-8 font-bold">Invoices — coming soon</div>} />
+            <Route path="loyalty"     element={<div className="text-white p-8 font-bold">Loyalty — coming soon</div>} />
+            <Route path="work-mode"   element={<WorkMode />} />
+            <Route path="recruitment" element={<div className="text-white p-8 font-bold">Recruitment — coming soon</div>} />
+            <Route path="analytics"   element={<div className="text-white p-8 font-bold">Analytics — coming soon</div>} />
+          </Route>
+
+          {/* --- 8. Owner: Customer access management --- */}
           <Route
             path="/owner/dashboard/customers/:id/access"
             element={
@@ -238,6 +266,7 @@ function App() {
       </LayoutManager>
     </Router>
     </CustomerAuthProvider>
+    </StaffAuthProvider>
   );
 }
 

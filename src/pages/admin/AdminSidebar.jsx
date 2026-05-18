@@ -9,6 +9,7 @@ const AdminSidebar = () => {
     { name: "KYC Review",      path: "/admin/verify-identity", icon: "🛡️" },
     { name: "Customers",       path: "/admin/customers",        icon: "👤" },
     { name: "Recruitment",     path: "/admin/recruitment",      icon: "💼" },
+    { name: "Staff Review",    path: "/admin/staff",            icon: "🪪" },
     { name: "Security Alerts", path: "/admin/security-alerts", icon: "🔐" },
     { name: "Verification",    path: "/admin/verification",     icon: "💳" },
   ];
