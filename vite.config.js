@@ -10,8 +10,9 @@ export default defineConfig({
   base: '/', 
   build: {
     outDir: 'dist',
-    emptyOutDir: true, // 🚨 Add this to wipe old files before building
+    emptyOutDir: true,
     assetsDir: 'assets',
-    manifest: true 
+    manifest: true,
+    chunkSizeWarningLimit: 2000,
   }
 })
