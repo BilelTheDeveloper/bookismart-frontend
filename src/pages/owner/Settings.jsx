@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import {
   UserCircle, ShieldCheck, Bell, Save, Eye, EyeOff,
   CheckCircle2, AlertCircle, Loader2, Lock, Phone,
   Mail, ChevronRight, BellOff, BellRing,
   KeyRound, QrCode, Copy, Check, X, ShieldOff,
+  Globe, Download, ExternalLink,
 } from "lucide-react";
 import QRCode from "react-qr-code";
 import API from "../../api/config";
@@ -47,7 +49,162 @@ const TABS = [
   { id: "profile",       label: "Profile",       icon: UserCircle },
   { id: "security",      label: "Security",       icon: ShieldCheck },
   { id: "notifications", label: "Notifications",  icon: Bell },
+  { id: "website",       label: "QR Code",        icon: QrCode },
 ];
+
+/* ─────────────────────────────────────────────────────────────────────
+   WEBSITE QR CODE PANEL
+───────────────────────────────────────────────────────────────────── */
+const WebsiteQRPanel = ({ website, loading }) => {
+  const [urlCopied, setUrlCopied] = useState(false);
+  const qrRef = useRef(null);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-48">
+        <Loader2 className="animate-spin text-indigo-600" size={28} />
+      </div>
+    );
+  }
+
+  if (!website) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 gap-5 text-center">
+        <div className="p-5 bg-slate-100 rounded-3xl">
+          <Globe size={32} className="text-slate-400" />
+        </div>
+        <div>
+          <p className="text-lg font-black text-slate-900">No Website Yet</p>
+          <p className="text-sm text-slate-500 font-medium mt-1 max-w-xs">
+            Build your public booking page first — your QR code will appear here once your site is created.
+          </p>
+        </div>
+        <Link
+          to="/owner/dashboard/themes"
+          className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all"
+        >
+          Build My Site
+        </Link>
+      </div>
+    );
+  }
+
+  const publicUrl = `https://bookiify.vercel.app/p/${website.slug}`;
+  const isLive = website.verificationStatus === "approved" && website.isPublished;
+
+  const copyUrl = () => {
+    navigator.clipboard.writeText(publicUrl);
+    setUrlCopied(true);
+    setTimeout(() => setUrlCopied(false), 2000);
+  };
+
+  const downloadPNG = () => {
+    const svg = qrRef.current?.querySelector("svg");
+    if (!svg) return;
+    const size = 512;
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    img.onload = () => {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, size, size);
+      ctx.drawImage(img, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      const a = document.createElement("a");
+      a.download = `${website.slug}-qr.png`;
+      a.href = canvas.toDataURL("image/png");
+      a.click();
+    };
+    img.src = url;
+  };
+
+  const downloadSVG = () => {
+    const svg = qrRef.current?.querySelector("svg");
+    if (!svg) return;
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.download = `${website.slug}-qr.svg`;
+    a.href = url;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="space-y-6">
+      {!isLive && (
+        <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-2xl border border-amber-100">
+          <AlertCircle size={15} className="text-amber-500 shrink-0 mt-0.5" />
+          <p className="text-xs text-amber-700 font-medium">
+            Your website is not live yet. The QR code is ready to print, but customers won't be able to book until your site is approved and published.
+          </p>
+        </div>
+      )}
+
+      {/* QR Code display */}
+      <div className="flex flex-col items-center gap-6 py-6">
+        <div ref={qrRef} className="p-6 bg-white border-2 border-slate-100 rounded-3xl shadow-lg">
+          <QRCode value={publicUrl} size={200} fgColor="#0f172a" bgColor="#ffffff" />
+        </div>
+
+        {/* URL row */}
+        <div className="flex items-center gap-2 w-full max-w-sm">
+          <div className="flex-1 px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold text-slate-600 truncate">
+            {publicUrl}
+          </div>
+          <button
+            onClick={copyUrl}
+            title="Copy link"
+            className="p-3 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all shrink-0"
+          >
+            {urlCopied ? <Check size={15} className="text-emerald-600" /> : <Copy size={15} className="text-slate-500" />}
+          </button>
+          {isLive && (
+            <a
+              href={publicUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Open booking page"
+              className="p-3 bg-emerald-100 hover:bg-emerald-200 rounded-xl transition-all shrink-0"
+            >
+              <ExternalLink size={15} className="text-emerald-700" />
+            </a>
+          )}
+        </div>
+
+        {/* Download buttons */}
+        <div className="flex gap-3 flex-wrap justify-center">
+          <button
+            onClick={downloadPNG}
+            className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all"
+          >
+            <Download size={15} /> Download PNG
+          </button>
+          <button
+            onClick={downloadSVG}
+            className="flex items-center gap-2 px-6 py-3 bg-slate-200 text-slate-700 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-300 transition-all"
+          >
+            <Download size={15} /> Download SVG
+          </button>
+        </div>
+      </div>
+
+      {/* Info tip */}
+      <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+        <QrCode size={15} className="text-indigo-400 shrink-0 mt-0.5" />
+        <p className="text-xs text-slate-500 font-medium">
+          Print this QR code and place it at your front desk or entrance. Customers who scan it go straight to your online booking page — no app required.
+        </p>
+      </div>
+    </div>
+  );
+};
 
 /* ─────────────────────────────────────────────────────────────────────
    2FA PANEL  (self-contained sub-component)
@@ -392,6 +549,11 @@ const Settings = () => {
   /* 2FA */
   const [twoFaEnabled, setTwoFaEnabled] = useState(false);
 
+  /* Website / QR */
+  const [website, setWebsite]             = useState(null);
+  const [websiteLoading, setWebsiteLoading] = useState(false);
+  const [websiteFetched, setWebsiteFetched] = useState(false);
+
   /* Notifications */
   const [notifs, setNotifs]           = useState({ newBookingEmail: true, cancellationEmail: true });
   const [notifSaving, setNotifSaving] = useState(false);
@@ -420,6 +582,15 @@ const Settings = () => {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (activeTab !== "website" || websiteFetched) return;
+    setWebsiteLoading(true);
+    API.get("/merchant/website/my-site")
+      .then((res) => setWebsite(res.data))
+      .catch(() => {})
+      .finally(() => { setWebsiteLoading(false); setWebsiteFetched(true); });
+  }, [activeTab, websiteFetched]);
 
   const saveProfile = async () => {
     setProfileSaving(true);
@@ -703,6 +874,20 @@ const Settings = () => {
                   {notifSaving ? "Saving…" : "Save Preferences"}
                 </button>
               </div>
+            </section>
+          )}
+
+          {/* ── WEBSITE QR CODE TAB ── */}
+          {activeTab === "website" && (
+            <section className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm space-y-6">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl"><QrCode size={22} /></div>
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">Booking QR Code</h3>
+                  <p className="text-xs text-slate-400 font-bold mt-0.5">Let customers scan and book instantly — no link needed.</p>
+                </div>
+              </div>
+              <WebsiteQRPanel website={website} loading={websiteLoading} />
             </section>
           )}
 
