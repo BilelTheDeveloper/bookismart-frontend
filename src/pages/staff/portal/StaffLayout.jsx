@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   CalendarDays, Users, BarChart2, MessageSquare, FileText,
   Gift, Briefcase, UserPlus, TrendingUp, Home,
-  LogOut, ChevronRight, Menu, X, User
+  LogOut, ChevronRight, Menu, X, User, Loader2,
 } from "lucide-react";
 import { useStaffAuth } from "../../../context/StaffAuthContext";
 
@@ -23,15 +23,25 @@ const StaffLayout = () => {
   const { staff, loading, isAuthenticated, logoutStaff } = useStaffAuth();
   const navigate = useNavigate();
 
+  // All hooks must be called unconditionally — before any early returns
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       navigate("/staff/login", { replace: true });
     }
   }, [loading, isAuthenticated, navigate]);
 
-  if (loading || !isAuthenticated) return null;
-  const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  if (loading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-slate-950">
+        <Loader2 size={32} className="animate-spin text-violet-400" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) return null;
 
   const allowedKeys = (staff?.allowedPages || []).map(p => p.pageKey);
   const navItems    = allowedKeys.map(k => PAGE_META[k]).filter(Boolean);
@@ -43,7 +53,7 @@ const StaffLayout = () => {
     .toUpperCase()
     .slice(0, 2) || "?";
 
-  const Sidebar = ({ mobile = false }) => (
+  const SidebarContent = ({ mobile = false }) => (
     <aside className={`
       ${mobile ? "fixed inset-y-0 left-0 z-50 w-72 flex flex-col" : "relative flex flex-col"}
       ${!mobile && collapsed ? "w-20" : !mobile ? "w-64" : ""}
@@ -185,13 +195,13 @@ const StaffLayout = () => {
       {/* Mobile sidebar */}
       {mobileOpen && (
         <div className="lg:hidden">
-          <Sidebar mobile />
+          <SidebarContent mobile />
         </div>
       )}
 
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
-        <Sidebar />
+        <SidebarContent />
       </div>
 
       {/* Main content */}

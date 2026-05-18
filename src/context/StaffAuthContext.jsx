@@ -71,14 +71,7 @@ export const StaffAuthProvider = ({ children }) => {
 
   return (
     <StaffAuthContext.Provider value={value}>
-      {!loading ? children : (
-        <div className="h-screen w-full flex items-center justify-center bg-slate-50">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-indigo-600" />
-            <div className="absolute inset-0 rounded-full border-4 border-indigo-100 opacity-25" />
-          </div>
-        </div>
-      )}
+      {children}
     </StaffAuthContext.Provider>
   );
 };
