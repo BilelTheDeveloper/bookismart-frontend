@@ -7,7 +7,7 @@ import {
   KeyRound, QrCode, Copy, Check, X, ShieldOff,
   Globe, Download, ExternalLink,
 } from "lucide-react";
-import QRCode from "react-qr-code";
+import { QRCode } from "react-qr-code";
 import API from "../../api/config";
 import { twoFaSetup, twoFaEnable, twoFaDisable } from "../../services/authService";
 import { toast } from "react-hot-toast";
