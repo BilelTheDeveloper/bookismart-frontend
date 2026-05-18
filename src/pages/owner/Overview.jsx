@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import API from "../../api/config";
 import {
@@ -129,8 +130,8 @@ const SkeletonRow = () => (
 
 /* ═══════════════════════════════════════════ */
 const Overview = () => {
-  const user = JSON.parse(localStorage.getItem('user')) || {};
-  const subscription = user?.paymentInfo?.subscription || {};
+  const { user: authUser } = useAuth();
+  const subscription = authUser?.paymentInfo?.subscription || {};
   const trialEndsAt = subscription.trialEndsAt
     ? new Date(subscription.trialEndsAt)
     : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
@@ -253,7 +254,7 @@ const Overview = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-            Good {greeting}, {user.fullName?.split(' ')[0] || 'Owner'}
+            Good {greeting}, {authUser?.fullName?.split(' ')[0] || 'Owner'}
           </h2>
           <p className="text-slate-500 text-sm font-medium mt-0.5">{todayLabel}</p>
         </div>

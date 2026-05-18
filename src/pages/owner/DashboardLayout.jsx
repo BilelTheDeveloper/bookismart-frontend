@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Outlet, Link, useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
+import Sidebar, { getAccessState, getTrialDaysLeft } from "./Sidebar";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationContext";
 import API from "../../api/config";
@@ -370,57 +370,90 @@ function HelpPanel({ onClose }) {
   );
 }
 
-/* ── KYC Status Banner ── */
-function KYCBanner({ accountStatus }) {
-  if (!accountStatus || accountStatus === "active") return null;
+/* ── Access State Banner ── */
+function AccessBanner({ user }) {
+  const accessState = getAccessState(user);
+  const daysLeft    = getTrialDaysLeft(user?.trialEndsAt);
+  const isRejected  = user?.accountStatus === "on_boarding" && user?.kycStatus === "rejected";
 
-  const banners = {
-    pending_kyc: {
-      bg: "bg-amber-50 border-amber-200",
-      text: "text-amber-800",
-      icon: <ShieldCheck size={16} className="text-amber-600 flex-shrink-0" />,
-      message: "Your account is not yet verified.",
-      cta: { label: "Complete KYC Verification →", to: "/owner/dashboard/kyc" },
-    },
-    review: {
-      bg: "bg-blue-50 border-blue-200",
-      text: "text-blue-800",
-      icon: <CheckCircle2 size={16} className="text-blue-500 flex-shrink-0" />,
-      message: "Your identity documents are under review. We'll notify you by email within 24 hours.",
-      cta: null,
-    },
-    rejected: {
-      bg: "bg-rose-50 border-rose-200",
-      text: "text-rose-800",
-      icon: <XCircle size={16} className="text-rose-500 flex-shrink-0" />,
-      message: "Your KYC was rejected. Please resubmit with correct documents.",
-      cta: { label: "Resubmit Documents →", to: "/owner/dashboard/kyc" },
-    },
-  };
-
-  const b = banners[accountStatus];
-  if (!b) return null;
-
-  return (
-    <div className={`flex items-center gap-3 px-8 py-3 border-b ${b.bg} ${b.text} text-sm font-bold`}>
-      {b.icon}
-      <span>{b.message}</span>
-      {b.cta && (
-        <Link to={b.cta.to} className="ml-1 underline hover:no-underline font-black whitespace-nowrap">
-          {b.cta.label}
+  if (accessState === "unverified") {
+    return (
+      <div className="flex items-center gap-3 px-8 py-3 border-b bg-amber-50 border-amber-200 text-amber-800 text-sm font-bold">
+        <ShieldCheck size={16} className="text-amber-600 flex-shrink-0" />
+        <span>{isRejected ? "Your KYC was rejected. Please resubmit with the correct documents." : "Your account is not yet verified."}</span>
+        <Link to="/owner/dashboard/kyc" className="ml-1 underline hover:no-underline font-black whitespace-nowrap">
+          {isRejected ? "Resubmit Documents →" : "Complete KYC Verification →"}
         </Link>
-      )}
-    </div>
-  );
+      </div>
+    );
+  }
+
+  if (accessState === "review") {
+    return (
+      <div className="flex items-center gap-3 px-8 py-3 border-b bg-blue-50 border-blue-200 text-blue-800 text-sm font-bold">
+        <CheckCircle2 size={16} className="text-blue-500 flex-shrink-0" />
+        <span>Your identity documents are under review. We&apos;ll notify you by email within 24 hours.</span>
+      </div>
+    );
+  }
+
+  if (accessState === "expired") {
+    return (
+      <div className="flex items-center gap-3 px-8 py-3 border-b bg-rose-50 border-rose-200 text-rose-800 text-sm font-bold">
+        <XCircle size={16} className="text-rose-500 flex-shrink-0" />
+        <span>Your free trial has expired. Upgrade your plan to continue using all features.</span>
+        <Link to="/owner/dashboard/billing" className="ml-1 underline hover:no-underline font-black whitespace-nowrap">
+          Upgrade Now →
+        </Link>
+      </div>
+    );
+  }
+
+  if (accessState === "trial" && daysLeft <= 30) {
+    const urgent = daysLeft <= 7;
+    return (
+      <div className={`flex items-center gap-3 px-8 py-3 border-b ${urgent ? "bg-rose-50 border-rose-200 text-rose-800" : "bg-amber-50 border-amber-200 text-amber-800"} text-sm font-bold`}>
+        <Loader2 size={16} className={`flex-shrink-0 ${urgent ? "text-rose-500" : "text-amber-600"}`} />
+        <span>
+          {urgent
+            ? `Your free trial expires in ${daysLeft} day${daysLeft !== 1 ? "s" : ""}. Upgrade now to avoid interruption.`
+            : `Your free trial expires in ${daysLeft} days.`}
+        </span>
+        <Link to="/owner/dashboard/billing" className="ml-1 underline hover:no-underline font-black whitespace-nowrap">
+          Upgrade Plan →
+        </Link>
+      </div>
+    );
+  }
+
+  return null;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
    DASHBOARD LAYOUT
    ══════════════════════════════════════════════════════════════════════════════ */
 const DashboardLayout = () => {
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
+  const location  = useLocation();
   const { user, logoutUser } = useAuth();
   const { unreadCount, toasts, dismissToast } = useNotifications();
+
+  /* ── Route Enforcement ── */
+  useEffect(() => {
+    if (!user) return;
+    const state = getAccessState(user);
+    const path  = location.pathname;
+
+    if (state === "unverified" || state === "review") {
+      if (path !== "/owner/dashboard/kyc" && path !== "/owner/dashboard") {
+        navigate("/owner/dashboard/kyc", { replace: true });
+      }
+    } else if (state === "expired") {
+      if (path !== "/owner/dashboard/billing" && path !== "/owner/dashboard") {
+        navigate("/owner/dashboard/billing", { replace: true });
+      }
+    }
+  }, [location.pathname, user, navigate]);
 
   const [isCollapsed,   setIsCollapsed]   = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -629,8 +662,8 @@ const DashboardLayout = () => {
           </div>
         </header>
 
-        {/* ── KYC STATUS BANNER ── */}
-        <KYCBanner accountStatus={displayUser.accountStatus} />
+        {/* ── ACCESS STATUS BANNER ── */}
+        <AccessBanner user={user} />
 
         {/* ── PAGE CONTENT ── */}
         <div className="p-8 flex-1 dark:bg-slate-950">
