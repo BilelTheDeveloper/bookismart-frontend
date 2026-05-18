@@ -32,6 +32,7 @@ const StaffLogin = () => {
     setError("");
     try {
       const res = await SAPI.post("/staff/login", { email, password });
+      if (res.data.csrfToken) sessionStorage.setItem("csrf_token", res.data.csrfToken);
       loginStaff(res.data.staff);
       navigate("/staff/portal", { replace: true });
     } catch (err) {

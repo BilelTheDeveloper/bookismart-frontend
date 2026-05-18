@@ -25,11 +25,20 @@ const processQueue = (error) => {
 
 SAPI.interceptors.request.use((config) => {
   config.headers["x-device-fingerprint"] = getBrowserFingerprint();
+  const method = (config.method || "get").toUpperCase();
+  if (!["GET", "HEAD", "OPTIONS"].includes(method)) {
+    const csrfToken = sessionStorage.getItem("csrf_token");
+    if (csrfToken) config.headers["x-csrf-token"] = csrfToken;
+  }
   return config;
 });
 
 SAPI.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    const csrfToken = res?.data?.csrfToken;
+    if (csrfToken) sessionStorage.setItem("csrf_token", csrfToken);
+    return res;
+  },
   async (error) => {
     const originalRequest = error.config;
     const code = error.response?.data?.code;
