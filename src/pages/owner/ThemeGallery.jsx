@@ -1,26 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle2, Eye, Palette, Sparkles, Layout, ArrowRight } from "lucide-react";
-import API from "../../api/config"; 
+import API from "../../api/config";
+import { useAuth } from "../../context/AuthContext";
 import { THEME_REGISTRY, getThemesByCategory } from "./ThemeRegistry";
 
 const ThemeGallery = () => {
   const navigate = useNavigate();
+  const { user: authUser } = useAuth();
 
-  let parsedUser = null;
-  try {
-    parsedUser = JSON.parse(localStorage.getItem("user") || "null");
-  } catch {
-    parsedUser = null;
-  }
-
-  const user = {
-    category: parsedUser?.category || "Beauty & Barbers",
-    businessName: parsedUser?.businessName || "My Business",
-  };
-
-  const safeCategory = typeof user.category === "string" && user.category.trim()
-    ? user.category
+  const safeCategory = typeof authUser?.category === "string" && authUser.category.trim()
+    ? authUser.category
     : "Beauty & Barbers";
 
   const filteredThemes = getThemesByCategory(safeCategory);
@@ -48,7 +38,7 @@ const ThemeGallery = () => {
     navigate("/owner/theme/customize-site", { 
       state: { 
         selectedThemeId: themeId,
-        category: user.category 
+        category: safeCategory,
       } 
     });
   };
