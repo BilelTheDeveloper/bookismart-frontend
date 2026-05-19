@@ -2,19 +2,13 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
+import { AuthProvider } from './context/AuthContext';
+import { NotificationProvider } from './context/NotificationContext';
 
 // i18n — only loaded when VITE_I18N_ENABLED=true
 if (import.meta.env.VITE_I18N_ENABLED === 'true') {
   await import('./i18n/index.js');
 }
-
-/**
- * 🔐 THE SECURITY ENGINE (AuthProvider)
- * Provides the "Source of Truth" for user identity.
- * Bypasses localStorage and relies on HttpOnly cookies.
- */
-import { AuthProvider } from './context/AuthContext';
-import { NotificationProvider } from './context/NotificationContext';
 
 /**
  * 🚀 THE THEME ENGINE (CategoryProvider)

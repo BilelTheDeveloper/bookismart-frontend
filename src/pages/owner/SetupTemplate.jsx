@@ -4,7 +4,7 @@ import API from "../../api/config";
 import {
   Save, ArrowLeft, Eye, EyeOff, X, Camera,
   Upload, Globe, Mail, Clock, Phone, Sparkles, Plus, Trash2, MapPin,
-  CalendarRange, Timer
+  CalendarRange, Timer, Video, Play, AlertCircle, CheckCircle2
 } from 'lucide-react';
 
 import { getThemeById } from "./ThemeRegistry";
@@ -43,8 +43,9 @@ const TemplateSetupForm = () => {
   const [uploadingField, setUploadingField] = useState(null); 
   const [validationErrors, setValidationErrors] = useState([]); 
   
-  const heroFileRef = useRef(null);
+  const heroFileRef  = useRef(null);
   const aboutFileRef = useRef(null);
+  const reelFileRef  = useRef(null);
 
   const [merchantData, setMerchantData] = useState({
     templateId: themeId,
@@ -55,6 +56,8 @@ const TemplateSetupForm = () => {
     about: { show: true, title: "Our Story", text: "", image: "" },
     services: [{ title: "", description: "", price: "", duration: 30, bufferTime: 0, active: true }],
     gallery: { show: true, images: ["", "", "", ""] },
+    beforeAfterGallery: [],
+    presentationReel: { show: false, videoUrl: '', title: 'Notre savoir-faire en vidéo', subtitle: '' },
     contact: {
       phone: "", email: "", address: "",
       socials: { instagram: "", facebook: "", tiktok: "" }
@@ -88,6 +91,8 @@ const TemplateSetupForm = () => {
             templateId: themeId,
             category: location.state?.category || res.data.category || "barbershops",
             seasonalHours: res.data.seasonalHours || [],
+            beforeAfterGallery: res.data.beforeAfterGallery || [],
+            presentationReel: res.data.presentationReel || { show: false, videoUrl: '', title: 'Notre savoir-faire en vidéo', subtitle: '' },
             setupConfig: {
               maxCustomersPerDay: incomingConfig.maxCustomersPerDay ?? 25,
               restMinutesBetweenConsultations: incomingConfig.restMinutesBetweenConsultations ?? 0,
@@ -231,6 +236,111 @@ const TemplateSetupForm = () => {
     } catch (err) {
       alert("Upload failed.");
     } finally { setUploadingField(null); }
+  };
+
+  const handleReelUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Client-side duration check via HTMLVideoElement
+    const checkDuration = () =>
+      new Promise((resolve) => {
+        const vid = document.createElement('video');
+        vid.preload = 'metadata';
+        vid.onloadedmetadata = () => { URL.revokeObjectURL(vid.src); resolve(vid.duration); };
+        vid.onerror = () => resolve(null);
+        vid.src = URL.createObjectURL(file);
+      });
+
+    const duration = await checkDuration();
+    if (duration !== null && duration > 32) {
+      alert(`⚠️ Video too long (${Math.round(duration)}s). Maximum is 30 seconds.`);
+      e.target.value = '';
+      return;
+    }
+
+    setUploadingField('presentationReel');
+    try {
+      const formData = new FormData();
+      formData.append('presentationReel', file);
+      const res = await API.post('/merchant/website/upload/reel', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setMerchantData(prev => ({
+        ...prev,
+        presentationReel: {
+          ...prev.presentationReel,
+          show: true,
+          videoUrl: res.data.url,
+        },
+      }));
+    } catch (err) {
+      alert(err.response?.data?.message || 'Reel upload failed.');
+    } finally {
+      setUploadingField(null);
+      e.target.value = '';
+    }
+  };
+
+  const handleReelDelete = async () => {
+    if (!window.confirm('Remove this presentation reel?')) return;
+    setUploadingField('reelDelete');
+    try {
+      await API.delete('/merchant/website/upload/reel');
+      setMerchantData(prev => ({
+        ...prev,
+        presentationReel: { show: false, videoUrl: '', title: prev.presentationReel?.title || '', subtitle: '' },
+      }));
+    } catch {
+      alert('Could not remove reel.');
+    } finally {
+      setUploadingField(null);
+    }
+  };
+
+  const handleBeforeAfterImageUpload = async (pairIdx, side, file) => {
+    if (!file) return;
+    const fieldKey = `ba.${pairIdx}.${side}`;
+    setUploadingField(fieldKey);
+    try {
+      const formData = new FormData();
+      formData.append('beforeAfterImage', file);
+      const res = await API.post('/merchant/website/upload/beforeafter', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setMerchantData(prev => {
+        const gallery = [...(prev.beforeAfterGallery || [])];
+        gallery[pairIdx] = { ...gallery[pairIdx], [side]: res.data.url };
+        return { ...prev, beforeAfterGallery: gallery };
+      });
+    } catch {
+      alert('Image upload failed.');
+    } finally {
+      setUploadingField(null);
+    }
+  };
+
+  const addBeforeAfterPair = () => {
+    if ((merchantData.beforeAfterGallery || []).length >= 10) return;
+    setMerchantData(prev => ({
+      ...prev,
+      beforeAfterGallery: [...(prev.beforeAfterGallery || []), { before: '', after: '', caption: '' }],
+    }));
+  };
+
+  const removeBeforeAfterPair = (idx) => {
+    setMerchantData(prev => ({
+      ...prev,
+      beforeAfterGallery: (prev.beforeAfterGallery || []).filter((_, i) => i !== idx),
+    }));
+  };
+
+  const updateBeforeAfterCaption = (idx, value) => {
+    setMerchantData(prev => {
+      const gallery = [...(prev.beforeAfterGallery || [])];
+      gallery[idx] = { ...gallery[idx], caption: value };
+      return { ...prev, beforeAfterGallery: gallery };
+    });
   };
 
   const handleSave = async () => {
@@ -618,6 +728,268 @@ const TemplateSetupForm = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+        </section>
+
+        {/* 07B: BEFORE & AFTER GALLERY */}
+        <section className="bg-white rounded-[3rem] p-12 shadow-sm border border-slate-100 space-y-8">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 flex items-center gap-4">
+              <span className="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center">
+                <Camera size={22} />
+              </span>
+              Before &amp; After
+            </h2>
+            <div className="flex items-center gap-3">
+              <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                {(merchantData.beforeAfterGallery || []).length} / 10
+              </span>
+              <button
+                onClick={addBeforeAfterPair}
+                disabled={(merchantData.beforeAfterGallery || []).length >= 10}
+                className="bg-amber-500 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-600 flex items-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <Plus size={16} /> Add Pair
+              </button>
+            </div>
+          </div>
+
+          <p className="text-sm text-slate-500 font-medium -mt-2">
+            Showcase your transformations. Upload before &amp; after image pairs to build trust with potential clients. Max 10 pairs.
+          </p>
+
+          {(merchantData.beforeAfterGallery || []).length === 0 ? (
+            <div
+              onClick={addBeforeAfterPair}
+              className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-amber-200 rounded-3xl bg-amber-50/30 cursor-pointer hover:bg-amber-50/60 hover:border-amber-400 transition-all group"
+            >
+              <div className="w-16 h-16 rounded-full bg-amber-100 group-hover:bg-amber-200 flex items-center justify-center transition-all mb-3">
+                <Camera size={26} className="text-amber-600" />
+              </div>
+              <p className="text-sm font-black text-slate-700">Add your first transformation</p>
+              <p className="text-xs text-slate-400 font-medium mt-1">Click to add a before &amp; after pair</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {(merchantData.beforeAfterGallery || []).map((pair, idx) => (
+                <div key={idx} className="bg-slate-50 rounded-3xl p-6 space-y-4 border border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Pair {idx + 1}</span>
+                    <button onClick={() => removeBeforeAfterPair(idx)} className="text-slate-300 hover:text-rose-500 transition-colors">
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Before */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-rose-400 inline-block" /> Before
+                      </label>
+                      <div
+                        className="relative aspect-square bg-white rounded-2xl border-2 border-dashed border-rose-200 overflow-hidden flex items-center justify-center cursor-pointer hover:border-rose-400 hover:bg-rose-50/40 transition-all group"
+                        onClick={() => {
+                          const inp = document.createElement('input');
+                          inp.type = 'file'; inp.accept = 'image/*';
+                          inp.onchange = (e) => handleBeforeAfterImageUpload(idx, 'before', e.target.files[0]);
+                          inp.click();
+                        }}
+                      >
+                        {pair.before
+                          ? <img src={pair.before} className="w-full h-full object-cover" alt="before" />
+                          : <div className="flex flex-col items-center gap-2">
+                              <Upload size={20} className="text-rose-300" />
+                              <span className="text-[10px] font-black text-rose-300 uppercase tracking-wider">Upload</span>
+                            </div>
+                        }
+                        {uploadingField === `ba.${idx}.before` && (
+                          <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+                            <div className="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+                          </div>
+                        )}
+                        {pair.before && (
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <div className="bg-white rounded-full p-2"><Upload size={14} /></div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* After */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" /> After
+                      </label>
+                      <div
+                        className="relative aspect-square bg-white rounded-2xl border-2 border-dashed border-emerald-200 overflow-hidden flex items-center justify-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/40 transition-all group"
+                        onClick={() => {
+                          const inp = document.createElement('input');
+                          inp.type = 'file'; inp.accept = 'image/*';
+                          inp.onchange = (e) => handleBeforeAfterImageUpload(idx, 'after', e.target.files[0]);
+                          inp.click();
+                        }}
+                      >
+                        {pair.after
+                          ? <img src={pair.after} className="w-full h-full object-cover" alt="after" />
+                          : <div className="flex flex-col items-center gap-2">
+                              <Upload size={20} className="text-emerald-300" />
+                              <span className="text-[10px] font-black text-emerald-300 uppercase tracking-wider">Upload</span>
+                            </div>
+                        }
+                        {uploadingField === `ba.${idx}.after` && (
+                          <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+                            <div className="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+                          </div>
+                        )}
+                        {pair.after && (
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <div className="bg-white rounded-full p-2"><Upload size={14} /></div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black uppercase text-slate-400">Caption (optional)</label>
+                    <input
+                      value={pair.caption || ''}
+                      onChange={(e) => updateBeforeAfterCaption(idx, e.target.value)}
+                      maxLength={120}
+                      className="w-full bg-white rounded-2xl px-4 py-3 text-sm font-bold outline-none border border-slate-200"
+                      placeholder="e.g. Complete color transformation — 3h session"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* 06B: PRESENTATION REEL — optional 30s showcase video */}
+        <section className={`bg-white rounded-[3rem] p-12 shadow-sm border border-slate-100 space-y-8 transition-all ${!merchantData.presentationReel?.show && merchantData.presentationReel?.videoUrl === '' ? '' : ''}`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-violet-50 text-violet-600 rounded-2xl flex items-center justify-center">
+                <Video size={22} />
+              </div>
+              <div>
+                <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900">Presentation Reel</h2>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Optional · Max 30 seconds</p>
+              </div>
+            </div>
+            {/* Toggle show/hide on the profile */}
+            {merchantData.presentationReel?.videoUrl && (
+              <button
+                onClick={() => setMerchantData(p => ({
+                  ...p,
+                  presentationReel: { ...p.presentationReel, show: !p.presentationReel.show }
+                }))}
+                className={`p-3 rounded-xl transition-all ${merchantData.presentationReel.show ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'}`}
+              >
+                {merchantData.presentationReel.show ? <Eye size={20} /> : <EyeOff size={20} />}
+              </button>
+            )}
+          </div>
+
+          {/* Info banner */}
+          <div className="flex items-start gap-3 rounded-2xl bg-violet-50 border border-violet-100 px-5 py-4">
+            <AlertCircle size={16} className="text-violet-500 mt-0.5 flex-shrink-0" />
+            <p className="text-xs font-semibold text-violet-700 leading-relaxed">
+              Add a short video (max 30s) showcasing your skills, your space, or your work. It will autoplay (muted) on your public profile in a dedicated section. You can skip this step and add it later.
+            </p>
+          </div>
+
+          {/* Upload area */}
+          {!merchantData.presentationReel?.videoUrl ? (
+            <div
+              onClick={() => reelFileRef.current?.click()}
+              className="relative flex flex-col items-center justify-center min-h-[220px] border-2 border-dashed border-violet-200 rounded-[2rem] bg-violet-50/40 cursor-pointer hover:bg-violet-50 hover:border-violet-400 transition-all group"
+            >
+              {uploadingField === 'presentationReel' ? (
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-10 h-10 border-4 border-violet-400 border-t-transparent rounded-full animate-spin" />
+                  <p className="text-xs font-black uppercase tracking-widest text-violet-500">Uploading…</p>
+                </div>
+              ) : (
+                <>
+                  <div className="w-16 h-16 rounded-full bg-violet-100 group-hover:bg-violet-200 flex items-center justify-center transition-all mb-3">
+                    <Play size={28} className="text-violet-600 ml-1" />
+                  </div>
+                  <p className="text-sm font-black text-slate-700">Click to upload your reel</p>
+                  <p className="text-xs text-slate-400 font-medium mt-1">MP4, MOV, WEBM · Max 30 seconds · Up to 80 MB</p>
+                </>
+              )}
+              <input
+                ref={reelFileRef}
+                type="file"
+                accept="video/mp4,video/quicktime,video/webm"
+                className="hidden"
+                onChange={handleReelUpload}
+              />
+            </div>
+          ) : (
+            <div className="space-y-5">
+              {/* Video preview */}
+              <div className="relative rounded-[2rem] overflow-hidden bg-slate-950 aspect-video">
+                <video
+                  src={merchantData.presentationReel.videoUrl}
+                  className="w-full h-full object-cover"
+                  controls
+                  playsInline
+                />
+                <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-emerald-500/90 backdrop-blur px-3 py-1">
+                  <CheckCircle2 size={12} className="text-white" />
+                  <span className="text-[11px] font-black text-white">Reel uploaded</span>
+                </div>
+              </div>
+
+              {/* Caption fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase text-slate-400">Section Title</label>
+                  <input
+                    value={merchantData.presentationReel.title || ''}
+                    onChange={(e) => setMerchantData(p => ({ ...p, presentationReel: { ...p.presentationReel, title: e.target.value } }))}
+                    className="w-full p-4 bg-slate-50 rounded-2xl font-bold text-sm outline-none"
+                    placeholder="Notre savoir-faire en vidéo"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase text-slate-400">Subtitle (optional)</label>
+                  <input
+                    value={merchantData.presentationReel.subtitle || ''}
+                    onChange={(e) => setMerchantData(p => ({ ...p, presentationReel: { ...p.presentationReel, subtitle: e.target.value } }))}
+                    className="w-full p-4 bg-slate-50 rounded-2xl font-bold text-sm outline-none"
+                    placeholder="Regardez notre équipe en action"
+                  />
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => reelFileRef.current?.click()}
+                  className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-xs font-black uppercase tracking-widest text-slate-700 hover:border-violet-400 hover:text-violet-600 transition-all"
+                >
+                  <Upload size={14} /> Replace video
+                </button>
+                <button
+                  onClick={handleReelDelete}
+                  disabled={uploadingField === 'reelDelete'}
+                  className="flex items-center gap-2 rounded-2xl border border-rose-200 bg-rose-50 px-5 py-3 text-xs font-black uppercase tracking-widest text-rose-600 hover:bg-rose-100 transition-all disabled:opacity-50"
+                >
+                  <Trash2 size={14} /> {uploadingField === 'reelDelete' ? 'Removing…' : 'Remove'}
+                </button>
+                <input
+                  ref={reelFileRef}
+                  type="file"
+                  accept="video/mp4,video/quicktime,video/webm"
+                  className="hidden"
+                  onChange={handleReelUpload}
+                />
+              </div>
             </div>
           )}
         </section>

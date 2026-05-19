@@ -5,7 +5,7 @@ import API from "../../api/config";
 import {
   CalendarCheck, Users, TrendingUp, Clock, CheckCircle2, AlertCircle,
   Globe, ArrowRight, XCircle, RefreshCw, ExternalLink, Star, Timer,
-  DollarSign, Palette, Zap, BarChart3
+  DollarSign, Palette, Zap, BarChart3, Sparkles, Target
 } from "lucide-react";
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
@@ -327,6 +327,49 @@ const Overview = () => {
           </div>
         ))}
       </div>
+
+      {/* ── Smart AI Widget ── */}
+      <Link
+        to="/owner/dashboard/smart-ai"
+        className="block group relative overflow-hidden rounded-[2rem] border border-indigo-900/60 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 hover:border-indigo-700/60 transition-all shadow-lg hover:shadow-indigo-900/30"
+      >
+        {/* glow */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute top-0 right-0 w-64 h-full bg-indigo-500/5 blur-2xl" />
+        </div>
+        <div className="relative flex items-center gap-5 px-6 py-5">
+          {/* icon */}
+          <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center shrink-0">
+            <Sparkles size={20} className="text-indigo-400" />
+            <div className="absolute w-3 h-3 bg-indigo-400 rounded-full top-4 right-6 animate-ping opacity-30" />
+          </div>
+          {/* text */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <p className="text-sm font-black text-white">Smart {authUser?.businessName || authUser?.fullName?.split(' ')[0] || 'AI'}</p>
+              <span className="bg-indigo-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">AI</span>
+            </div>
+            <p className="text-xs text-slate-400 font-medium">
+              Business intelligence — busiest days, top clients, success rate &amp; more
+            </p>
+          </div>
+          {/* stats pills */}
+          <div className="hidden md:flex items-center gap-2 shrink-0">
+            {summary && (
+              <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+                <Target size={11} className="text-emerald-400" />
+                <span className="text-[11px] font-black text-white">{summary.bookingsCompleted} done</span>
+              </div>
+            )}
+            <div className="flex items-center gap-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl px-3 py-2">
+              <Sparkles size={11} className="text-indigo-400" />
+              <span className="text-[11px] font-black text-indigo-300">12 insights</span>
+            </div>
+          </div>
+          {/* arrow */}
+          <ArrowRight size={18} className="text-slate-600 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all shrink-0" />
+        </div>
+      </Link>
 
       {/* ── Today's Schedule + Pending Confirmations ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

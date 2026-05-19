@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   MapPin, Star, Briefcase, Clock3, Loader2, Search, ChevronDown,
-  X, SlidersHorizontal, CheckCircle2, Calendar, TrendingUp,
+  X, CheckCircle2, Calendar, TrendingUp, Shield, Users,
   Building2, Filter, ArrowUpDown, Sparkles, Globe, Zap,
+  Timer, Award, MessageSquare, ThumbsUp,
 } from "lucide-react";
 import API from "../../api/config";
 
@@ -30,9 +31,10 @@ const CATEGORY_META = {
 };
 
 const SORT_OPTIONS = [
-  { value: "rating",  label: "Top Rated",  icon: Star },
-  { value: "reviews", label: "Most Reviewed", icon: TrendingUp },
-  { value: "newest",  label: "Recently Added", icon: Sparkles },
+  { value: "rating",    label: "Top Rated",      icon: Star },
+  { value: "reviews",   label: "Most Reviewed",  icon: TrendingUp },
+  { value: "completed", label: "Most Experienced", icon: Award },
+  { value: "newest",    label: "Recently Added", icon: Sparkles },
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -99,12 +101,25 @@ const SkeletonCard = () => (
   </div>
 );
 
+// ─── Trust metric helpers ─────────────────────────────────────────────────────
+const formatResponseTime = (hours) => {
+  if (hours === null || hours === undefined) return null;
+  if (hours < 1)  return "< 1h";
+  if (hours < 2)  return "~ 1h";
+  if (hours < 24) return `~ ${Math.round(hours)}h`;
+  return `~ ${Math.round(hours / 24)}j`;
+};
+
 // ─── Professional card ────────────────────────────────────────────────────────
 const ProfessionalCard = ({ site, index }) => {
   const catMeta = CATEGORY_META[site.ownerId?.category] || { emoji: "🏢", color: "bg-slate-100 text-slate-700 border-slate-200" };
   const openStatus = isOpenNow(site.businessHours || []);
   const minPrice = priceFrom(site.services || []);
-  const topServices = (site.services || []).filter((s) => s.active !== false).slice(0, 3);
+  const topServices = (site.services || []).filter((s) => s.active !== false).slice(0, 2);
+  const responseTime = formatResponseTime(site.avgResponseHours);
+  const isHighlyTrusted = site.completedCount >= 20 && (site.cancellationRate ?? 100) < 10;
+  const isNewcomer = site.completedCount === 0 && !site.rating;
+  const firstReview = site.recentReviews?.[0];
 
   return (
     <motion.article
@@ -112,120 +127,203 @@ const ProfessionalCard = ({ site, index }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.4, delay: Math.min(index * 0.06, 0.36) }}
-      className="group relative flex flex-col overflow-hidden rounded-[1.5rem] border border-slate-100 bg-white shadow-md shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-slate-300/40"
+      className="group relative flex flex-col overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-md shadow-slate-200/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-300/40"
     >
-      {/* Cover image */}
-      <div className="relative h-52 overflow-hidden flex-shrink-0">
+      {/* ── Cover image ───────────────────────────────────────────────────── */}
+      <div className="relative h-[13rem] overflow-hidden flex-shrink-0">
         <img
           src={site.hero?.backgroundImage || `https://placehold.co/800x400/e2e8f0/94a3b8?text=${encodeURIComponent(site.ownerId?.businessName || "Business")}`}
           alt={site.ownerId?.businessName}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
+        {/* Gradient layers */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/10 to-transparent" />
 
-        {/* Top badges */}
+        {/* ── Top-left badges ── */}
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-          <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${catMeta.color}`}>
+          <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[10px] font-black backdrop-blur-sm ${catMeta.color} bg-white/85`}>
             <span>{catMeta.emoji}</span>
-            <span>{site.ownerId?.category}</span>
-          </span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-white/90 backdrop-blur border border-white/60 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700">
-            <CheckCircle2 size={10} className="text-emerald-500" />
-            Vérifié
+            <span className="hidden sm:inline">{site.ownerId?.category}</span>
           </span>
         </div>
 
-        {/* Open/Closed badge */}
-        {openStatus !== null && (
-          <div className={`absolute right-3 top-3 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold backdrop-blur-sm border ${
-            openStatus
-              ? "bg-emerald-500/90 border-emerald-400/50 text-white"
-              : "bg-slate-800/80 border-slate-700/50 text-slate-300"
-          }`}>
-            <span className={`h-1.5 w-1.5 rounded-full ${openStatus ? "bg-white animate-pulse" : "bg-slate-400"}`} />
-            {openStatus ? "Ouvert" : "Fermé"}
-          </div>
-        )}
+        {/* ── Top-right: open + highly trusted ── */}
+        <div className="absolute right-3 top-3 flex flex-col items-end gap-1.5">
+          {openStatus !== null && (
+            <div className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold backdrop-blur-sm border ${
+              openStatus
+                ? "bg-emerald-500/90 border-emerald-400/40 text-white"
+                : "bg-black/60 border-white/10 text-slate-300"
+            }`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${openStatus ? "bg-white animate-pulse" : "bg-slate-400"}`} />
+              {openStatus ? "Ouvert" : "Fermé"}
+            </div>
+          )}
+          {isHighlyTrusted && (
+            <div className="flex items-center gap-1 rounded-full bg-amber-400 px-2.5 py-1 text-[10px] font-black text-amber-950 shadow-lg shadow-amber-400/30">
+              <Award size={9} />
+              Top Pro
+            </div>
+          )}
+          {isNewcomer && (
+            <div className="flex items-center gap-1 rounded-full bg-violet-500/90 backdrop-blur px-2.5 py-1 text-[10px] font-bold text-white">
+              <Sparkles size={9} />
+              Nouveau
+            </div>
+          )}
+        </div>
 
-        {/* Avatar + name overlay */}
-        <div className="absolute bottom-3 left-3 right-3 flex items-end gap-3">
+        {/* ── Bottom: avatar + name ── */}
+        <div className="absolute bottom-0 left-0 right-0 p-3 flex items-end gap-2.5">
           {site.ownerId?.profilePicUrl ? (
             <img
               src={site.ownerId.profilePicUrl}
               alt={site.ownerId.fullName}
-              className="h-10 w-10 rounded-full border-2 border-white object-cover shadow-lg flex-shrink-0"
+              className="h-11 w-11 rounded-2xl border-2 border-white/30 object-cover shadow-lg flex-shrink-0 ring-2 ring-white/10"
             />
           ) : (
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-white bg-indigo-600 text-sm font-black text-white shadow-lg">
+            <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border-2 border-white/20 bg-gradient-to-br from-indigo-500 to-violet-600 text-sm font-black text-white shadow-lg">
               {(site.ownerId?.businessName || "B")[0].toUpperCase()}
             </div>
           )}
-          <div className="min-w-0">
-            <h3 className="truncate text-sm font-black text-white leading-tight drop-shadow">
-              {site.ownerId?.businessName || site.ownerId?.fullName}
-            </h3>
-            <p className="truncate text-xs font-medium text-white/80">
-              par {site.ownerId?.fullName}
-            </p>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5">
+              <h3 className="truncate text-sm font-black text-white leading-tight">
+                {site.ownerId?.businessName || site.ownerId?.fullName}
+              </h3>
+              <Shield size={11} className="text-emerald-400 flex-shrink-0" title="Profil vérifié" />
+            </div>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <MapPin size={10} className="text-white/50 flex-shrink-0" />
+              <span className="truncate text-[11px] font-medium text-white/60">{site.ownerId?.ville}</span>
+            </div>
           </div>
+          {minPrice && (
+            <div className="flex-shrink-0 rounded-xl bg-white/15 backdrop-blur border border-white/15 px-2.5 py-1 text-right">
+              <p className="text-[9px] font-bold text-white/50 leading-none">Dès</p>
+              <p className="text-xs font-black text-white leading-tight">{minPrice} TND</p>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Card body */}
-      <div className="flex flex-1 flex-col p-4">
-        {/* Rating + price row */}
-        <div className="flex items-center justify-between gap-2">
+      {/* ── Card body ─────────────────────────────────────────────────────── */}
+      <div className="flex flex-1 flex-col p-4 gap-3">
+
+        {/* ── Rating row ── */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             {site.rating ? (
               <>
-                <span className="flex gap-0.5">{renderStars(site.rating)}</span>
-                <span className="text-xs font-bold text-slate-700">{site.rating.toFixed(1)}</span>
-                <span className="text-xs text-slate-400 font-medium">({site.reviewCount})</span>
+                <span className="flex gap-0.5">{renderStars(site.rating, 13)}</span>
+                <span className="text-xs font-black text-slate-800">{site.rating.toFixed(1)}</span>
+                <span className="text-[11px] text-slate-400 font-medium">({site.reviewCount} avis)</span>
               </>
             ) : (
-              <span className="text-xs text-slate-400 font-medium italic">Aucun avis</span>
+              <span className="text-[11px] text-slate-400 italic">Pas encore d'avis</span>
             )}
           </div>
-          {minPrice && (
-            <span className="rounded-lg bg-indigo-50 border border-indigo-100 px-2 py-0.5 text-xs font-bold text-indigo-700">
-              Dès {minPrice} TND
-            </span>
-          )}
+          <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-2 py-0.5">
+            <Zap size={9} />
+            Instantané
+          </div>
         </div>
 
-        {/* Location */}
-        <div className="mt-2.5 flex items-center gap-1 text-xs font-semibold text-slate-500">
-          <MapPin size={12} className="text-indigo-400 flex-shrink-0" />
-          <span className="truncate">{site.ownerId?.ville}</span>
-          <span className="text-slate-300 mx-1">·</span>
-          <Zap size={11} className="text-emerald-500 flex-shrink-0" />
-          <span className="text-slate-500">Réservation instantanée</span>
+        {/* ── Trust metrics strip ── */}
+        <div className="grid grid-cols-3 gap-1.5 rounded-2xl bg-slate-50 border border-slate-100 p-2.5">
+          {/* Clients */}
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-0.5 mb-0.5">
+              <Users size={10} className="text-indigo-400" />
+              <span className="text-xs font-black text-slate-800">
+                {site.uniqueClients > 0 ? site.uniqueClients : "—"}
+              </span>
+            </div>
+            <p className="text-[9px] font-semibold text-slate-400 leading-none">clients</p>
+          </div>
+          {/* Completed */}
+          <div className="text-center border-x border-slate-200">
+            <div className="flex items-center justify-center gap-0.5 mb-0.5">
+              <CheckCircle2 size={10} className="text-emerald-500" />
+              <span className="text-xs font-black text-slate-800">
+                {site.completedCount > 0 ? site.completedCount : "—"}
+              </span>
+            </div>
+            <p className="text-[9px] font-semibold text-slate-400 leading-none">RDV fait</p>
+          </div>
+          {/* Response time or cancellation rate */}
+          <div className="text-center">
+            {responseTime ? (
+              <>
+                <div className="flex items-center justify-center gap-0.5 mb-0.5">
+                  <Timer size={10} className="text-violet-400" />
+                  <span className="text-xs font-black text-slate-800">{responseTime}</span>
+                </div>
+                <p className="text-[9px] font-semibold text-slate-400 leading-none">répons.</p>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center justify-center gap-0.5 mb-0.5">
+                  <ThumbsUp size={10} className={site.cancellationRate < 10 ? "text-emerald-500" : "text-slate-400"} />
+                  <span className="text-xs font-black text-slate-800">
+                    {site.completedCount > 0 ? `${100 - (site.cancellationRate ?? 0)}%` : "—"}
+                  </span>
+                </div>
+                <p className="text-[9px] font-semibold text-slate-400 leading-none">succès</p>
+              </>
+            )}
+          </div>
         </div>
 
-        {/* Services preview */}
+        {/* ── Services preview ── */}
         {topServices.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5">
             {topServices.map((svc, i) => (
               <span
                 key={i}
-                className="inline-flex items-center rounded-lg bg-slate-50 border border-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600"
+                className="inline-flex items-center gap-1 rounded-lg bg-slate-50 border border-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600"
               >
                 {svc.title}
-                {svc.price && <span className="ml-1 text-indigo-500 font-bold">{svc.price} TND</span>}
+                {svc.price && <span className="text-indigo-500 font-bold">{svc.price} TND</span>}
               </span>
             ))}
+            {(site.services || []).filter(s => s.active !== false).length > 2 && (
+              <span className="rounded-lg bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500">
+                +{(site.services || []).filter(s => s.active !== false).length - 2}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* ── Recent review snippet ── */}
+        {firstReview && (
+          <div className="rounded-xl bg-amber-50/60 border border-amber-100/80 px-3 py-2">
+            <div className="flex items-center gap-1 mb-1">
+              <span className="flex gap-0.5">
+                {Array.from({ length: firstReview.rating }, (_, i) => (
+                  <Star key={i} size={9} className="text-amber-400 fill-amber-400" />
+                ))}
+              </span>
+              <span className="text-[9px] font-bold text-slate-500">{firstReview.customerName?.split(" ")[0]}</span>
+            </div>
+            {firstReview.text && (
+              <p className="text-[10px] text-slate-600 leading-relaxed line-clamp-2 italic">
+                "{firstReview.text}"
+              </p>
+            )}
           </div>
         )}
 
         {/* Spacer */}
         <div className="flex-1" />
 
-        {/* CTA buttons */}
-        <div className="mt-4 flex gap-2">
+        {/* ── CTA buttons ── */}
+        <div className="flex gap-2">
           <Link
             to={`/book/${site.ownerId?._id}`}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-3 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-200 transition-all hover:bg-indigo-500 hover:shadow-indigo-300 active:scale-95"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-3 py-2.5 text-xs font-black text-white shadow-md shadow-indigo-200 transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-200 active:scale-95"
           >
             <Calendar size={13} />
             Réserver
@@ -235,7 +333,7 @@ const ProfessionalCard = ({ site, index }) => {
             className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 transition-all hover:bg-slate-50 hover:border-slate-300 active:scale-95"
           >
             <Globe size={13} />
-            Voir le profil
+            Profil
           </Link>
         </div>
       </div>
@@ -461,11 +559,12 @@ const Professionals = () => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.45 }}
-              className="mx-auto mt-10 grid max-w-lg grid-cols-3 gap-6 border-t border-white/10 pt-8"
+              className="mx-auto mt-10 grid max-w-xl grid-cols-4 gap-4 border-t border-white/10 pt-8"
             >
               <StatCounter end={stats.businesses} label="Professionnels" icon={Building2} />
               <StatCounter end={stats.cities}     label="Villes"         icon={MapPin} />
-              <StatCounter end={stats.reviews}    label="Avis"           icon={Star} />
+              <StatCounter end={stats.reviews}    label="Avis clients"   icon={Star} />
+              <StatCounter end={stats.completed}  label="RDV réalisés"   icon={CheckCircle2} />
             </motion.div>
           )}
         </div>

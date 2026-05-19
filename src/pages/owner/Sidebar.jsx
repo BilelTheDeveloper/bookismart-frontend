@@ -5,7 +5,7 @@ import API from "../../api/config";
 import {
   LayoutDashboard, CalendarCheck, Users, Settings, CreditCard,
   BarChart3, LogOut, ChevronLeft, ChevronRight, Wallet, Palette,
-  Power, FileText, Star, Briefcase, Globe, Zap,
+  Power, FileText, Star, Briefcase, Globe, Zap, Sparkles,
   ShieldCheck, Lock, MessageSquare, BadgeCheck, Clock,
   AlertTriangle, RefreshCw,
 } from "lucide-react";
@@ -57,6 +57,7 @@ const NAV_SECTIONS = [
   {
     label: "Growth",
     items: [
+      { name: "Smart AI",     icon: Sparkles,       path: "/owner/dashboard/smart-ai",   badge: "AI"  },
       { name: "Analytics",    icon: BarChart3,      path: "/owner/dashboard/stats"       },
       { name: "Website",      icon: Palette,        path: "/owner/dashboard/themes"      },
     ],

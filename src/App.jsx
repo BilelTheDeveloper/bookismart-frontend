@@ -42,6 +42,7 @@ import Customers from "./pages/owner/Customers";
 import Settings from "./pages/owner/Settings";
 import KYCVerification from "./pages/owner/KYCVerification";
 import WorkMode from "./pages/owner/WorkMode";
+import SmartAssistant from "./pages/owner/SmartAssistant";
 import CustomerHistory from "./pages/owner/CustomerHistory";
 import Recruitment from "./pages/owner/Recruitment";
 import Staff from "./pages/owner/Staff";
@@ -79,6 +80,7 @@ import { StaffAuthProvider } from "./context/StaffAuthContext";
 // --- Public: Find Work ---
 import FindWorkPage from "./pages/public/FindWork/FindWorkPage";
 import JobDetailPage from "./pages/public/FindWork/JobDetailPage";
+import ReviewPage from "./pages/public/ReviewPage";
 
 /**
  * 🛡️ SECURITY WATCHDOG
@@ -127,11 +129,12 @@ const LayoutManager = ({ children }) => {
   const isOwnerPage     = location.pathname.startsWith("/owner");
   const isProfilePreview = location.pathname.startsWith("/p/");
   const isBookingPage   = location.pathname.startsWith("/book/");
+  const isReviewPage    = location.pathname.startsWith("/review/");
   const isCustomerPage  = location.pathname.startsWith("/customer");
   const isStaffPage     = location.pathname.startsWith("/staff");
 
   // 🛡️ Hide Chrome for high-immersion pages
-  const hideChrome = isSignupPage || isAuthPage || isAdminPage || isOwnerPage || isProfilePreview || isBookingPage || isCustomerPage || isStaffPage;
+  const hideChrome = isSignupPage || isAuthPage || isAdminPage || isOwnerPage || isProfilePreview || isBookingPage || isReviewPage || isCustomerPage || isStaffPage;
 
   return (
     <>
@@ -160,6 +163,7 @@ function App() {
           <Route path="/professionals" element={<ProfessionalsPage />} />
           <Route path="/p/:slug" element={<ProfilePreview />} />
           <Route path="/book/:merchantId" element={<BookingPage />} />
+          <Route path="/review/:token" element={<ReviewPage />} />
           <Route path="/work-mode/worker" element={<WorkerWorkMode />} />
           <Route path="/find-work" element={<FindWorkPage />} />
           <Route path="/find-work/:id" element={<JobDetailPage />} />
@@ -215,6 +219,7 @@ function App() {
             <Route path="dashboard/recruitment" element={<Recruitment />} />
             <Route path="dashboard/staff"       element={<Staff />} />
             <Route path="dashboard/chat"        element={<Chat />} />
+            <Route path="dashboard/smart-ai"    element={<SmartAssistant />} />
           </Route>
           
           {/* --- 5. Customer Registration (public, no auth) --- */}
