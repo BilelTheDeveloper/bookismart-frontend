@@ -1,0 +1,78 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "howItWorks": "Comment ça marche",
+    "services": "Services",
+    "professionals": "Professionnels",
+    "findWork": "Trouver un emploi",
+    "login": "Connexion",
+    "signup": "Créer un compte"
+  },
+  "home": {
+    "hero": {
+      "title": "Réservez vos rendez-vous",
+      "subtitle": "en quelques secondes.",
+      "description": "La plateforme de réservation intelligente pour tous les professionnels de Tunisie.",
+      "cta": "Commencer gratuitement",
+      "ctaSecondary": "Voir les professionnels"
+    }
+  },
+  "professionals": {
+    "heroTitle": "Trouvez et réservez les meilleurs experts.",
+    "heroSubtitle": "Coiffeurs, médecins, coachs, mécaniciens — tous vérifiés, disponibles, réservables en un clic.",
+    "searchPlaceholder": "Coiffeur à Tunis, dentiste à Sousse...",
+    "filterAll": "Tous",
+    "allCities": "Toutes les villes",
+    "found": "professionnel(s) trouvé(s)",
+    "bookNow": "Réserver",
+    "viewProfile": "Voir le profil",
+    "openNow": "Ouvert",
+    "closed": "Fermé",
+    "verified": "Vérifié",
+    "from": "Dès",
+    "noResults": "Aucun résultat",
+    "noResultsHint": "Essayez d'ajuster vos filtres ou de rechercher une autre ville.",
+    "clearFilters": "Effacer les filtres",
+    "joinCta": "Vous êtes professionnel ? Rejoignez Bookiify gratuitement.",
+    "stats": {
+      "professionals": "Professionnels",
+      "cities": "Villes",
+      "reviews": "Avis"
+    }
+  },
+  "booking": {
+    "title": "Prendre un rendez-vous",
+    "selectService": "Choisir un service",
+    "selectDate": "Choisir une date",
+    "selectTime": "Choisir un horaire",
+    "yourInfo": "Vos informations",
+    "name": "Nom complet",
+    "email": "Email",
+    "phone": "Téléphone",
+    "notes": "Notes (optionnel)",
+    "confirm": "Confirmer le rendez-vous",
+    "success": "Rendez-vous pris avec succès !",
+    "loading": "Chargement..."
+  },
+  "auth": {
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "email": "Email",
+    "password": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Pas encore de compte ?",
+    "createAccount": "Créer un compte"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue.",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "search": "Rechercher",
+    "back": "Retour",
+    "close": "Fermer"
+  }
+}

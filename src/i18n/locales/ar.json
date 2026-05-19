@@ -1,0 +1,78 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "howItWorks": "كيف يعمل",
+    "services": "الخدمات",
+    "professionals": "المحترفون",
+    "findWork": "ابحث عن عمل",
+    "login": "تسجيل الدخول",
+    "signup": "إنشاء حساب"
+  },
+  "home": {
+    "hero": {
+      "title": "احجز مواعيدك",
+      "subtitle": "في ثوانٍ.",
+      "description": "منصة الحجز الذكية لجميع المحترفين في تونس.",
+      "cta": "ابدأ مجاناً",
+      "ctaSecondary": "اكتشف المحترفين"
+    }
+  },
+  "professionals": {
+    "heroTitle": "اعثر واحجز أفضل الخبراء.",
+    "heroSubtitle": "حلاقون، أطباء، مدربون، ميكانيكيون — جميعهم موثقون، متاحون، يمكن حجزهم بنقرة واحدة.",
+    "searchPlaceholder": "حلاق في تونس، طبيب أسنان في سوسة...",
+    "filterAll": "الكل",
+    "allCities": "جميع المدن",
+    "found": "محترف(ون) وجدوا",
+    "bookNow": "احجز الآن",
+    "viewProfile": "عرض الملف",
+    "openNow": "مفتوح",
+    "closed": "مغلق",
+    "verified": "موثق",
+    "from": "من",
+    "noResults": "لا توجد نتائج",
+    "noResultsHint": "حاول تعديل الفلاتر أو البحث عن مدينة أخرى.",
+    "clearFilters": "مسح الفلاتر",
+    "joinCta": "هل أنت محترف؟ انضم إلى Bookiify مجاناً.",
+    "stats": {
+      "professionals": "المحترفون",
+      "cities": "مدن",
+      "reviews": "تقييمات"
+    }
+  },
+  "booking": {
+    "title": "حجز موعد",
+    "selectService": "اختر خدمة",
+    "selectDate": "اختر تاريخاً",
+    "selectTime": "اختر وقتاً",
+    "yourInfo": "معلوماتك",
+    "name": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "notes": "ملاحظات (اختياري)",
+    "confirm": "تأكيد الموعد",
+    "success": "تم الحجز بنجاح!",
+    "loading": "جار التحميل..."
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "noAccount": "ليس لديك حساب؟",
+    "createAccount": "إنشاء حساب"
+  },
+  "common": {
+    "loading": "جار التحميل...",
+    "error": "حدث خطأ ما.",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "search": "بحث",
+    "back": "رجوع",
+    "close": "إغلاق"
+  }
+}

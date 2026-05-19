@@ -3,6 +3,11 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
 
+// i18n — only loaded when VITE_I18N_ENABLED=true
+if (import.meta.env.VITE_I18N_ENABLED === 'true') {
+  await import('./i18n/index.js');
+}
+
 /**
  * 🔐 THE SECURITY ENGINE (AuthProvider)
  * Provides the "Source of Truth" for user identity.

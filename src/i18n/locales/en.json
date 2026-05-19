@@ -1,0 +1,78 @@
+{
+  "nav": {
+    "home": "Home",
+    "howItWorks": "How It Works",
+    "services": "Services",
+    "professionals": "Professionals",
+    "findWork": "Find Work",
+    "login": "Login",
+    "signup": "Sign Up"
+  },
+  "home": {
+    "hero": {
+      "title": "Book your appointments",
+      "subtitle": "in seconds.",
+      "description": "The smart booking platform for all professionals in Tunisia.",
+      "cta": "Get started for free",
+      "ctaSecondary": "Browse professionals"
+    }
+  },
+  "professionals": {
+    "heroTitle": "Find and book the best experts.",
+    "heroSubtitle": "Barbers, doctors, coaches, mechanics — all verified, available, bookable in one click.",
+    "searchPlaceholder": "Barber in Tunis, dentist in Sousse...",
+    "filterAll": "All",
+    "allCities": "All cities",
+    "found": "professional(s) found",
+    "bookNow": "Book Now",
+    "viewProfile": "View Profile",
+    "openNow": "Open",
+    "closed": "Closed",
+    "verified": "Verified",
+    "from": "From",
+    "noResults": "No results found",
+    "noResultsHint": "Try adjusting your filters or searching for a different city.",
+    "clearFilters": "Clear filters",
+    "joinCta": "Are you a professional? Join Bookiify for free.",
+    "stats": {
+      "professionals": "Professionals",
+      "cities": "Cities",
+      "reviews": "Reviews"
+    }
+  },
+  "booking": {
+    "title": "Book an appointment",
+    "selectService": "Select a service",
+    "selectDate": "Select a date",
+    "selectTime": "Select a time",
+    "yourInfo": "Your information",
+    "name": "Full name",
+    "email": "Email",
+    "phone": "Phone",
+    "notes": "Notes (optional)",
+    "confirm": "Confirm appointment",
+    "success": "Booking confirmed!",
+    "loading": "Loading..."
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "createAccount": "Create an account"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong.",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "back": "Back",
+    "close": "Close"
+  }
+}
