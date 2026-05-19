@@ -1,11 +1,5 @@
-/**
- * LanguageSwitcher
- *
- * Only rendered when VITE_I18N_ENABLED=true.
- * Cycles through: FR → AR → EN → FR
- * Can be dropped into <Navbar /> or any header.
- */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Globe, ChevronDown } from 'lucide-react';
 
@@ -16,21 +10,16 @@ const LANGS = [
 ];
 
 const LanguageSwitcher = () => {
+  const { i18n } = useTranslation();
   const [open, setOpen] = useState(false);
 
-  // Lazy-load i18n only when this component is actually used
-  const [i18n, setI18n] = useState(null);
-  React.useEffect(() => {
-    if (import.meta.env.VITE_I18N_ENABLED !== 'true') return;
-    import('../i18n/index.js').then((mod) => setI18n(mod.default));
-  }, []);
-
-  if (import.meta.env.VITE_I18N_ENABLED !== 'true' || !i18n) return null;
-
-  const current = LANGS.find((l) => l.code === i18n.language) || LANGS[0];
+  const current = LANGS.find((l) => l.code === i18n.language?.slice(0, 2)) || LANGS[0];
 
   return (
-    <div className="relative" onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setOpen(false); }}>
+    <div
+      className="relative"
+      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setOpen(false); }}
+    >
       <button
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50"
@@ -55,7 +44,7 @@ const LanguageSwitcher = () => {
                   key={lang.code}
                   onClick={() => { i18n.changeLanguage(lang.code); setOpen(false); }}
                   className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold transition-colors ${
-                    i18n.language === lang.code
+                    i18n.language?.slice(0, 2) === lang.code
                       ? 'bg-indigo-50 text-indigo-700 font-bold'
                       : 'text-slate-700 hover:bg-slate-50'
                   }`}

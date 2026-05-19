@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import API from "../../api/config";
 import {
   ArrowLeft,
@@ -21,14 +22,8 @@ import {
 } from "lucide-react";
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   CONSTANTS & HELPERS
+   HELPERS
    ───────────────────────────────────────────────────────────────────────────── */
-
-const MONTHS = [
-  "January","February","March","April","May","June",
-  "July","August","September","October","November","December",
-];
-const DAYS_SHORT = ["Su","Mo","Tu","We","Th","Fr","Sa"];
 
 const toDateString = (date) => {
   const y = date.getFullYear();
@@ -37,11 +32,11 @@ const toDateString = (date) => {
   return `${y}-${m}-${d}`;
 };
 
-const formatDisplayDate = (dateStr) => {
+const formatDisplayDate = (dateStr, locale = "en-US") => {
   if (!dateStr) return "";
   const [y, m, d] = dateStr.split("-").map(Number);
   const date = new Date(y, m - 1, d);
-  return date.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+  return date.toLocaleDateString(locale, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
 };
 
 const formatTime = (time24) => {
@@ -74,7 +69,7 @@ const StepIndicator = ({ current, total }) => (
    MINI CALENDAR
    ───────────────────────────────────────────────────────────────────────────── */
 
-const MiniCalendar = ({ selectedDate, onSelect, businessHours }) => {
+const MiniCalendar = ({ selectedDate, onSelect, businessHours, locale, t }) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -107,6 +102,12 @@ const MiniCalendar = ({ selectedDate, onSelect, businessHours }) => {
     else setViewMonth(m => m + 1);
   };
 
+  const monthLabel = new Date(viewYear, viewMonth, 1).toLocaleString(locale, { month: "long", year: "numeric" });
+
+  const dayLabels = Array.from({ length: 7 }, (_, i) =>
+    new Date(2023, 0, i + 1).toLocaleString(locale, { weekday: "short" }).slice(0, 2)
+  );
+
   return (
     <div className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
       {/* Header */}
@@ -117,8 +118,8 @@ const MiniCalendar = ({ selectedDate, onSelect, businessHours }) => {
         >
           <ChevronLeft size={16} />
         </button>
-        <span className="text-sm font-bold text-white tracking-wide">
-          {MONTHS[viewMonth]} {viewYear}
+        <span className="text-sm font-bold text-white tracking-wide capitalize">
+          {monthLabel}
         </span>
         <button
           onClick={nextMonth}
@@ -130,8 +131,8 @@ const MiniCalendar = ({ selectedDate, onSelect, businessHours }) => {
 
       {/* Day labels */}
       <div className="grid grid-cols-7 mb-2">
-        {DAYS_SHORT.map((d) => (
-          <div key={d} className="text-center text-[10px] font-bold text-white/30 uppercase tracking-widest py-1">
+        {dayLabels.map((d, i) => (
+          <div key={i} className="text-center text-[10px] font-bold text-white/30 uppercase tracking-widest py-1">
             {d}
           </div>
         ))}
@@ -174,11 +175,11 @@ const MiniCalendar = ({ selectedDate, onSelect, businessHours }) => {
       <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/5">
         <div className="flex items-center gap-1.5">
           <div className="w-2 h-2 rounded-full bg-amber-400" />
-          <span className="text-[10px] text-white/40">Selected</span>
+          <span className="text-[10px] text-white/40">{t("booking.selectedLabel")}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-2 h-2 rounded-full bg-white/15" />
-          <span className="text-[10px] text-white/40">Closed / Past</span>
+          <span className="text-[10px] text-white/40">{t("booking.closedPast")}</span>
         </div>
       </div>
     </div>
@@ -189,12 +190,12 @@ const MiniCalendar = ({ selectedDate, onSelect, businessHours }) => {
    TIME SLOT GRID
    ───────────────────────────────────────────────────────────────────────────── */
 
-const TimeSlotGrid = ({ slots, selectedTime, onSelect, loading }) => {
+const TimeSlotGrid = ({ slots, selectedTime, onSelect, loading, t }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-10">
         <Loader2 className="animate-spin text-amber-400 w-6 h-6" />
-        <span className="ml-3 text-white/50 text-sm">Loading slots...</span>
+        <span className="ml-3 text-white/50 text-sm">{t("booking.loadingSlots")}</span>
       </div>
     );
   }
@@ -203,7 +204,7 @@ const TimeSlotGrid = ({ slots, selectedTime, onSelect, loading }) => {
     return (
       <div className="text-center py-10">
         <AlertCircle className="w-8 h-8 text-white/20 mx-auto mb-2" />
-        <p className="text-white/40 text-sm">No slots available for this day.</p>
+        <p className="text-white/40 text-sm">{t("booking.noSlotsForDay")}</p>
       </div>
     );
   }
@@ -215,7 +216,7 @@ const TimeSlotGrid = ({ slots, selectedTime, onSelect, loading }) => {
     <div>
       {available.length === 0 && (
         <div className="text-center py-6 bg-red-500/10 border border-red-500/20 rounded-xl mb-4">
-          <p className="text-red-400 text-sm font-medium">All slots are booked for this day</p>
+          <p className="text-red-400 text-sm font-medium">{t("booking.allSlotsBooked")}</p>
         </div>
       )}
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
@@ -240,7 +241,7 @@ const TimeSlotGrid = ({ slots, selectedTime, onSelect, loading }) => {
       </div>
       {taken.length > 0 && (
         <p className="text-[10px] text-white/25 mt-3 text-center">
-          {taken.length} slot{taken.length > 1 ? "s" : ""} already taken
+          {t("booking.slotsTaken", { count: taken.length })}
         </p>
       )}
     </div>
@@ -254,6 +255,8 @@ const TimeSlotGrid = ({ slots, selectedTime, onSelect, loading }) => {
 const BookingPage = () => {
   const { merchantId } = useParams();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language?.slice(0, 2) || "en";
 
   // --- Step State ---
   const [step, setStep] = useState(0); // 0: Service, 1: DateTime, 2: Details, 3: Confirm, 4: Success
@@ -290,16 +293,16 @@ const BookingPage = () => {
         if (res.data.success) {
           setMerchant(res.data.data);
         } else {
-          setMerchantError("Business not found.");
+          setMerchantError(t("booking.notAvailable"));
         }
       } catch (err) {
-        setMerchantError("Could not load this booking page.");
+        setMerchantError(t("booking.notAvailable"));
       } finally {
         setLoadingMerchant(false);
       }
     };
     load();
-  }, [merchantId]);
+  }, [merchantId, t]);
 
   /* ── Load slots whenever date or service changes ── */
   const loadSlots = useCallback(async () => {
@@ -314,13 +317,12 @@ const BookingPage = () => {
       if (res.data.success) {
         if (res.data.data.isClosed) {
           setDayIsClosed(true);
-            setDayLimitReached(false);
+          setDayLimitReached(false);
           setSlots([]);
         } else {
           setDayIsClosed(false);
-            setDayLimitReached(Boolean(res.data.data.isFullyBookedByLimit));
+          setDayLimitReached(Boolean(res.data.data.isFullyBookedByLimit));
           setSlots(res.data.data.slots);
-          // Auto-select first available slot
           const first = res.data.data.slots.find((s) => s.available);
           if (first) setSelectedTime(first.time);
         }
@@ -339,11 +341,11 @@ const BookingPage = () => {
   /* ── Form validation ── */
   const validateForm = () => {
     const errors = {};
-    if (!form.name.trim()) errors.name = "Name is required";
+    if (!form.name.trim()) errors.name = t("booking.name") + " " + t("common.error");
     if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-      errors.email = "Valid email is required";
+      errors.email = t("booking.email") + " " + t("common.error");
     if (!form.phone.trim() || form.phone.trim().length < 8)
-      errors.phone = "Valid phone number is required";
+      errors.phone = t("booking.phone") + " " + t("common.error");
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -368,10 +370,10 @@ const BookingPage = () => {
         setStep(4);
       }
     } catch (err) {
-      const msg = err.response?.data?.message || "Booking failed. Please try again.";
+      const msg = err.response?.data?.message || t("common.error");
       const code = err.response?.data?.code;
       if (code === "SLOT_CONFLICT") {
-        setSubmitError("This slot was just taken! Please go back and pick another time.");
+        setSubmitError(t("booking.slotConflict"));
       } else {
         setDayLimitReached(false);
         setSubmitError(msg);
@@ -391,7 +393,7 @@ const BookingPage = () => {
         <div className="text-center">
           <Loader2 className="w-10 h-10 text-amber-400 animate-spin mx-auto mb-4" />
           <p className="text-white/40 text-sm font-medium tracking-widest uppercase">
-            Loading booking...
+            {t("booking.loadingBooking")}
           </p>
         </div>
       </div>
@@ -405,13 +407,13 @@ const BookingPage = () => {
           <div className="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-8 h-8 text-red-400" />
           </div>
-          <h2 className="text-white font-bold text-xl mb-2">Not Available</h2>
+          <h2 className="text-white font-bold text-xl mb-2">{t("booking.notAvailable")}</h2>
           <p className="text-white/40 text-sm mb-6">{merchantError}</p>
           <button
             onClick={() => navigate(-1)}
             className="px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white/70 text-sm font-medium hover:bg-white/10 transition-colors"
           >
-            Go Back
+            {t("booking.goBack")}
           </button>
         </div>
       </div>
@@ -426,7 +428,6 @@ const BookingPage = () => {
     return (
       <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-6">
         <div className="max-w-md w-full text-center">
-          {/* Animated checkmark */}
           <div className="relative mb-8">
             <div className="w-24 h-24 bg-amber-400/10 border-2 border-amber-400/30 rounded-full flex items-center justify-center mx-auto animate-pulse">
               <CheckCircle2 className="w-12 h-12 text-amber-400" />
@@ -435,37 +436,36 @@ const BookingPage = () => {
           </div>
 
           <h1 className="text-3xl font-black text-white mb-2 tracking-tight">
-            Booking Confirmed!
+            {t("booking.bookingConfirmed")}
           </h1>
           <p className="text-white/40 text-sm mb-8">
-            We've saved your appointment. The business will confirm shortly.
+            {t("booking.bookingSaved")}
           </p>
 
-          {/* Booking card */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-left mb-6 space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-amber-400/10 rounded-xl flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-amber-400" />
               </div>
               <div>
-                <p className="text-[10px] text-white/30 uppercase tracking-widest">Service</p>
+                <p className="text-[10px] text-white/30 uppercase tracking-widest">{t("booking.service")}</p>
                 <p className="text-white font-bold">{bookingResult.service}</p>
               </div>
             </div>
             <div className="h-px bg-white/5" />
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Date</p>
-                <p className="text-white text-sm font-semibold">{formatDisplayDate(bookingResult.date)}</p>
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">{t("booking.date")}</p>
+                <p className="text-white text-sm font-semibold">{formatDisplayDate(bookingResult.date, locale)}</p>
               </div>
               <div>
-                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Time</p>
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">{t("booking.time")}</p>
                 <p className="text-white text-sm font-semibold">{formatTime(bookingResult.time)}</p>
               </div>
             </div>
             <div className="h-px bg-white/5" />
             <div>
-              <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Booking ID</p>
+              <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">{t("booking.bookingId")}</p>
               <p className="text-white/50 text-xs font-mono">{bookingResult.bookingId}</p>
             </div>
           </div>
@@ -475,7 +475,7 @@ const BookingPage = () => {
               onClick={() => navigate(`/p/${merchant.slug}`)}
               className="flex-1 py-3 bg-white/5 border border-white/10 rounded-xl text-white/70 text-sm font-semibold hover:bg-white/10 transition-colors"
             >
-              View Profile
+              {t("booking.viewProfile")}
             </button>
             <button
               onClick={() => {
@@ -488,7 +488,7 @@ const BookingPage = () => {
               }}
               className="flex-1 py-3 bg-amber-400 text-black rounded-xl text-sm font-black hover:bg-amber-300 transition-colors"
             >
-              Book Again
+              {t("booking.bookAgain")}
             </button>
           </div>
         </div>
@@ -500,7 +500,12 @@ const BookingPage = () => {
      MAIN LAYOUT
      ───────────────────────────────────────────────────────────────────────── */
 
-  const stepTitles = ["Choose Service", "Pick a Date & Time", "Your Details", "Review & Confirm"];
+  const stepTitles = [
+    t("booking.chooseService"),
+    t("booking.pickDateTime"),
+    t("booking.yourDetails"),
+    t("booking.reviewConfirm"),
+  ];
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white">
@@ -518,7 +523,7 @@ const BookingPage = () => {
             className="flex items-center gap-2 text-white/40 hover:text-white transition-colors group"
           >
             <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-            <span className="text-sm font-medium">{step === 0 ? "Back" : stepTitles[step - 1] || "Back"}</span>
+            <span className="text-sm font-medium">{step === 0 ? t("common.back") : stepTitles[step - 1] || t("common.back")}</span>
           </button>
           <StepIndicator current={step} total={4} />
         </div>
@@ -536,7 +541,7 @@ const BookingPage = () => {
             <h2 className="font-black text-white text-lg leading-tight">{merchant?.businessName}</h2>
             <p className="text-white/40 text-xs">{merchant?.category} · {merchant?.ville}</p>
             <p className="text-white/25 text-[11px] mt-1">
-              {merchant?.setupConfig?.localization?.address || merchant?.contact?.address || "Location not specified"}
+              {merchant?.setupConfig?.localization?.address || merchant?.contact?.address || t("booking.locationNotSpecified")}
             </p>
           </div>
         </div>
@@ -544,7 +549,7 @@ const BookingPage = () => {
         {/* ── STEP TITLE ── */}
         <div className="mb-6">
           <p className="text-[10px] font-black text-amber-400/70 uppercase tracking-[0.25em] mb-1">
-            Step {step + 1} of 4
+            {t("booking.stepOf", { current: step + 1, total: 4 })}
           </p>
           <h1 className="text-2xl font-black text-white tracking-tight">{stepTitles[step]}</h1>
         </div>
@@ -557,7 +562,7 @@ const BookingPage = () => {
             {merchant?.services?.length === 0 && (
               <div className="text-center py-12 text-white/30">
                 <Scissors className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                <p>No services available yet.</p>
+                <p>{t("booking.noServicesYet")}</p>
               </div>
             )}
             {merchant?.services?.map((service, i) => (
@@ -584,7 +589,7 @@ const BookingPage = () => {
                     {service.duration && (
                       <div className="flex items-center gap-1.5 mt-2">
                         <Clock size={11} className="text-white/25" />
-                        <span className="text-[11px] text-white/30">{service.duration} min</span>
+                        <span className="text-[11px] text-white/30">{service.duration} {t("booking.min")}</span>
                       </div>
                     )}
                   </div>
@@ -615,32 +620,34 @@ const BookingPage = () => {
             {/* Calendar */}
             <div>
               <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-3 flex items-center gap-2">
-                <Calendar size={10} /> Select Date
+                <Calendar size={10} /> {t("booking.selectDateLabel")}
               </p>
               <MiniCalendar
                 selectedDate={selectedDate}
                 onSelect={(d) => { setSelectedDate(d); setSelectedTime(null); }}
                 businessHours={merchant?.businessHours || []}
+                locale={locale}
+                t={t}
               />
             </div>
 
             {/* Time slots */}
             <div>
               <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-3 flex items-center gap-2">
-                <Clock size={10} /> Available Times — {formatDisplayDate(selectedDate)}
+                <Clock size={10} /> {t("booking.selectTime")} — {formatDisplayDate(selectedDate, locale)}
               </p>
 
               {dayIsClosed ? (
                 <div className="text-center py-8 bg-white/3 border border-white/8 rounded-2xl">
                   <X className="w-8 h-8 text-white/20 mx-auto mb-2" />
-                  <p className="text-white/40 text-sm font-medium">Closed on this day</p>
-                  <p className="text-white/20 text-xs mt-1">Pick another date from the calendar</p>
+                  <p className="text-white/40 text-sm font-medium">{t("booking.closedOnDay")}</p>
+                  <p className="text-white/20 text-xs mt-1">{t("booking.pickOtherDate")}</p>
                 </div>
               ) : dayLimitReached ? (
                 <div className="text-center py-8 bg-white/3 border border-white/8 rounded-2xl">
                   <X className="w-8 h-8 text-white/20 mx-auto mb-2" />
-                  <p className="text-white/40 text-sm font-medium">Maximum customers reached for this day</p>
-                  <p className="text-white/20 text-xs mt-1">Please choose another date</p>
+                  <p className="text-white/40 text-sm font-medium">{t("booking.maxCustomers")}</p>
+                  <p className="text-white/20 text-xs mt-1">{t("booking.chooseOtherDate")}</p>
                 </div>
               ) : (
                 <div className="bg-white/3 border border-white/8 rounded-2xl p-4">
@@ -649,6 +656,7 @@ const BookingPage = () => {
                     selectedTime={selectedTime}
                     onSelect={setSelectedTime}
                     loading={slotsLoading}
+                    t={t}
                   />
                 </div>
               )}
@@ -665,7 +673,7 @@ const BookingPage = () => {
                 }
               `}
             >
-              {selectedTime ? `Continue with ${formatTime(selectedTime)}` : "Select a time to continue"}
+              {selectedTime ? t("booking.continueWith", { time: formatTime(selectedTime) }) : t("booking.selectToContinue")}
             </button>
           </div>
         )}
@@ -678,24 +686,24 @@ const BookingPage = () => {
             {/* Appointment recap */}
             <div className="p-4 bg-white/3 border border-white/8 rounded-2xl space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-white/40">Service</span>
+                <span className="text-white/40">{t("booking.service")}</span>
                 <span className="text-white font-semibold">{selectedService?.title}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-white/40">Date</span>
-                <span className="text-white font-semibold">{formatDisplayDate(selectedDate)}</span>
+                <span className="text-white/40">{t("booking.date")}</span>
+                <span className="text-white font-semibold">{formatDisplayDate(selectedDate, locale)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-white/40">Time</span>
+                <span className="text-white/40">{t("booking.time")}</span>
                 <span className="text-amber-400 font-black">{formatTime(selectedTime)}</span>
               </div>
             </div>
 
             {/* Form fields */}
             {[
-              { key: "name", label: "Full Name", icon: User, type: "text", placeholder: "Your full name" },
-              { key: "email", label: "Email Address", icon: Mail, type: "email", placeholder: "you@example.com" },
-              { key: "phone", label: "Phone Number", icon: Phone, type: "tel", placeholder: "+216 XX XXX XXX" },
+              { key: "name", label: t("booking.fullName"), icon: User, type: "text", placeholder: t("booking.fullName") },
+              { key: "email", label: t("booking.emailAddress"), icon: Mail, type: "email", placeholder: "you@example.com" },
+              { key: "phone", label: t("booking.phoneNumber"), icon: Phone, type: "tel", placeholder: "+216 XX XXX XXX" },
             ].map(({ key, label, icon: Icon, type, placeholder }) => (
               <div key={key}>
                 <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-2 flex items-center gap-1.5">
@@ -727,12 +735,12 @@ const BookingPage = () => {
             {/* Notes */}
             <div>
               <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                <MessageSquare size={10} /> Notes (optional)
+                <MessageSquare size={10} /> {t("booking.notes")}
               </label>
               <textarea
                 value={form.notes}
                 onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-                placeholder="Any special requests or info for the business..."
+                placeholder={t("booking.specialRequests")}
                 rows={3}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/20 outline-none transition-all focus:bg-white/8 focus:border-amber-400/40 resize-none"
               />
@@ -744,7 +752,7 @@ const BookingPage = () => {
               }}
               className="w-full py-4 bg-amber-400 text-black rounded-2xl font-black text-sm tracking-wide hover:bg-amber-300 transition-colors shadow-lg shadow-amber-400/20"
             >
-              Review Appointment →
+              {t("booking.reviewAppointment")}
             </button>
           </div>
         )}
@@ -756,20 +764,20 @@ const BookingPage = () => {
           <div className="space-y-5">
             <div className="bg-white/3 border border-white/8 rounded-2xl overflow-hidden">
               <div className="p-4 bg-amber-400/5 border-b border-amber-400/10">
-                <p className="text-[10px] font-black text-amber-400/70 uppercase tracking-widest mb-1">Appointment Summary</p>
+                <p className="text-[10px] font-black text-amber-400/70 uppercase tracking-widest mb-1">{t("booking.appointmentSummary")}</p>
                 <h3 className="text-white font-bold">{merchant?.businessName}</h3>
               </div>
               <div className="divide-y divide-white/5">
                 {[
-                  { label: "Service", value: selectedService?.title },
-                  { label: "Price", value: selectedService?.price, accent: true },
-                  { label: "Duration", value: selectedService?.duration ? `${selectedService.duration} min` : "—" },
-                  { label: "Date", value: formatDisplayDate(selectedDate) },
-                  { label: "Time", value: formatTime(selectedTime), accent: true },
-                  { label: "Name", value: form.name },
-                  { label: "Email", value: form.email },
-                  { label: "Phone", value: form.phone },
-                  form.notes && { label: "Notes", value: form.notes },
+                  { label: t("booking.service"), value: selectedService?.title },
+                  { label: t("booking.price"), value: selectedService?.price, accent: true },
+                  { label: t("booking.duration"), value: selectedService?.duration ? `${selectedService.duration} ${t("booking.min")}` : "—" },
+                  { label: t("booking.date"), value: formatDisplayDate(selectedDate, locale) },
+                  { label: t("booking.time"), value: formatTime(selectedTime), accent: true },
+                  { label: t("booking.name"), value: form.name },
+                  { label: t("booking.email"), value: form.email },
+                  { label: t("booking.phone"), value: form.phone },
+                  form.notes && { label: t("booking.notes"), value: form.notes },
                 ].filter(Boolean).map(({ label, value, accent }) => (
                   <div key={label} className="flex justify-between items-center px-4 py-3">
                     <span className="text-white/40 text-sm">{label}</span>
@@ -787,7 +795,7 @@ const BookingPage = () => {
             )}
 
             <p className="text-white/25 text-xs text-center leading-relaxed">
-              By confirming, you agree to the appointment terms. The business may contact you to confirm.
+              {t("booking.agreeTerms")}
             </p>
 
             <button
@@ -798,12 +806,12 @@ const BookingPage = () => {
               {submitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Securing your booking...
+                  {t("booking.securingBooking")}
                 </>
               ) : (
                 <>
                   <CheckCircle2 size={16} />
-                  Confirm Appointment
+                  {t("booking.confirmAppointment")}
                 </>
               )}
             </button>
@@ -817,7 +825,7 @@ const BookingPage = () => {
           <div className="w-4 h-4 bg-amber-400 rounded-sm flex items-center justify-center">
             <Sparkles size={9} className="text-black" />
           </div>
-          <span className="text-[9px] font-black text-white/30 uppercase tracking-widest">Powered by Bookiify</span>
+          <span className="text-[9px] font-black text-white/30 uppercase tracking-widest">{t("booking.poweredBy")}</span>
         </div>
       </div>
     </div>

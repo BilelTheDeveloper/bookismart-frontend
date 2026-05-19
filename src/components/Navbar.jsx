@@ -7,6 +7,8 @@ import {
   ExternalLink, Check
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 /* ─── Notification data (will be real when notification center is built) ─── */
 const DEMO_NOTIFICATIONS = [
@@ -18,18 +20,19 @@ const DEMO_NOTIFICATIONS = [
 /* ─── Profile Dropdown ─── */
 function ProfileDropdown({ user, onLogout, onClose }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const ownerLinks = [
-    { label: "Dashboard",    icon: <LayoutDashboard size={16} />, path: "/owner/dashboard" },
-    { label: "Appointments", icon: <Zap size={16} />,             path: "/owner/dashboard/bookings" },
-    { label: "Financials",   icon: <Wallet size={16} />,          path: "/owner/dashboard/finance" },
-    { label: "Settings",     icon: <Settings size={16} />,        path: "/owner/dashboard/settings" },
-    { label: "Billing",      icon: <CreditCard size={16} />,      path: "/owner/dashboard/billing" },
+    { label: t("nav.dashboard"),    icon: <LayoutDashboard size={16} />, path: "/owner/dashboard" },
+    { label: t("nav.appointments"), icon: <Zap size={16} />,             path: "/owner/dashboard/bookings" },
+    { label: t("nav.financials"),   icon: <Wallet size={16} />,          path: "/owner/dashboard/finance" },
+    { label: t("nav.settings"),     icon: <Settings size={16} />,        path: "/owner/dashboard/settings" },
+    { label: t("nav.billing"),      icon: <CreditCard size={16} />,      path: "/owner/dashboard/billing" },
   ];
 
   const adminLinks = [
-    { label: "Admin Panel",  icon: <Shield size={16} />,          path: "/admin/dashboard" },
-    { label: "KYC Review",   icon: <User size={16} />,            path: "/admin/verify-identity" },
+    { label: t("nav.adminPanel"),  icon: <Shield size={16} />,          path: "/admin/dashboard" },
+    { label: t("nav.kycReview"),   icon: <User size={16} />,            path: "/admin/verify-identity" },
   ];
 
   const links = user?.role === "admin" ? adminLinks : ownerLinks;
@@ -58,7 +61,7 @@ function ProfileDropdown({ user, onLogout, onClose }) {
               <div className="flex items-center gap-1.5 mt-1">
                 <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
                 <span className="text-emerald-300 text-[10px] font-bold uppercase tracking-wider">
-                  {user?.role === "admin" ? "Administrator" : "Business Owner"}
+                  {user?.role === "admin" ? t("nav.administrator") : t("nav.businessOwner")}
                 </span>
               </div>
             </div>
@@ -89,7 +92,7 @@ function ProfileDropdown({ user, onLogout, onClose }) {
             className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-all"
           >
             <LayoutDashboard size={15} />
-            Go to Dashboard
+            {t("nav.goToDashboard")}
           </Link>
         </div>
 
@@ -98,7 +101,7 @@ function ProfileDropdown({ user, onLogout, onClose }) {
             onClick={() => { onClose(); onLogout(); }}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-rose-500 hover:bg-rose-50 transition-all"
           >
-            <LogOut size={16} /> Sign Out
+            <LogOut size={16} /> {t("nav.signOut")}
           </button>
         </div>
       </div>
@@ -108,6 +111,7 @@ function ProfileDropdown({ user, onLogout, onClose }) {
 
 /* ─── Notification Dropdown ─── */
 function NotificationDropdown({ onClose }) {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState(DEMO_NOTIFICATIONS);
   const unread = notifications.filter(n => !n.read).length;
 
@@ -126,14 +130,14 @@ function NotificationDropdown({ onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <h3 className="font-black text-slate-900 text-sm">Notifications</h3>
+            <h3 className="font-black text-slate-900 text-sm">{t("nav.notifications")}</h3>
             {unread > 0 && (
               <span className="bg-indigo-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{unread}</span>
             )}
           </div>
           {unread > 0 && (
             <button onClick={markAllRead} className="flex items-center gap-1 text-xs text-indigo-600 font-bold hover:text-indigo-500 transition-colors">
-              <Check size={11} /> Mark all read
+              <Check size={11} /> {t("nav.markAllRead")}
             </button>
           )}
         </div>
@@ -141,7 +145,7 @@ function NotificationDropdown({ onClose }) {
         {/* List */}
         <div className="max-h-72 overflow-y-auto">
           {notifications.length === 0 ? (
-            <div className="py-10 text-center text-slate-400 text-sm">No notifications</div>
+            <div className="py-10 text-center text-slate-400 text-sm">{t("nav.noNotifications")}</div>
           ) : (
             notifications.map(n => (
               <div key={n.id} className={`flex items-start gap-3 px-4 py-3.5 border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer ${!n.read ? "bg-indigo-50/40" : ""}`}>
@@ -166,7 +170,7 @@ function NotificationDropdown({ onClose }) {
             onClick={onClose}
             className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl text-xs font-bold text-indigo-600 hover:bg-indigo-50 transition-colors"
           >
-            View all in dashboard <ExternalLink size={11} />
+            {t("nav.viewAllDashboard")} <ExternalLink size={11} />
           </Link>
         </div>
       </div>
@@ -177,6 +181,7 @@ function NotificationDropdown({ onClose }) {
 /* ─── Main Navbar ─── */
 const Navbar = () => {
   const { user, isAuthenticated, logoutUser } = useAuth();
+  const { t } = useTranslation();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen]       = useState(false);
@@ -201,10 +206,10 @@ const Navbar = () => {
   const initials = user?.fullName?.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() || "U";
 
   const navLinks = [
-    { name: "Services",     href: "/services",     icon: <LayoutGrid size={17} /> },
-    { name: "How it Works", href: "/how-it-works", icon: <Zap size={17} /> },
-    { name: "Professionals", href: "/professionals", icon: <Star size={17} /> },
-    { name: "Find Work",    href: "/find-work",    icon: <Briefcase size={17} /> },
+    { name: t("nav.services"),      href: "/services",      icon: <LayoutGrid size={17} /> },
+    { name: t("nav.howItWorks"),    href: "/how-it-works",  icon: <Zap size={17} /> },
+    { name: t("nav.professionals"), href: "/professionals", icon: <Star size={17} /> },
+    { name: t("nav.findWork"),      href: "/find-work",     icon: <Briefcase size={17} /> },
   ];
 
   return (
@@ -304,21 +309,22 @@ const Navbar = () => {
           ) : (
             <>
               <span className="hidden rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 xl:inline-flex items-center gap-1.5">
-                <Sparkles size={13} /> AI-powered bookings
+                <Sparkles size={13} /> {t("nav.aiPowered")}
               </span>
+              <LanguageSwitcher />
               <Link
                 to="/login"
                 className="hidden items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-100 sm:flex"
               >
-                <LogIn size={17} /> Login
+                <LogIn size={17} /> {t("nav.login")}
               </Link>
               <Link
                 to="/signup"
                 className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-400 via-cyan-300 to-emerald-300 px-3.5 py-2.5 text-sm font-black text-slate-900 shadow-md shadow-cyan-100 transition-all hover:scale-[1.02] hover:shadow-lg hover:shadow-cyan-200 active:scale-95 sm:px-5"
               >
                 <UserPlus size={16} />
-                <span className="hidden sm:inline">Join as Owner</span>
-                <span className="sm:hidden">Join</span>
+                <span className="hidden sm:inline">{t("nav.joinAsOwner")}</span>
+                <span className="sm:hidden">{t("nav.joinShort")}</span>
               </Link>
             </>
           )}
@@ -379,30 +385,33 @@ const Navbar = () => {
                 className="flex items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3 font-bold text-white text-sm hover:bg-indigo-500 transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <LayoutDashboard size={18} /> Go to Dashboard
+                <LayoutDashboard size={18} /> {t("nav.goToDashboard")}
               </Link>
               <button
                 onClick={() => { setIsMobileMenuOpen(false); logoutUser(); }}
                 className="flex items-center justify-center gap-2 rounded-xl bg-slate-100 py-3 font-bold text-rose-500 text-sm hover:bg-rose-50 transition-colors"
               >
-                <LogOut size={18} /> Sign Out
+                <LogOut size={18} /> {t("nav.signOut")}
               </button>
             </>
           ) : (
             <div className="flex flex-col gap-3">
+              <div className="flex justify-center pb-1">
+                <LanguageSwitcher />
+              </div>
               <Link
                 to="/login"
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-100 py-3.5 font-bold text-slate-900 hover:bg-slate-200 transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <LogIn size={20} /> Login
+                <LogIn size={20} /> {t("nav.login")}
               </Link>
               <Link
                 to="/signup"
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 py-3.5 font-bold text-white shadow-lg shadow-indigo-200 transition-transform hover:scale-[1.01]"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <UserPlus size={20} /> Join as Owner
+                <UserPlus size={20} /> {t("nav.joinAsOwner")}
               </Link>
             </div>
           )}

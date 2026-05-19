@@ -1,6 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const feedbacks = [
   {
@@ -176,6 +177,7 @@ const FeedbackModal = ({ feedback, isOpen, onClose }) => {
 };
 
 const Feedback = () => {
+  const { t } = useTranslation();
   const [selectedFeedback, setSelectedFeedback] = useState(null);
 
   return (
@@ -202,16 +204,16 @@ const Feedback = () => {
           className="mx-auto mb-14 max-w-2xl text-center"
         >
           <span className="text-indigo-600 font-black text-sm uppercase tracking-[0.3em]">
-            Community
+            {t("home.feedback.badge")}
           </span>
           <h2 className="text-4xl md:text-5xl font-black text-slate-900 mt-4 tracking-tighter">
-            Trusted by{" "}
+            {t("home.feedback.title")}{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-cyan-500">
-              Professionals.
+              {t("home.feedback.titleHighlight")}
             </span>
           </h2>
           <p className="text-slate-500 font-medium mt-4">
-            Hear from the business owners who scaled their projects with BookiSmart.
+            {t("home.feedback.description")}
           </p>
         </motion.div>
 
@@ -274,7 +276,7 @@ const Feedback = () => {
           viewport={{ once: true }}
           className="mt-16 flex flex-wrap justify-center gap-8 border-t border-slate-200 pt-12 md:gap-20"
         >
-          {["RELIABLE", "SECURE", "SMART", "FAST"].map((word, i) => (
+          {(t("home.feedback.words", { returnObjects: true }) || ["RELIABLE", "SECURE", "SMART", "FAST"]).map((word, i) => (
             <motion.span
               key={word}
               initial={{ opacity: 0.3 }}

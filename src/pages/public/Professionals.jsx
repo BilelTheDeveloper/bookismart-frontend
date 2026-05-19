@@ -8,6 +8,7 @@ import {
   Timer, Award, MessageSquare, ThumbsUp,
 } from "lucide-react";
 import API from "../../api/config";
+import { useTranslation } from "react-i18next";
 
 // ─── Tunisia governorates ────────────────────────────────────────────────────
 const CITIES = [
@@ -30,11 +31,11 @@ const CATEGORY_META = {
   "Grooming & Vets":   { emoji: "🐾",  color: "bg-teal-100 text-teal-700 border-teal-200" },
 };
 
-const SORT_OPTIONS = [
-  { value: "rating",    label: "Top Rated",      icon: Star },
-  { value: "reviews",   label: "Most Reviewed",  icon: TrendingUp },
-  { value: "completed", label: "Most Experienced", icon: Award },
-  { value: "newest",    label: "Recently Added", icon: Sparkles },
+const SORT_KEYS = [
+  { value: "rating",    key: "sort.topRated",        icon: Star },
+  { value: "reviews",   key: "sort.mostReviewed",    icon: TrendingUp },
+  { value: "completed", key: "sort.mostExperienced", icon: Award },
+  { value: "newest",    key: "sort.recentlyAdded",   icon: Sparkles },
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -112,6 +113,7 @@ const formatResponseTime = (hours) => {
 
 // ─── Professional card ────────────────────────────────────────────────────────
 const ProfessionalCard = ({ site, index }) => {
+  const { t } = useTranslation();
   const catMeta = CATEGORY_META[site.ownerId?.category] || { emoji: "🏢", color: "bg-slate-100 text-slate-700 border-slate-200" };
   const openStatus = isOpenNow(site.businessHours || []);
   const minPrice = priceFrom(site.services || []);
@@ -158,19 +160,19 @@ const ProfessionalCard = ({ site, index }) => {
                 : "bg-black/60 border-white/10 text-slate-300"
             }`}>
               <span className={`h-1.5 w-1.5 rounded-full ${openStatus ? "bg-white animate-pulse" : "bg-slate-400"}`} />
-              {openStatus ? "Ouvert" : "Fermé"}
+              {openStatus ? t("professionals.openNow") : t("professionals.closed")}
             </div>
           )}
           {isHighlyTrusted && (
             <div className="flex items-center gap-1 rounded-full bg-amber-400 px-2.5 py-1 text-[10px] font-black text-amber-950 shadow-lg shadow-amber-400/30">
               <Award size={9} />
-              Top Pro
+              {t("professionals.topPro")}
             </div>
           )}
           {isNewcomer && (
             <div className="flex items-center gap-1 rounded-full bg-violet-500/90 backdrop-blur px-2.5 py-1 text-[10px] font-bold text-white">
               <Sparkles size={9} />
-              Nouveau
+              {t("professionals.new")}
             </div>
           )}
         </div>
@@ -202,7 +204,7 @@ const ProfessionalCard = ({ site, index }) => {
           </div>
           {minPrice && (
             <div className="flex-shrink-0 rounded-xl bg-white/15 backdrop-blur border border-white/15 px-2.5 py-1 text-right">
-              <p className="text-[9px] font-bold text-white/50 leading-none">Dès</p>
+              <p className="text-[9px] font-bold text-white/50 leading-none">{t("professionals.from")}</p>
               <p className="text-xs font-black text-white leading-tight">{minPrice} TND</p>
             </div>
           )}
@@ -219,15 +221,15 @@ const ProfessionalCard = ({ site, index }) => {
               <>
                 <span className="flex gap-0.5">{renderStars(site.rating, 13)}</span>
                 <span className="text-xs font-black text-slate-800">{site.rating.toFixed(1)}</span>
-                <span className="text-[11px] text-slate-400 font-medium">({site.reviewCount} avis)</span>
+                <span className="text-[11px] text-slate-400 font-medium">({site.reviewCount} {t("professionals.reviewsUnit")})</span>
               </>
             ) : (
-              <span className="text-[11px] text-slate-400 italic">Pas encore d'avis</span>
+              <span className="text-[11px] text-slate-400 italic">{t("professionals.noReviews")}</span>
             )}
           </div>
           <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-2 py-0.5">
             <Zap size={9} />
-            Instantané
+            {t("professionals.instant")}
           </div>
         </div>
 
@@ -241,7 +243,7 @@ const ProfessionalCard = ({ site, index }) => {
                 {site.uniqueClients > 0 ? site.uniqueClients : "—"}
               </span>
             </div>
-            <p className="text-[9px] font-semibold text-slate-400 leading-none">clients</p>
+            <p className="text-[9px] font-semibold text-slate-400 leading-none">{t("professionals.clients")}</p>
           </div>
           {/* Completed */}
           <div className="text-center border-x border-slate-200">
@@ -251,7 +253,7 @@ const ProfessionalCard = ({ site, index }) => {
                 {site.completedCount > 0 ? site.completedCount : "—"}
               </span>
             </div>
-            <p className="text-[9px] font-semibold text-slate-400 leading-none">RDV fait</p>
+            <p className="text-[9px] font-semibold text-slate-400 leading-none">{t("professionals.completedLabel")}</p>
           </div>
           {/* Response time or cancellation rate */}
           <div className="text-center">
@@ -261,7 +263,7 @@ const ProfessionalCard = ({ site, index }) => {
                   <Timer size={10} className="text-violet-400" />
                   <span className="text-xs font-black text-slate-800">{responseTime}</span>
                 </div>
-                <p className="text-[9px] font-semibold text-slate-400 leading-none">répons.</p>
+                <p className="text-[9px] font-semibold text-slate-400 leading-none">{t("professionals.responseLabel")}</p>
               </>
             ) : (
               <>
@@ -271,7 +273,7 @@ const ProfessionalCard = ({ site, index }) => {
                     {site.completedCount > 0 ? `${100 - (site.cancellationRate ?? 0)}%` : "—"}
                   </span>
                 </div>
-                <p className="text-[9px] font-semibold text-slate-400 leading-none">succès</p>
+                <p className="text-[9px] font-semibold text-slate-400 leading-none">{t("professionals.successLabel")}</p>
               </>
             )}
           </div>
@@ -326,14 +328,14 @@ const ProfessionalCard = ({ site, index }) => {
             className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-3 py-2.5 text-xs font-black text-white shadow-md shadow-indigo-200 transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-200 active:scale-95"
           >
             <Calendar size={13} />
-            Réserver
+            {t("professionals.bookNow")}
           </Link>
           <Link
             to={`/p/${site.slug}`}
             className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 transition-all hover:bg-slate-50 hover:border-slate-300 active:scale-95"
           >
             <Globe size={13} />
-            Profil
+            {t("professionals.viewProfile")}
           </Link>
         </div>
       </div>
@@ -381,6 +383,7 @@ const StatCounter = ({ end, label, icon: Icon }) => {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 const Professionals = () => {
+  const { t } = useTranslation();
   const [professionals, setProfessionals] = useState([]);
   const [stats, setStats]       = useState(null);
   const [loading, setLoading]   = useState(true);
@@ -466,6 +469,7 @@ const Professionals = () => {
     setSortBy("rating");
   };
 
+  const SORT_OPTIONS = SORT_KEYS.map((s) => ({ ...s, label: t(`professionals.${s.key}`) }));
   const currentSort = SORT_OPTIONS.find((o) => o.value === sortBy);
 
   return (
@@ -501,7 +505,7 @@ const Professionals = () => {
           >
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-indigo-300">
               <Sparkles size={12} className="text-indigo-400" />
-              Partenaires vérifiés — Tunisie
+              {t("professionals.verifiedBadge")}
             </span>
           </motion.div>
 
@@ -511,9 +515,9 @@ const Professionals = () => {
             transition={{ duration: 0.65, delay: 0.1 }}
             className="mt-6 text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
           >
-            Trouvez et réservez
+            {t("professionals.heroTitleLine1")}
             <span className="block bg-gradient-to-r from-indigo-300 via-violet-300 to-cyan-300 bg-clip-text text-transparent">
-              les meilleurs experts.
+              {t("professionals.heroTitleLine2")}
             </span>
           </motion.h1>
 
@@ -523,7 +527,7 @@ const Professionals = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mx-auto mt-5 max-w-2xl text-sm font-medium text-slate-400 sm:text-base md:text-lg"
           >
-            Coiffeurs, médecins, coachs, mécaniciens — tous vérifiés, disponibles, réservables en un clic.
+            {t("professionals.heroSubtitle")}
           </motion.p>
 
           {/* Search bar */}
@@ -539,7 +543,7 @@ const Professionals = () => {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Coiffeur à Tunis, dentiste à Sousse..."
+                placeholder={t("professionals.searchPlaceholder")}
                 className="w-full rounded-2xl border border-white/10 bg-white/10 backdrop-blur-md py-4 pl-12 pr-12 text-sm font-medium text-white placeholder:text-slate-500 outline-none transition-all focus:border-indigo-400/60 focus:bg-white/15 focus:ring-2 focus:ring-indigo-500/20"
               />
               {searchTerm && (
@@ -561,10 +565,10 @@ const Professionals = () => {
               transition={{ duration: 0.6, delay: 0.45 }}
               className="mx-auto mt-10 grid max-w-xl grid-cols-4 gap-4 border-t border-white/10 pt-8"
             >
-              <StatCounter end={stats.businesses} label="Professionnels" icon={Building2} />
-              <StatCounter end={stats.cities}     label="Villes"         icon={MapPin} />
-              <StatCounter end={stats.reviews}    label="Avis clients"   icon={Star} />
-              <StatCounter end={stats.completed}  label="RDV réalisés"   icon={CheckCircle2} />
+              <StatCounter end={stats.businesses} label={t("professionals.stats.professionals")} icon={Building2} />
+              <StatCounter end={stats.cities}     label={t("professionals.stats.cities")}        icon={MapPin} />
+              <StatCounter end={stats.reviews}    label={t("professionals.stats.reviews")}       icon={Star} />
+              <StatCounter end={stats.completed}  label={t("professionals.stats.completedFull")} icon={CheckCircle2} />
             </motion.div>
           )}
         </div>
@@ -585,7 +589,7 @@ const Professionals = () => {
               }`}
             >
               <Filter size={13} />
-              Filtres
+              {t("professionals.filters")}
               {activeFilterCount > 0 && (
                 <span className="flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-black text-white">
                   {activeFilterCount}
@@ -603,7 +607,7 @@ const Professionals = () => {
                     : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
                 }`}
               >
-                Tous
+                {t("professionals.filterAll")}
               </button>
               {Object.entries(CATEGORY_META).map(([cat, meta]) => (
                 <button
@@ -633,7 +637,7 @@ const Professionals = () => {
                   }`}
                 >
                   <MapPin size={12} />
-                  {selectedCity === "all" ? "Toutes les villes" : selectedCity}
+                  {selectedCity === "all" ? t("professionals.allCities") : selectedCity}
                   <ChevronDown size={12} className={`transition-transform ${cityDropdownOpen ? "rotate-180" : ""}`} />
                 </button>
                 <AnimatePresence>
@@ -652,7 +656,7 @@ const Professionals = () => {
                             selectedCity === "all" ? "bg-indigo-50 text-indigo-700" : "text-slate-700 hover:bg-slate-50"
                           }`}
                         >
-                          Toutes les villes
+                          {t("professionals.allCities")}
                         </button>
                         {CITIES.map((city) => (
                           <button
@@ -716,7 +720,7 @@ const Professionals = () => {
                   className="flex items-center gap-1 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold text-red-600 transition-all hover:bg-red-100"
                 >
                   <X size={12} />
-                  Effacer
+                  {t("professionals.clearFilters")}
                 </button>
               )}
             </div>
@@ -772,7 +776,7 @@ const Professionals = () => {
               </span>
             )}
             <p className="text-sm font-bold text-slate-700">
-              {loading ? "Chargement..." : `${filtered.length} professionnel${filtered.length !== 1 ? "s" : ""} trouvé${filtered.length !== 1 ? "s" : ""}`}
+              {loading ? t("common.loading") : `${filtered.length} ${t("professionals.found")}`}
             </p>
           </div>
 
@@ -807,15 +811,15 @@ const Professionals = () => {
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-slate-400 text-3xl mb-4">
               🔍
             </div>
-            <h3 className="text-lg font-black text-slate-800">Aucun résultat</h3>
+            <h3 className="text-lg font-black text-slate-800">{t("professionals.noResults")}</h3>
             <p className="mt-2 text-sm text-slate-500 max-w-xs">
-              Essayez d'ajuster vos filtres ou de rechercher une autre ville ou spécialité.
+              {t("professionals.noResultsHint")}
             </p>
             <button
               onClick={clearFilters}
               className="mt-6 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-indigo-200 hover:bg-indigo-500 transition-all"
             >
-              Effacer tous les filtres
+              {t("professionals.clearAllFilters")}
             </button>
           </motion.div>
         ) : (
@@ -841,20 +845,20 @@ const Professionals = () => {
             </div>
             <div className="relative z-10">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-4 py-1 text-xs font-bold uppercase tracking-widest text-indigo-300">
-                <Briefcase size={11} /> Vous êtes professionnel ?
+                <Briefcase size={11} /> {t("professionals.joinCta").split("?")[0]}?
               </span>
               <h2 className="mt-4 text-2xl font-black text-white sm:text-3xl">
-                Rejoignez Bookiify gratuitement.
+                {t("professionals.joinTitle")}
               </h2>
               <p className="mx-auto mt-3 max-w-md text-sm text-slate-400 font-medium">
-                Créez votre profil, gérez vos rendez-vous et développez votre clientèle avec nos outils avancés.
+                {t("professionals.joinDesc")}
               </p>
               <Link
                 to="/signup"
                 className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-900/50 transition-all hover:bg-indigo-500 hover:shadow-indigo-700/60 active:scale-95"
               >
                 <Sparkles size={14} />
-                Créer mon compte — C'est gratuit
+                {t("professionals.joinBtn")}
               </Link>
             </div>
           </motion.div>

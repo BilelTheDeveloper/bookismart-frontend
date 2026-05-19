@@ -1,20 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Star, Loader2, CheckCircle2, AlertCircle, Sparkles, ArrowLeft } from "lucide-react";
 import API from "../../api/config";
-
-const LABELS = ["Terrible", "Mauvais", "Correct", "Bien", "Excellent !"];
-const COLORS = [
-  "text-red-400",
-  "text-orange-400",
-  "text-amber-400",
-  "text-lime-400",
-  "text-emerald-400",
-];
 
 const ReviewPage = () => {
   const { token } = useParams();
   const navigate   = useNavigate();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language?.slice(0, 2) || "fr";
 
   const [info,       setInfo]       = useState(null);
   const [loadErr,    setLoadErr]    = useState(null);
@@ -26,6 +20,15 @@ const ReviewPage = () => {
   const [success,    setSuccess]    = useState(false);
   const [submitErr,  setSubmitErr]  = useState(null);
 
+  const LABELS = t("review.ratingLabels", { returnObjects: true });
+  const COLORS = [
+    "text-red-400",
+    "text-orange-400",
+    "text-amber-400",
+    "text-lime-400",
+    "text-emerald-400",
+  ];
+
   // Load booking info from token
   useEffect(() => {
     const load = async () => {
@@ -34,21 +37,21 @@ const ReviewPage = () => {
         if (res.data.success) {
           setInfo(res.data.data);
         } else {
-          setLoadErr(res.data.message || "Lien invalide.");
+          setLoadErr(res.data.message || t("review.invalidLink"));
         }
       } catch (err) {
         const msg = err.response?.data?.message;
         if (err.response?.data?.alreadySubmitted) {
-          setLoadErr("Vous avez déjà soumis un avis pour ce rendez-vous.");
+          setLoadErr(t("review.alreadySubmitted"));
         } else {
-          setLoadErr(msg || "Lien invalide ou expiré.");
+          setLoadErr(msg || t("review.invalidLink"));
         }
       } finally {
         setLoadDone(true);
       }
     };
     load();
-  }, [token]);
+  }, [token, t]);
 
   const handleSubmit = async () => {
     if (!rating) return;
@@ -60,7 +63,7 @@ const ReviewPage = () => {
         setSuccess(true);
       }
     } catch (err) {
-      setSubmitErr(err.response?.data?.message || "Erreur lors de la soumission.");
+      setSubmitErr(err.response?.data?.message || t("common.error"));
     } finally {
       setSubmitting(false);
     }
@@ -74,7 +77,7 @@ const ReviewPage = () => {
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-10 h-10 text-amber-400 animate-spin mx-auto mb-4" />
-          <p className="text-slate-400 text-sm font-medium">Vérification du lien...</p>
+          <p className="text-slate-400 text-sm font-medium">{t("review.verifyingLink")}</p>
         </div>
       </div>
     );
@@ -88,13 +91,13 @@ const ReviewPage = () => {
           <div className="w-20 h-20 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mx-auto mb-6">
             <AlertCircle className="w-10 h-10 text-rose-400" />
           </div>
-          <h2 className="text-xl font-black text-white mb-2">Lien invalide</h2>
+          <h2 className="text-xl font-black text-white mb-2">{t("review.invalidTitle")}</h2>
           <p className="text-slate-400 text-sm mb-8">{loadErr}</p>
           <button
             onClick={() => navigate("/")}
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 border border-white/10 rounded-xl text-white text-sm font-semibold hover:bg-white/15 transition-all"
           >
-            <ArrowLeft size={14} /> Retour à l'accueil
+            <ArrowLeft size={14} /> {t("review.returnHome")}
           </button>
         </div>
       </div>
@@ -106,18 +109,16 @@ const ReviewPage = () => {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
         <div className="max-w-sm w-full text-center">
-          {/* Animated check */}
           <div className="relative mb-8">
             <div className="w-24 h-24 rounded-full bg-emerald-500/10 border-2 border-emerald-400/30 flex items-center justify-center mx-auto animate-pulse">
               <CheckCircle2 className="w-12 h-12 text-emerald-400" />
             </div>
             <div className="absolute -top-1 -right-1 w-6 h-6 bg-emerald-400 rounded-full animate-ping opacity-30" />
           </div>
-          <h1 className="text-3xl font-black text-white mb-2">Merci !</h1>
+          <h1 className="text-3xl font-black text-white mb-2">{t("review.success")}</h1>
           <p className="text-slate-400 text-sm leading-relaxed mb-4">
-            Votre avis a été publié avec succès. Il aidera d'autres clients à choisir les meilleurs professionnels.
+            {t("review.publicNotice")}
           </p>
-          {/* Stars recap */}
           <div className="flex justify-center gap-1 mb-8">
             {Array.from({ length: 5 }, (_, i) => (
               <Star
@@ -131,7 +132,7 @@ const ReviewPage = () => {
             onClick={() => navigate("/")}
             className="px-6 py-3 bg-indigo-600 rounded-xl font-bold text-white hover:bg-indigo-500 transition-all"
           >
-            Retour à Bookiify
+            {t("review.returnToBookiify")}
           </button>
         </div>
       </div>
@@ -147,23 +148,23 @@ const ReviewPage = () => {
       </div>
 
       <div className="relative w-full max-w-md">
-        {/* Logo */}
+        {/* Badge */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-amber-400">
             <Sparkles size={11} />
-            Votre avis compte
+            {t("review.yourOpinion")}
           </div>
         </div>
 
         <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm">
           {/* Booking info card */}
           <div className="bg-white/5 border border-white/8 rounded-2xl p-4 mb-8">
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Votre rendez-vous</p>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">{t("review.yourAppointment")}</p>
             <p className="text-white font-bold text-base">{info.service}</p>
-            <p className="text-slate-400 text-sm mt-0.5">chez {info.businessName}</p>
+            <p className="text-slate-400 text-sm mt-0.5">{t("review.at")} {info.businessName}</p>
             <div className="flex items-center gap-3 mt-3">
               <span className="text-[11px] font-medium text-slate-500">
-                {info.date ? new Date(info.date).toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }) : ""}
+                {info.date ? new Date(info.date).toLocaleDateString(locale, { weekday: "long", year: "numeric", month: "long", day: "numeric" }) : ""}
               </span>
             </div>
           </div>
@@ -171,9 +172,9 @@ const ReviewPage = () => {
           {/* Star picker */}
           <div className="text-center mb-6">
             <p className="text-sm font-black text-white mb-1">
-              Bonjour {info.customerName?.split(" ")[0]} ! Comment évaluez-vous ce service ?
+              {t("review.helloGreeting", { name: info.customerName?.split(" ")[0] || "" })}
             </p>
-            <p className="text-xs text-slate-500 mb-5">Appuyez sur les étoiles pour noter</p>
+            <p className="text-xs text-slate-500 mb-5">{t("review.tapToRate")}</p>
 
             <div className="flex justify-center gap-2 mb-3">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -198,7 +199,7 @@ const ReviewPage = () => {
 
             {displayRating > 0 && (
               <p className={`text-sm font-black transition-all ${COLORS[displayRating - 1]}`}>
-                {LABELS[displayRating - 1]}
+                {Array.isArray(LABELS) ? LABELS[displayRating - 1] : ""}
               </p>
             )}
           </div>
@@ -206,12 +207,12 @@ const ReviewPage = () => {
           {/* Text input */}
           <div className="mb-6">
             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 block">
-              Votre commentaire (optionnel)
+              {t("review.commentLabel")}
             </label>
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Décrivez votre expérience... Qu'est-ce qui vous a le plus impressionné ?"
+              placeholder={t("review.commentPlaceholder")}
               rows={4}
               maxLength={1200}
               className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm placeholder:text-slate-600 outline-none transition-all focus:border-amber-400/40 focus:bg-white/8 resize-none"
@@ -236,18 +237,18 @@ const ReviewPage = () => {
             {submitting ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Envoi en cours...
+                {t("review.submitting")}
               </>
             ) : (
               <>
                 <Star size={15} className="fill-amber-950" />
-                Publier mon avis
+                {t("review.publishReview")}
               </>
             )}
           </button>
 
           <p className="text-center text-[10px] text-slate-600 mt-4">
-            Votre avis est public et sera visible sur le profil de ce professionnel.
+            {t("review.publicNotice")}
           </p>
         </div>
 

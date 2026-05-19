@@ -1,24 +1,12 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const ServiceShowcase = () => {
-  const features = [
-    {
-      title: "Web Inside a Web",
-      desc: "Your own professional digital storefront. No coding, just a powerful dashboard to manage your entire business.",
-      icon: "🌐",
-    },
-    {
-      title: "Smart Booking",
-      desc: "Clients book in 3 clicks. No accounts, no passwords, no wasted time. Just pure speed.",
-      icon: "⚡",
-    },
-    {
-      title: "Smart Waiting List",
-      desc: "An appointment cancelled? Our system automatically notifies the next person on the list. Zero empty slots.",
-      icon: "🔔",
-    },
-  ];
+  const { t } = useTranslation();
+
+  const featureKeys = ["web", "booking", "waiting"];
+  const featureIcons = { web: "🌐", booking: "⚡", waiting: "🔔" };
 
   return (
     <section className="overflow-hidden bg-slate-50 py-20 md:py-28">
@@ -62,29 +50,29 @@ const ServiceShowcase = () => {
               transition={{ delay: 0.15, duration: 0.4 }}
               className="absolute -bottom-7 right-0 rounded-3xl border-4 border-white bg-cyan-300 px-5 py-4 text-slate-900 shadow-2xl"
             >
-              <p className="text-[10px] font-extrabold uppercase tracking-[0.2em]">Live status</p>
-              <p className="mt-1 text-sm font-black">Waiting list active</p>
+              <p className="text-[10px] font-extrabold uppercase tracking-[0.2em]">{t("home.showcase.liveStatus")}</p>
+              <p className="mt-1 text-sm font-black">{t("home.showcase.waitingActive")}</p>
             </motion.div>
           </div>
 
           <div className="order-1 w-full space-y-8 text-center lg:order-2 lg:flex-1 lg:text-left">
             <div>
               <span className="text-sm font-black uppercase tracking-[0.3em] text-indigo-600">
-                Engine Features
+                {t("home.showcase.badge")}
               </span>
               <h2 className="mt-4 text-3xl font-black leading-[1.05] tracking-tight text-slate-900 sm:text-4xl md:text-5xl lg:text-6xl">
-                Your business
-                <span className="block text-slate-400">on autopilot.</span>
+                {t("home.showcase.title")}
+                <span className="block text-slate-400">{t("home.showcase.titleSub")}</span>
               </h2>
               <p className="mx-auto mt-6 max-w-xl text-base font-medium text-slate-500 md:text-xl lg:mx-0">
-                A high-performance ecosystem designed to save you hours every week. More bookings, zero stress.
+                {t("home.showcase.description")}
               </p>
             </div>
 
             <div className="space-y-5 text-left sm:space-y-7">
-              {features.map((f, i) => (
+              {featureKeys.map((key, i) => (
                 <motion.div
-                  key={f.title}
+                  key={key}
                   initial={{ opacity: 0, y: 14 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -92,12 +80,12 @@ const ServiceShowcase = () => {
                   className="group flex items-start gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md md:gap-5"
                 >
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-2xl transition-all group-hover:bg-indigo-600 group-hover:text-white md:h-14 md:w-14">
-                    {f.icon}
+                    {featureIcons[key]}
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-slate-900 md:text-xl">{f.title}</h3>
+                    <h3 className="text-lg font-black text-slate-900 md:text-xl">{t(`home.showcase.features.${key}.title`)}</h3>
                     <p className="mt-1 text-sm font-medium leading-relaxed text-slate-500 md:text-base">
-                      {f.desc}
+                      {t(`home.showcase.features.${key}.desc`)}
                     </p>
                   </div>
                 </motion.div>
@@ -106,11 +94,10 @@ const ServiceShowcase = () => {
 
             <div className="pt-2">
               <button className="w-full rounded-2xl bg-indigo-600 px-10 py-4 text-sm font-black text-white shadow-xl shadow-indigo-200 transition-all hover:-translate-y-1 hover:bg-indigo-700 active:scale-95 sm:w-auto md:text-base">
-                Start 3-Month Free Trial
+                {t("home.showcase.cta")}
               </button>
             </div>
           </div>
-
         </div>
       </div>
     </section>

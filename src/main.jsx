@@ -5,10 +5,8 @@ import App from './App.jsx';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 
-// i18n — only loaded when VITE_I18N_ENABLED=true
-if (import.meta.env.VITE_I18N_ENABLED === 'true') {
-  await import('./i18n/index.js');
-}
+// i18n — EN / FR / AR, always active
+await import('./i18n/index.js');
 
 /**
  * 🚀 THE THEME ENGINE (CategoryProvider)

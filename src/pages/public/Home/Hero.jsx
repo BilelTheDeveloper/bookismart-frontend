@@ -1,7 +1,10 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const Hero = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="relative overflow-hidden bg-slate-950 pb-20 pt-28 sm:pt-32 md:pb-24 lg:pb-32 lg:pt-40">
       <div className="absolute inset-0">
@@ -30,16 +33,16 @@ const Hero = () => {
           className="mx-auto max-w-4xl text-center"
         >
           <span className="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">
-            Modern Booking Engine
+            {t("home.hero.badge")}
           </span>
           <h1 className="mt-6 text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
-            Book appointments faster with a
+            {t("home.hero.title")}
             <span className="block bg-gradient-to-r from-cyan-300 to-indigo-300 bg-clip-text text-transparent">
-              premium digital experience.
+              {t("home.hero.titleHighlight")}
             </span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-base font-medium leading-relaxed text-slate-300 sm:text-lg md:text-xl">
-            From salons to clinics, Bookiify helps clients book instantly while your team runs on autopilot.
+            {t("home.hero.description")}
           </p>
         </motion.div>
 
@@ -52,23 +55,23 @@ const Hero = () => {
           <div className="rounded-[2rem] border border-white/20 bg-white/95 p-2 shadow-[0_30px_80px_rgba(2,6,23,0.45)] md:rounded-full">
             <div className="flex flex-col gap-2 md:flex-row md:items-center">
               <div className="w-full px-5 py-3 text-left md:flex-1 md:border-r md:border-slate-100 md:px-7">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Service</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{t("home.hero.serviceLabel")}</span>
                 <input
                   type="text"
-                  placeholder="Hair Salon, Dentist, Therapist..."
+                  placeholder={t("home.hero.servicePlaceholder")}
                   className="mt-1 w-full bg-transparent text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-400 md:text-base"
                 />
               </div>
               <div className="w-full px-5 py-3 text-left md:flex-1 md:px-7">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">City</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{t("home.hero.cityLabel")}</span>
                 <input
                   type="text"
-                  placeholder="Tunis, Sousse, Sfax..."
+                  placeholder={t("home.hero.cityPlaceholder")}
                   className="mt-1 w-full bg-transparent text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-400 md:text-base"
                 />
               </div>
               <button className="mx-1 mb-1 mt-1 rounded-[1.3rem] bg-gradient-to-r from-indigo-600 to-cyan-500 px-8 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-cyan-500/25 transition-all hover:scale-[1.02] active:scale-95 md:mx-0 md:mb-0 md:mt-0 md:rounded-full md:px-10">
-                Search Now
+                {t("home.hero.searchBtn")}
               </button>
             </div>
           </div>

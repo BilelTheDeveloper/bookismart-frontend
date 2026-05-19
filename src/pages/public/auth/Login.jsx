@@ -7,6 +7,7 @@ import {
 import { login, twoFaVerify } from "../../../services/authService";
 import { useAuth } from "../../../context/AuthContext";
 import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 /* ─── tiny reusable input wrapper ─── */
 const InputRow = ({ icon: Icon, children, focus }) => (
@@ -19,6 +20,7 @@ const InputRow = ({ icon: Icon, children, focus }) => (
 const Login = () => {
   const navigate   = useNavigate();
   const { loginUser } = useAuth();
+  const { t } = useTranslation();
 
   /* ── credential form ── */
   const [formData, setFormData]     = useState({ email: "", password: "" });
@@ -153,10 +155,10 @@ const Login = () => {
             <span className="text-2xl font-black tracking-tighter">BOOKIIFY</span>
           </div>
           <h1 className="text-6xl font-black leading-tight mb-6">
-            Welcome <br /><span className="text-indigo-400">Back.</span>
+            {t("auth.welcomeTitle")}
           </h1>
           <p className="text-xl text-slate-200 leading-relaxed font-medium">
-            Log in to manage your bookings and grow your business today.
+            {t("auth.welcomeTagline")}
           </p>
           <div className="mt-12 flex gap-8">
             <div>
@@ -182,7 +184,7 @@ const Login = () => {
               onClick={() => { setTwoFaRequired(false); setTotpDigits(["","","","","",""]); setTwoFaError(""); }}
               className="flex items-center gap-2 text-slate-400 hover:text-slate-700 text-sm font-bold mb-8 transition-colors"
             >
-              <ArrowLeft size={16} /> Back to login
+              <ArrowLeft size={16} /> {t("auth.twoFaBackToLogin")}
             </button>
 
             {/* Icon + title */}
@@ -191,8 +193,8 @@ const Login = () => {
                 <KeyRound size={28} className="text-indigo-600" />
               </div>
               <div>
-                <h2 className="text-3xl font-black text-slate-900">Two-Factor Auth</h2>
-                <p className="text-slate-500 font-bold text-sm mt-0.5">Enter the 6-digit code from your authenticator app.</p>
+                <h2 className="text-3xl font-black text-slate-900">{t("auth.twoFaTitle")}</h2>
+                <p className="text-slate-500 font-bold text-sm mt-0.5">{t("auth.twoFaDesc")}</p>
               </div>
             </div>
 
@@ -226,11 +228,11 @@ const Login = () => {
               disabled={twoFaLoading || totpDigits.join("").length !== 6}
               className="w-full py-4 bg-indigo-600 text-white font-black rounded-2xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-60"
             >
-              {twoFaLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><span>VERIFY</span><ArrowRight size={18} /></>}
+              {twoFaLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><span>{t("auth.twoFaVerify")}</span><ArrowRight size={18} /></>}
             </button>
 
             <p className="mt-6 text-center text-xs text-slate-400 font-medium leading-relaxed">
-              Open <strong>Google Authenticator</strong>, <strong>Authy</strong>, or any TOTP app<br />and enter the current 6-digit code for Bookiify.
+              {t("auth.twoFaHint")}
             </p>
           </div>
 
@@ -238,20 +240,20 @@ const Login = () => {
           /* ── LOGIN FORM ── */
           <div className="w-full max-w-md">
             <div className="mb-10 text-left">
-              <h2 className="text-4xl font-black text-slate-900 mb-2">Sign In</h2>
-              <p className="text-slate-500 font-bold">Enter your details below.</p>
+              <h2 className="text-4xl font-black text-slate-900 mb-2">{t("auth.loginTitle")}</h2>
+              <p className="text-slate-500 font-bold">{t("auth.loginSubtitle")}</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Email */}
               <div className="space-y-2">
-                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
+                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("auth.emailLabel")}</label>
                 <InputRow icon={Mail} focus={emailFocus}>
                   <input
                     type="email"
                     required
                     className="w-full py-4 px-4 bg-transparent outline-none text-slate-900 font-bold placeholder:text-slate-300"
-                    placeholder="name@email.com"
+                    placeholder={t("auth.emailPlaceholder")}
                     onFocus={() => setEmailFocus(true)}
                     onBlur={() => setEmailFocus(false)}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -262,15 +264,15 @@ const Login = () => {
               {/* Password */}
               <div className="space-y-2">
                 <div className="flex justify-between px-1">
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Password</label>
-                  <Link to="/forgot-password" className="text-xs font-bold text-indigo-600 hover:underline">Forgot?</Link>
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{t("auth.passwordLabel")}</label>
+                  <Link to="/forgot-password" className="text-xs font-bold text-indigo-600 hover:underline">{t("auth.forgotPassword")}</Link>
                 </div>
                 <InputRow icon={Lock} focus={pwdFocus}>
                   <input
                     type={showPassword ? "text" : "password"}
                     required
                     className="w-full py-4 px-4 bg-transparent outline-none text-slate-900 font-bold placeholder:text-slate-300"
-                    placeholder="Your password"
+                    placeholder={t("auth.passwordPlaceholder")}
                     onFocus={() => setPwdFocus(true)}
                     onBlur={() => setPwdFocus(false)}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -291,13 +293,13 @@ const Login = () => {
                 disabled={loading}
                 className="w-full py-4 bg-indigo-600 text-white font-black rounded-2xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-70"
               >
-                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><span>LOG IN</span><ArrowRight size={18} /></>}
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><span>{t("auth.loginBtn")}</span><ArrowRight size={18} /></>}
               </button>
             </form>
 
             <p className="mt-8 text-center text-slate-500 font-bold text-sm">
-              Don't have an account?{" "}
-              <Link to="/signup" className="text-indigo-600 font-black hover:underline">Sign Up Now</Link>
+              {t("auth.noAccount")}{" "}
+              <Link to="/signup" className="text-indigo-600 font-black hover:underline">{t("auth.signUpNow")}</Link>
             </p>
           </div>
         )}
