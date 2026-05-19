@@ -6,7 +6,7 @@ import {
   Users, Clock, Zap, Shield, Copy, RefreshCw, ChevronRight,
   StickyNote, Tag, Trash2, AlertTriangle, Star, Heart,
   Settings2, RotateCcw, Loader2, ArrowRight, X, MessageSquare,
-  Bookmark, CheckCheck, Bell, User,
+  Bookmark, CheckCheck, Bell, User, Tv2, ExternalLink,
 } from "lucide-react";
 
 /* ─────────────────────────────────────────────────────── helpers */
@@ -342,6 +342,8 @@ const WorkMode = () => {
   const [checkpointData, setCheckpointData]   = useState({ summary: "", nextAction: "" });
   const [tickSeconds, setTickSeconds]         = useState(0);
   const [rightTab, setRightTab]   = useState("notes"); // notes | history
+  const [displaySlug, setDisplaySlug] = useState(null);
+  const [displayCopied, setDisplayCopied] = useState(false);
 
   const joinedRoomRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -373,6 +375,12 @@ const WorkMode = () => {
     loadAll({ force: true });
     const id = setInterval(() => { if (!document.hidden) loadAll(); }, 20_000);
     return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    API.get('/merchant/website/my-site')
+      .then(res => { if (res.data?.slug) setDisplaySlug(res.data.slug); })
+      .catch(() => {});
   }, []);
 
   /* ── Client-side countdown tick ── */
@@ -501,12 +509,40 @@ const WorkMode = () => {
             </div>
             <p className="font-black text-white text-sm">Work Mode</p>
           </div>
-          <button
-            onClick={() => setShowInvitePanel(p => !p)}
-            className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-500 hover:text-white transition-all"
-          >
-            <Settings2 size={15} />
-          </button>
+          <div className="flex items-center gap-1.5">
+            {displaySlug && (
+              <div className="relative flex items-center gap-1">
+                <a
+                  href={`/display/${displaySlug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Open waiting room display screen"
+                  className="p-1.5 rounded-lg hover:bg-indigo-500/20 text-slate-500 hover:text-indigo-400 transition-all"
+                >
+                  <Tv2 size={15} />
+                </a>
+                <button
+                  onClick={() => {
+                    const url = `${window.location.origin}/display/${displaySlug}`;
+                    navigator.clipboard.writeText(url).then(() => {
+                      setDisplayCopied(true);
+                      setTimeout(() => setDisplayCopied(false), 2000);
+                    });
+                  }}
+                  title="Copy display URL"
+                  className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-500 hover:text-white transition-all"
+                >
+                  {displayCopied ? <CheckCircle2 size={15} className="text-emerald-400" /> : <Copy size={15} />}
+                </button>
+              </div>
+            )}
+            <button
+              onClick={() => setShowInvitePanel(p => !p)}
+              className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-500 hover:text-white transition-all"
+            >
+              <Settings2 size={15} />
+            </button>
+          </div>
         </div>
 
         {/* Invite panel */}

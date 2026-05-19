@@ -81,6 +81,7 @@ import { StaffAuthProvider } from "./context/StaffAuthContext";
 import FindWorkPage from "./pages/public/FindWork/FindWorkPage";
 import JobDetailPage from "./pages/public/FindWork/JobDetailPage";
 import ReviewPage from "./pages/public/ReviewPage";
+import DisplayScreen from "./pages/public/DisplayScreen";
 
 /**
  * 🛡️ SECURITY WATCHDOG
@@ -130,11 +131,12 @@ const LayoutManager = ({ children }) => {
   const isProfilePreview = location.pathname.startsWith("/p/");
   const isBookingPage   = location.pathname.startsWith("/book/");
   const isReviewPage    = location.pathname.startsWith("/review/");
+  const isDisplayPage   = location.pathname.startsWith("/display/");
   const isCustomerPage  = location.pathname.startsWith("/customer");
   const isStaffPage     = location.pathname.startsWith("/staff");
 
   // 🛡️ Hide Chrome for high-immersion pages
-  const hideChrome = isSignupPage || isAuthPage || isAdminPage || isOwnerPage || isProfilePreview || isBookingPage || isReviewPage || isCustomerPage || isStaffPage;
+  const hideChrome = isSignupPage || isAuthPage || isAdminPage || isOwnerPage || isProfilePreview || isBookingPage || isReviewPage || isDisplayPage || isCustomerPage || isStaffPage;
 
   return (
     <>
@@ -164,6 +166,7 @@ function App() {
           <Route path="/p/:slug" element={<ProfilePreview />} />
           <Route path="/book/:merchantId" element={<BookingPage />} />
           <Route path="/review/:token" element={<ReviewPage />} />
+          <Route path="/display/:slug" element={<DisplayScreen />} />
           <Route path="/work-mode/worker" element={<WorkerWorkMode />} />
           <Route path="/find-work" element={<FindWorkPage />} />
           <Route path="/find-work/:id" element={<JobDetailPage />} />
