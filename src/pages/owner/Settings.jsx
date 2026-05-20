@@ -43,7 +43,7 @@ const Field = ({ label, children }) => (
   </div>
 );
 
-const inputClass = "w-full px-5 py-3.5 bg-slate-50 border-2 border-transparent rounded-2xl text-sm font-bold focus:bg-white focus:border-indigo-500 transition-all outline-none disabled:text-slate-400 disabled:cursor-not-allowed";
+const inputClass = "w-full px-3 sm:px-5 py-2.5 sm:py-3.5 bg-slate-50 border-2 border-transparent rounded-2xl text-sm font-bold focus:bg-white focus:border-indigo-500 transition-all outline-none disabled:text-slate-400 disabled:cursor-not-allowed";
 
 const TABS = [
   { id: "profile",       label: "Profile",       icon: UserCircle },

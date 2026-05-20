@@ -1,5 +1,6 @@
 import React from "react";
 import Hero from "./Hero";
+import FeaturedSection from "./FeaturedSection";
 import Categories from "./Categories";
 import ServiceShowcase from "./ServiceShowcase";
 import WhyBookiSmart from "./WhyBookiSmart";
@@ -10,6 +11,7 @@ const HomeLayout = () => {
     <div className="min-h-screen bg-slate-950">
       <main className="relative">
         <Hero />
+        <FeaturedSection />
         <Categories />
         <ServiceShowcase />
         <WhyBookiSmart />

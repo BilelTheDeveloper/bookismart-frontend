@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   MapPin, Star, Briefcase, Clock3, Loader2, Search, ChevronDown,
@@ -384,12 +384,18 @@ const StatCounter = ({ end, label, icon: Icon }) => {
 // ─── Main component ───────────────────────────────────────────────────────────
 const Professionals = () => {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
   const [professionals, setProfessionals] = useState([]);
   const [stats, setStats]       = useState(null);
   const [loading, setLoading]   = useState(true);
-  const [searchTerm, setSearchTerm]     = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [selectedCity, setSelectedCity] = useState("all");
+  const [searchTerm, setSearchTerm]     = useState(() => searchParams.get("service") || "");
+  const [debouncedSearch, setDebouncedSearch] = useState(() => searchParams.get("service") || "");
+  const [selectedCity, setSelectedCity] = useState(() => {
+    const c = searchParams.get("city");
+    if (!c) return "all";
+    const match = CITIES.find((city) => city.toLowerCase() === c.toLowerCase());
+    return match || "all";
+  });
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy]     = useState("rating");
   const [showFilters, setShowFilters] = useState(false);
@@ -475,7 +481,7 @@ const Professionals = () => {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* ── HERO ─────────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-slate-950 pb-20 pt-28 text-white sm:pt-36">
+      <section className="relative overflow-hidden bg-slate-950 pb-20 pt-28 text-white sm:pt-32 md:pt-36">
         {/* Animated blobs */}
         <div className="pointer-events-none absolute inset-0">
           <motion.div
@@ -563,7 +569,7 @@ const Professionals = () => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.45 }}
-              className="mx-auto mt-10 grid max-w-xl grid-cols-4 gap-4 border-t border-white/10 pt-8"
+              className="mx-auto mt-10 grid max-w-xl grid-cols-2 gap-4 border-t border-white/10 pt-8 sm:grid-cols-4"
             >
               <StatCounter end={stats.businesses} label={t("professionals.stats.professionals")} icon={Building2} />
               <StatCounter end={stats.cities}     label={t("professionals.stats.cities")}        icon={MapPin} />
@@ -575,7 +581,7 @@ const Professionals = () => {
       </section>
 
       {/* ── FILTER BAR ───────────────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm">
+      <div className="sticky top-[72px] z-30 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Main filter row */}
           <div className="flex items-center gap-3 py-3">

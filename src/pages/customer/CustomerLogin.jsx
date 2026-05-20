@@ -42,7 +42,7 @@ const CustomerLogin = () => {
 
       <div className="relative w-full max-w-md">
         {/* Card */}
-        <div className="bg-slate-900 border border-slate-800 rounded-[2rem] p-10 shadow-2xl shadow-black/60">
+        <div className="bg-slate-900 border border-slate-800 rounded-[2rem] p-6 sm:p-8 md:p-10 shadow-2xl shadow-black/60">
           {/* Logo */}
           <div className="text-center mb-10">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-600/20 border border-indigo-500/30 rounded-2xl mb-5">

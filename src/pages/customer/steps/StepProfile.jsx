@@ -48,7 +48,7 @@ const StepProfile = ({
   };
 
   return (
-    <div className="p-10">
+    <div className="p-5 sm:p-8 md:p-10">
       {/* Header */}
       <div className="flex flex-col items-center text-center mb-10">
         <div className="w-16 h-16 bg-blue-600/20 border border-blue-500/30 rounded-2xl flex items-center justify-center mb-5">

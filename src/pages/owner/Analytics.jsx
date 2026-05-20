@@ -174,7 +174,7 @@ const Analytics = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* Monthly Bookings Chart */}
-        <div className="lg:col-span-2 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+        <div className="lg:col-span-2 bg-white p-4 sm:p-6 lg:p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
               <BarChart3 className="text-indigo-600" /> Monthly Bookings
@@ -200,7 +200,7 @@ const Analytics = () => {
         </div>
 
         {/* Booking Status Breakdown */}
-        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+        <div className="bg-white p-4 sm:p-6 lg:p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
           <h3 className="text-xl font-black text-slate-900 mb-2 flex items-center gap-2">
             <CheckCircle2 className="text-indigo-600" /> Status Overview
           </h3>
@@ -227,7 +227,7 @@ const Analytics = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* Top Services */}
-        <div className="lg:col-span-2 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+        <div className="lg:col-span-2 bg-white p-4 sm:p-6 lg:p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
           <h3 className="text-xl font-black text-slate-900 mb-2 flex items-center gap-2">
             <MousePointer2 className="text-indigo-600" /> Top Services
           </h3>
@@ -274,7 +274,7 @@ const Analytics = () => {
         {/* Efficiency Panel */}
         <div className="flex flex-col gap-6">
           {/* Completion Rate */}
-          <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white flex-1 relative overflow-hidden">
+          <div className="bg-slate-900 rounded-[2.5rem] p-4 sm:p-6 lg:p-8 text-white flex-1 relative overflow-hidden">
             <div className="relative z-10">
               <p className="text-indigo-300 text-xs font-black uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
                 <Award size={12} /> Completion Rate

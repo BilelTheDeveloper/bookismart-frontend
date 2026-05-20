@@ -72,7 +72,7 @@ const Customers = () => {
     <div className="space-y-8 animate-in fade-in duration-700">
 
       {/* ── KPI row ── */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
         <div className="md:col-span-2 bg-indigo-600 rounded-[2.5rem] p-7 text-white flex items-center justify-between shadow-xl shadow-indigo-100 relative overflow-hidden">
           <div className="relative z-10">
             <p className="text-indigo-200 text-xs font-black uppercase tracking-widest mb-1">Portal Clients</p>
@@ -316,7 +316,7 @@ const Customers = () => {
       )}
 
       {/* Footer CTA */}
-      <div className="bg-slate-900 rounded-[3rem] p-10 text-white flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+      <div className="bg-slate-900 rounded-[2rem] sm:rounded-[3rem] p-5 sm:p-8 md:p-10 text-white flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
         <div className="relative z-10">
           <h3 className="text-2xl font-black italic">Need more customer insights?</h3>
           <p className="text-slate-400 font-medium mt-1">Export your data to CSV or connect with automated marketing tools.</p>

@@ -154,12 +154,12 @@ export default function FindWorkPage() {
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl" />
           <div className="absolute top-10 right-1/4 w-80 h-80 bg-violet-600/10 rounded-full blur-3xl" />
         </div>
-        <div className="relative max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
-          <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-sm font-bold px-4 py-2 rounded-full mb-6">
+        <div className="relative max-w-5xl mx-auto px-4 pt-28 pb-14 text-center sm:px-6 sm:pt-32 md:pb-16">
+          <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-sm font-bold px-4 py-2 rounded-full mb-5 sm:mb-6">
             <Zap size={14} className="text-indigo-400" />
             {total} Opportunities Available
           </div>
-          <h1 className="text-5xl md:text-6xl font-black tracking-tight leading-tight">
+          <h1 className="text-4xl font-black tracking-tight leading-tight sm:text-5xl md:text-6xl">
             Find Your Next<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-400">
               Opportunity
@@ -197,7 +197,7 @@ export default function FindWorkPage() {
       </div>
 
       {/* ── Filters ── */}
-      <div className="max-w-5xl mx-auto px-6 mb-8">
+      <div className="max-w-5xl mx-auto px-4 mb-8 sm:px-6">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="flex items-center gap-1.5 text-slate-500 text-sm font-semibold mr-2">
             <Filter size={14} /> Filter:
@@ -227,7 +227,7 @@ export default function FindWorkPage() {
       </div>
 
       {/* ── Grid ── */}
-      <div className="max-w-5xl mx-auto px-6 pb-20">
+      <div className="max-w-5xl mx-auto px-4 pb-20 sm:px-6">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
             <Loader2 size={36} className="text-indigo-500 animate-spin" />

@@ -81,7 +81,7 @@ const CustomerLoyalty = () => {
           <h3 className="text-white font-black">Stamp Card</h3>
           <span className="text-slate-400 text-sm font-bold">{stamps}/{maxStamps}</span>
         </div>
-        <div className="grid grid-cols-5 gap-3 mb-6">
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-6">
           {Array.from({ length: maxStamps }).map((_, i) => (
             <div key={i} className={`aspect-square rounded-xl border-2 flex items-center justify-center transition-all ${
               i < stamps

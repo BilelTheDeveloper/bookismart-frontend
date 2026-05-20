@@ -30,9 +30,9 @@ const CustomerProfile = () => {
   return (
     <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in duration-500">
       {/* Hero card */}
-      <div className="relative bg-gradient-to-br from-indigo-900/50 via-slate-900 to-slate-900 border border-indigo-500/20 rounded-[2rem] p-8 overflow-hidden">
+      <div className="relative bg-gradient-to-br from-indigo-900/50 via-slate-900 to-slate-900 border border-indigo-500/20 rounded-[2rem] p-4 sm:p-6 lg:p-8 overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none" />
-        <div className="relative flex items-center gap-6">
+        <div className="relative flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
           {customer.profilePicture ? (
             <img
               src={customer.profilePicture}

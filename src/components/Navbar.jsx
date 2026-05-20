@@ -342,7 +342,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`absolute left-0 top-full w-full px-4 pt-2 lg:hidden transition-all duration-300 origin-top ${
+        className={`absolute left-0 top-full w-full px-4 pt-2 pb-2 lg:hidden transition-all duration-300 origin-top ${
           isMobileMenuOpen ? "opacity-100 scale-y-100 pointer-events-auto" : "opacity-0 scale-y-0 pointer-events-none"
         }`}
       >

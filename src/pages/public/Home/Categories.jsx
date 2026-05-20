@@ -31,7 +31,7 @@ const Categories = () => {
             <Sparkles size={14} />
             {t("home.categories.badge")}
           </span>
-          <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl md:text-5xl">
+          <h2 className="mt-3 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl md:text-4xl lg:text-5xl">
             {t("home.categories.title")} <span className="text-indigo-600">{t("home.categories.titleHighlight")}</span> {t("home.categories.titleSuffix")}
           </h2>
           <p className="mt-4 max-w-2xl text-base font-medium text-slate-500 sm:text-lg">
@@ -92,7 +92,7 @@ const Categories = () => {
               animate={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
               exit={{ opacity: 0, scale: 0.94, y: 24 }}
               transition={{ type: "spring", stiffness: 230, damping: 24 }}
-              className="relative w-full max-w-lg rounded-[2rem] border border-slate-100 bg-white p-6 shadow-2xl sm:p-8"
+              className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-[2rem] border border-slate-100 bg-white p-6 shadow-2xl sm:p-8"
               style={{ transformStyle: "preserve-3d" }}
             >
               <button

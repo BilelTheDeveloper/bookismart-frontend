@@ -165,7 +165,7 @@ export default function Chat() {
   const [customers, setCustomers]       = useState([]);
   const [typing, setTyping]             = useState('');
   const [search, setSearch]             = useState('');
-  const [sidebarOpen, setSidebarOpen]   = useState(true);
+  const [sidebarOpen, setSidebarOpen]   = useState(() => window.innerWidth >= 1024);
   const socketRef   = useRef(null);
   const bottomRef   = useRef(null);
   const inputRef    = useRef(null);
@@ -272,10 +272,15 @@ export default function Chat() {
   const totalUnread   = rooms.reduce((s, r) => s + (r.unreadCounts?.get?.(user._id) || 0), 0);
 
   return (
-    <div className="flex h-[calc(100vh-11rem)] bg-[#0d1117] rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
+    <div className="relative flex h-[calc(100vh-8rem)] sm:h-[calc(100vh-9rem)] lg:h-[calc(100vh-11rem)] bg-[#0d1117] rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
+
+      {/* Mobile overlay backdrop */}
+      {sidebarOpen && (
+        <div className="absolute inset-0 bg-black/50 z-10 lg:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
 
       {/* ── LEFT: Rooms sidebar ── */}
-      <div className={`${sidebarOpen ? 'w-72' : 'w-0 overflow-hidden'} flex-shrink-0 flex flex-col border-r border-slate-800 transition-all duration-300`}>
+      <div className={`absolute inset-y-0 left-0 z-20 lg:relative lg:z-auto flex-shrink-0 flex flex-col border-r border-slate-800 transition-all duration-300 ${sidebarOpen ? 'w-72' : 'w-0 overflow-hidden'}`}>
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-4 border-b border-slate-800">
           <div className="flex items-center gap-2">

@@ -119,7 +119,7 @@ const PermissionsEditor = ({ allowedPages = [], onChange }) => {
       </div>
 
       {/* Page toggles */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
         {ALL_PAGES.map(page => {
           const Icon = page.icon;
           const on = selectedKeys.includes(page.key);

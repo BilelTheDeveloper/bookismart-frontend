@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import Sidebar, { getAccessState, getTrialDaysLeft } from "./Sidebar";
+import { Menu } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationContext";
 import API from "../../api/config";
@@ -11,7 +12,7 @@ import {
   LogOut, Globe, X, CheckCheck, Trash2, BookOpen, Star,
   ShieldCheck, Zap, MessageSquare, Users, AlertCircle, CreditCard,
   FileText, CheckCircle2, XCircle, Loader2, Command, BadgeCheck,
-  Moon, Sun, HelpCircle, ChevronRight,
+  Moon, Sun, HelpCircle, ChevronRight, MenuIcon,
 } from "lucide-react";
 
 /* ── Notification type meta ── */
@@ -149,7 +150,7 @@ function NotificationDropdown({ onClose }) {
   };
 
   return (
-    <div className="absolute right-0 mt-3 w-[400px] bg-[#0d1117] border border-slate-700/60 rounded-2xl shadow-2xl shadow-black/60 z-50 flex flex-col overflow-hidden max-h-[560px]">
+    <div className="absolute right-0 mt-3 w-[calc(100vw-2rem)] max-w-[400px] bg-[#0d1117] border border-slate-700/60 rounded-2xl shadow-2xl shadow-black/60 z-50 flex flex-col overflow-hidden max-h-[80vh] sm:max-h-[560px]">
 
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3.5 border-b border-slate-800">
@@ -378,11 +379,11 @@ function AccessBanner({ user }) {
 
   if (accessState === "unverified") {
     return (
-      <div className="flex items-center gap-3 px-8 py-3 border-b bg-amber-50 border-amber-200 text-amber-800 text-sm font-bold">
+      <div className="flex flex-wrap items-center gap-2 px-4 py-3 border-b bg-amber-50 border-amber-200 text-amber-800 text-xs font-bold sm:flex-nowrap sm:gap-3 sm:px-8 sm:text-sm">
         <ShieldCheck size={16} className="text-amber-600 flex-shrink-0" />
-        <span>{isRejected ? "Your KYC was rejected. Please resubmit with the correct documents." : "Your account is not yet verified."}</span>
-        <Link to="/owner/dashboard/kyc" className="ml-1 underline hover:no-underline font-black whitespace-nowrap">
-          {isRejected ? "Resubmit Documents →" : "Complete KYC Verification →"}
+        <span className="flex-1">{isRejected ? "Your KYC was rejected. Please resubmit with the correct documents." : "Your account is not yet verified."}</span>
+        <Link to="/owner/dashboard/kyc" className="underline hover:no-underline font-black whitespace-nowrap">
+          {isRejected ? "Resubmit →" : "Complete KYC →"}
         </Link>
       </div>
     );
@@ -390,21 +391,19 @@ function AccessBanner({ user }) {
 
   if (accessState === "review") {
     return (
-      <div className="flex items-center gap-3 px-8 py-3 border-b bg-blue-50 border-blue-200 text-blue-800 text-sm font-bold">
+      <div className="flex items-center gap-2 px-4 py-3 border-b bg-blue-50 border-blue-200 text-blue-800 text-xs font-bold sm:gap-3 sm:px-8 sm:text-sm">
         <CheckCircle2 size={16} className="text-blue-500 flex-shrink-0" />
-        <span>Your identity documents are under review. We&apos;ll notify you by email within 24 hours.</span>
+        <span>Your identity documents are under review. We&apos;ll notify you within 24 hours.</span>
       </div>
     );
   }
 
   if (accessState === "expired") {
     return (
-      <div className="flex items-center gap-3 px-8 py-3 border-b bg-rose-50 border-rose-200 text-rose-800 text-sm font-bold">
+      <div className="flex flex-wrap items-center gap-2 px-4 py-3 border-b bg-rose-50 border-rose-200 text-rose-800 text-xs font-bold sm:flex-nowrap sm:gap-3 sm:px-8 sm:text-sm">
         <XCircle size={16} className="text-rose-500 flex-shrink-0" />
-        <span>Your free trial has expired. Upgrade your plan to continue using all features.</span>
-        <Link to="/owner/dashboard/billing" className="ml-1 underline hover:no-underline font-black whitespace-nowrap">
-          Upgrade Now →
-        </Link>
+        <span className="flex-1">Your free trial has expired. Upgrade your plan to continue.</span>
+        <Link to="/owner/dashboard/billing" className="underline hover:no-underline font-black whitespace-nowrap">Upgrade Now →</Link>
       </div>
     );
   }
@@ -412,7 +411,7 @@ function AccessBanner({ user }) {
   if (accessState === "trial" && daysLeft <= 30) {
     const urgent = daysLeft <= 7;
     return (
-      <div className={`flex items-center gap-3 px-8 py-3 border-b ${urgent ? "bg-rose-50 border-rose-200 text-rose-800" : "bg-amber-50 border-amber-200 text-amber-800"} text-sm font-bold`}>
+      <div className={`flex flex-wrap items-center gap-2 px-4 py-3 border-b sm:gap-3 sm:px-8 text-xs sm:text-sm font-bold ${urgent ? "bg-rose-50 border-rose-200 text-rose-800" : "bg-amber-50 border-amber-200 text-amber-800"}`}>
         <Loader2 size={16} className={`flex-shrink-0 ${urgent ? "text-rose-500" : "text-amber-600"}`} />
         <span>
           {urgent
@@ -455,14 +454,15 @@ const DashboardLayout = () => {
     }
   }, [location.pathname, user, navigate]);
 
-  const [isCollapsed,   setIsCollapsed]   = useState(true);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isNotifOpen,   setIsNotifOpen]   = useState(false);
-  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
-  const [isHelpOpen,    setIsHelpOpen]    = useState(false);
-  const [isLangOpen,    setIsLangOpen]    = useState(false);
-  const [lang,          setLang]          = useState(() => localStorage.getItem("bookiify_lang") || "FR");
-  const [isDark,        setIsDark]        = useState(() => localStorage.getItem("bookiify_theme") === "dark");
+  const [isCollapsed,    setIsCollapsed]   = useState(true);
+  const [isMobileOpen,   setIsMobileOpen]  = useState(false);
+  const [isProfileOpen,  setIsProfileOpen] = useState(false);
+  const [isNotifOpen,    setIsNotifOpen]   = useState(false);
+  const [isPaletteOpen,  setIsPaletteOpen] = useState(false);
+  const [isHelpOpen,     setIsHelpOpen]    = useState(false);
+  const [isLangOpen,     setIsLangOpen]    = useState(false);
+  const [lang,           setLang]          = useState(() => localStorage.getItem("bookiify_lang") || "FR");
+  const [isDark,         setIsDark]        = useState(() => localStorage.getItem("bookiify_theme") === "dark");
 
   const profileRef = useRef(null);
   const notifRef   = useRef(null);
@@ -506,29 +506,47 @@ const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 flex">
-      {/* SIDEBAR */}
-      <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+      {/* Mobile overlay */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
+      {/* SIDEBAR — hidden on mobile, shown as overlay when isMobileOpen */}
+      <div className={`lg:block ${isMobileOpen ? "block" : "hidden"}`}>
+        <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} onMobileClose={() => setIsMobileOpen(false)} />
+      </div>
 
       {/* MAIN */}
-      <main className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${isCollapsed ? "ml-20" : "ml-64"}`}>
+      <main className={`flex-1 flex flex-col min-h-screen transition-all duration-300 lg:${isCollapsed ? "ml-[72px]" : "ml-64"}`}>
 
         {/* ── HEADER ── */}
-        <header className="h-20 bg-white/80 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 px-8 flex items-center justify-between gap-4">
+        <header className="h-16 sm:h-20 bg-white/80 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 px-4 sm:px-8 flex items-center justify-between gap-3">
+
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setIsMobileOpen(true)}
+            className="lg:hidden p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+          >
+            <Menu size={22} />
+          </button>
 
           {/* Command search bar (opens palette) */}
           <button
             onClick={() => setIsPaletteOpen(true)}
-            className="relative w-80 flex items-center gap-3 pl-4 pr-3 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border-2 border-transparent hover:border-indigo-200 rounded-2xl text-sm transition-all group text-left"
+            className="relative flex-1 max-w-xs sm:max-w-sm lg:max-w-sm flex items-center gap-2 sm:gap-3 pl-3 sm:pl-4 pr-2 sm:pr-3 py-2 sm:py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border-2 border-transparent hover:border-indigo-200 rounded-2xl text-sm transition-all group text-left"
           >
             <Search className="h-4 w-4 text-slate-400 flex-shrink-0" />
-            <span className="text-slate-400 dark:text-slate-500 font-medium flex-1">Search anything…</span>
+            <span className="text-slate-400 dark:text-slate-500 font-medium flex-1 truncate text-xs sm:text-sm">Search…</span>
             <kbd className="hidden sm:flex items-center gap-0.5 px-2 py-1 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 text-[10px] font-black rounded-lg shadow-sm flex-shrink-0">
               <Command size={10} /> K
             </kbd>
           </button>
 
           {/* Right side */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
 
             {/* Language toggle */}
             <div className="relative" ref={langRef}>
@@ -666,7 +684,7 @@ const DashboardLayout = () => {
         <AccessBanner user={user} />
 
         {/* ── PAGE CONTENT ── */}
-        <div className="p-8 flex-1 dark:bg-slate-950">
+        <div className="p-4 sm:p-6 lg:p-8 flex-1 dark:bg-slate-950">
           <div className="max-w-7xl mx-auto">
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
               <Outlet />

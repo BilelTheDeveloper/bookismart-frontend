@@ -9,8 +9,8 @@ const Footer = () => {
     <footer className="bg-slate-900 text-white pt-24 pb-12 overflow-hidden relative">
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="container mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8 mb-16 sm:mb-20">
 
           {/* Brand Column */}
           <div className="space-y-6">
@@ -94,7 +94,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="pt-10 border-t border-white/5 flex flex-col items-center gap-4 text-center sm:flex-row sm:justify-between sm:text-left">
           <p className="text-slate-500 text-xs font-bold tracking-widest uppercase">
             {t("footer.copyright", { year: currentYear })}
           </p>

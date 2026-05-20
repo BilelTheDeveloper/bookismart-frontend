@@ -253,7 +253,7 @@ function StateCTA({ accessState, isRejected, daysLeft, isCollapsed }) {
 }
 
 /* ─── Main Sidebar ─── */
-const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
+const Sidebar = ({ isCollapsed, setIsCollapsed, onMobileClose }) => {
   const location   = useLocation();
   const navigate   = useNavigate();
   const { user }   = useAuth();
@@ -382,6 +382,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
                   >
                     <Link
                       to={item.path}
+                      onClick={() => onMobileClose?.()}
                       className={`flex items-center gap-3.5 rounded-xl transition-all duration-200 font-semibold relative overflow-hidden group ${
                         isCollapsed ? "w-11 h-11 justify-center mx-auto" : "px-3.5 py-2.5"
                       } ${active ? "text-white" : "text-slate-400 hover:text-white"}`}

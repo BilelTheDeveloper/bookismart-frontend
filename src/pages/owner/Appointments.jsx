@@ -285,7 +285,7 @@ const RescheduleModal = ({ booking, onClose, onSuccess }) => {
                 <p className="text-slate-400 text-sm">No slots available</p>
               </div>
             ) : (
-              <div className="grid grid-cols-4 gap-2 max-h-36 overflow-y-auto">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 max-h-36 overflow-y-auto">
                 {slots.map(({ time, available }) => (
                   <button
                     key={time}

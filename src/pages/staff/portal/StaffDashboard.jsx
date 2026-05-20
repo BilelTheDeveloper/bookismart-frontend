@@ -37,7 +37,7 @@ const StaffDashboard = () => {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Hero greeting */}
-      <div className="bg-gradient-to-br from-violet-600/20 to-indigo-600/10 border border-violet-500/20 rounded-[2rem] p-8">
+      <div className="bg-gradient-to-br from-violet-600/20 to-indigo-600/10 border border-violet-500/20 rounded-[2rem] p-4 sm:p-6 lg:p-8">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-violet-400 text-xs font-black uppercase tracking-widest mb-2">

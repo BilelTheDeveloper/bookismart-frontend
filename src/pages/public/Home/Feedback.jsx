@@ -274,7 +274,7 @@ const Feedback = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="mt-16 flex flex-wrap justify-center gap-8 border-t border-slate-200 pt-12 md:gap-20"
+          className="mt-14 flex flex-wrap justify-center gap-5 border-t border-slate-200 pt-10 sm:gap-10 md:gap-20"
         >
           {(t("home.feedback.words", { returnObjects: true }) || ["RELIABLE", "SECURE", "SMART", "FAST"]).map((word, i) => (
             <motion.span

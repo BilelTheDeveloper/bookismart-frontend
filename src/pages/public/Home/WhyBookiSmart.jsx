@@ -21,16 +21,16 @@ const WhyBookiSmart = () => {
     <section className="overflow-hidden bg-white py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto mb-16 max-w-3xl text-center md:mb-20">
-          <h2 className="text-4xl font-black leading-tight tracking-tight text-slate-900 md:text-6xl">
+          <h2 className="text-3xl font-black leading-tight tracking-tight text-slate-900 sm:text-4xl md:text-5xl lg:text-6xl">
             {t("home.why.title")} <span className="text-indigo-600">{t("home.why.pros")}</span>,<br />
             {t("home.why.titleBreak")} <span className="text-cyan-500">{t("home.why.clients")}</span>
           </h2>
-          <p className="mt-6 text-lg font-medium text-slate-500">
+          <p className="mt-5 text-base font-medium text-slate-500 sm:text-lg">
             {t("home.why.description")}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2 lg:gap-10">
+        <div className="grid grid-cols-1 items-stretch gap-6 sm:gap-8 lg:grid-cols-2 lg:gap-10">
           <motion.div
             initial={{ opacity: 0, x: -24 }}
             whileInView={{ opacity: 1, x: 0 }}

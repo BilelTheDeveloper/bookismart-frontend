@@ -270,7 +270,7 @@ const StepKYC = ({ token, onSuccess, api = CAPI, pathBase = "/customer/register"
   };
 
   return (
-    <div className="p-10 space-y-10">
+    <div className="p-5 sm:p-8 md:p-10 space-y-6 sm:space-y-10">
       {/* Header */}
       <div className="text-center">
         <div className="w-16 h-16 bg-emerald-600/20 border border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto mb-5">

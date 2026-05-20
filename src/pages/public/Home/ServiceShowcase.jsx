@@ -11,7 +11,7 @@ const ServiceShowcase = () => {
   return (
     <section className="overflow-hidden bg-slate-50 py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center gap-14 lg:flex-row lg:gap-20">
+        <div className="flex flex-col items-center gap-10 sm:gap-14 lg:flex-row lg:gap-20">
           <div className="relative order-2 w-full lg:order-1 lg:flex-1">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
