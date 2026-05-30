@@ -63,6 +63,7 @@ import { CustomerAuthProvider } from "./context/CustomerAuthContext";
 
 // --- Owner: Customer access ---
 import CustomerAccessPage from "./pages/owner/CustomerAccessPage";
+import QueueManager from "./pages/owner/QueueManager";
 
 // --- Admin: Customer + Staff review ---
 import AdminCustomers from "./pages/admin/AdminCustomers";
@@ -223,6 +224,7 @@ function App() {
             <Route path="dashboard/staff"       element={<Staff />} />
             <Route path="dashboard/chat"        element={<Chat />} />
             <Route path="dashboard/smart-ai"    element={<SmartAssistant />} />
+            <Route path="dashboard/queue"       element={<QueueManager />} />
           </Route>
           
           {/* --- 5. Customer Registration (public, no auth) --- */}

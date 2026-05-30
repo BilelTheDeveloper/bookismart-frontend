@@ -53,11 +53,19 @@ const WebcamCapture = ({ onCapture, label, hint, overlayShape = "oval" }) => {
     const video  = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
+    if (!video.videoWidth || !video.videoHeight) {
+      setError("Camera isn't ready yet. Please wait a moment and try again.");
+      return;
+    }
     canvas.width  = video.videoWidth;
     canvas.height = video.videoHeight;
     const ctx = canvas.getContext("2d");
     ctx.drawImage(video, 0, 0);
     const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+    if (!dataUrl || !dataUrl.startsWith("data:image/")) {
+      setError("Capture failed. Please try again.");
+      return;
+    }
     setCaptured(dataUrl);
     onCapture(dataUrl);
     stopCamera();
@@ -248,7 +256,8 @@ const StepKYC = ({ token, onSuccess, api = CAPI, pathBase = "/customer/register"
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState("");
 
-  const allReady = liveness && idFront && idBack;
+  const isValidDataUrl = (url) => url && url.startsWith("data:image/");
+  const allReady = isValidDataUrl(liveness) && isValidDataUrl(idFront) && isValidDataUrl(idBack);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

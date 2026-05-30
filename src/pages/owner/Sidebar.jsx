@@ -7,7 +7,7 @@ import {
   BarChart3, LogOut, ChevronLeft, ChevronRight, Wallet, Palette,
   Power, FileText, Star, Briefcase, Globe, Zap, Sparkles,
   ShieldCheck, Lock, MessageSquare, BadgeCheck, Clock,
-  AlertTriangle, RefreshCw,
+  AlertTriangle, RefreshCw, MonitorPlay,
 } from "lucide-react";
 
 /* ─── Access State Helpers ─── */
@@ -40,6 +40,7 @@ const NAV_SECTIONS = [
     label: "Management",
     items: [
       { name: "Appointments", icon: CalendarCheck,  path: "/owner/dashboard/bookings"    },
+      { name: "Queue Screen", icon: MonitorPlay,    path: "/owner/dashboard/queue"       },
       { name: "Customers",    icon: Users,          path: "/owner/dashboard/customers"   },
       { name: "Recruitment",  icon: Briefcase,      path: "/owner/dashboard/recruitment" },
       { name: "Staff",        icon: Users,          path: "/owner/dashboard/staff"       },
