@@ -53,14 +53,21 @@ const WebcamCapture = ({ onCapture, label, hint, overlayShape = "oval" }) => {
     const video  = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
-    if (!video.videoWidth || !video.videoHeight) {
+
+    // videoWidth can be 0 on Firefox / some mobile cameras even while playing —
+    // fall back to the rendered element size so the draw always has valid dimensions.
+    const w = video.videoWidth  || video.clientWidth  || 640;
+    const h = video.videoHeight || video.clientHeight || 480;
+
+    if (!w || !h) {
       setError("Camera isn't ready yet. Please wait a moment and try again.");
       return;
     }
-    canvas.width  = video.videoWidth;
-    canvas.height = video.videoHeight;
+
+    canvas.width  = w;
+    canvas.height = h;
     const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0);
+    ctx.drawImage(video, 0, 0, w, h);
     const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
     if (!dataUrl || !dataUrl.startsWith("data:image/")) {
       setError("Capture failed. Please try again.");
