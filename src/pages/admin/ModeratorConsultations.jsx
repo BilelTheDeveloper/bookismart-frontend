@@ -46,22 +46,22 @@ const ModeratorConsultations = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-black text-slate-900">Moderator Console</h2>
+        <h2 className="text-3xl font-black text-slate-900 dark:text-white">Moderator Console</h2>
         <p className="text-slate-500 font-medium">Live owner coordination and next-client readiness.</p>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-5">
-        <section className="bg-white rounded-3xl border p-5 space-y-3">
-          <h3 className="font-black text-slate-800">Live Queue</h3>
+        <section className="bg-white dark:bg-slate-900 rounded-3xl border p-5 space-y-3">
+          <h3 className="font-black text-slate-800 dark:text-slate-100">Live Queue</h3>
           {queue.map((c) => (
-            <button key={c._id} onClick={() => setSelected(c)} className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-indigo-50 border border-slate-100">
-              <p className="font-bold text-slate-800">{c.customerName}</p>
+            <button key={c._id} onClick={() => setSelected(c)} className="w-full text-left p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-indigo-50 border border-slate-100 dark:border-slate-800">
+              <p className="font-bold text-slate-800 dark:text-slate-100">{c.customerName}</p>
               <p className="text-xs text-slate-500">{c.ownerId?.businessName || "Owner"} · {c.serviceTitle}</p>
               <p className="text-xs text-slate-500">{c.dateString} {c.timeSlot} · {formatTimeLeft(c.remainingSeconds)}</p>
             </button>
           ))}
           {recentlyDone.length > 0 && (
-            <div className="pt-3 mt-2 border-t border-slate-100">
+            <div className="pt-3 mt-2 border-t border-slate-100 dark:border-slate-800">
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Recently Done</p>
               {recentlyDone.map((c) => (
                 <div key={c._id} className="p-2 rounded-xl bg-emerald-50 border border-emerald-100 mb-2">
@@ -73,12 +73,12 @@ const ModeratorConsultations = () => {
           )}
         </section>
 
-        <section className="lg:col-span-2 bg-white rounded-3xl border p-5">
+        <section className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl border p-5">
           {selected ? (
             <div className="space-y-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-xl font-black text-slate-900">{selected.customerName}</h3>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white">{selected.customerName}</h3>
                   <p className="text-sm text-slate-500">{selected.serviceTitle} · {selected.serviceDurationMinutes} min</p>
                 </div>
                 <span className="px-3 py-2 rounded-xl bg-indigo-100 text-indigo-700 font-black text-sm">{formatTimeLeft(selected.remainingSeconds)}</span>
@@ -86,7 +86,7 @@ const ModeratorConsultations = () => {
 
               <div className="rounded-2xl border p-3 h-72 overflow-y-auto bg-slate-50">
                 {(selected.messages || []).map((m) => (
-                  <div key={m._id} className={`mb-2 p-2 rounded-lg text-sm ${m.senderRole === "moderator" ? "bg-indigo-100 text-indigo-800" : "bg-white border text-slate-700"}`}>
+                  <div key={m._id} className={`mb-2 p-2 rounded-lg text-sm ${m.senderRole === "moderator" ? "bg-indigo-100 text-indigo-800" : "bg-white dark:bg-slate-900 border text-slate-700 dark:text-slate-200"}`}>
                     <p className="text-[10px] font-black uppercase mb-1">{m.senderRole}</p>
                     {m.text}
                   </div>
@@ -94,7 +94,7 @@ const ModeratorConsultations = () => {
               </div>
 
               <div className="flex gap-2">
-                <input value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Inform owner / next client readiness..." className="flex-1 p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm outline-none" />
+                <input value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Inform owner / next client readiness..." className="flex-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-sm outline-none" />
                 <button onClick={sendMessage} className="px-4 rounded-xl bg-indigo-600 text-white"><Send size={16} /></button>
               </div>
 
@@ -102,7 +102,7 @@ const ModeratorConsultations = () => {
                 <button onClick={() => setMessage("Current consultation ended. Please notify the next client to be ready.")} className="py-3 rounded-xl bg-emerald-100 text-emerald-700 font-bold text-sm">
                   <BellRing size={16} className="inline mr-2" /> Next Client Ready
                 </button>
-                <button onClick={() => setMessage("Please update me if you need additional support during this consultation.")} className="py-3 rounded-xl bg-slate-100 text-slate-700 font-bold text-sm">
+                <button onClick={() => setMessage("Please update me if you need additional support during this consultation.")} className="py-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-sm">
                   Owner Follow-up
                 </button>
               </div>

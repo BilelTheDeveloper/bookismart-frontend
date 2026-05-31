@@ -789,6 +789,35 @@
       "staffSeats": "{{count}} مقاعد للموظفين"
     }
   },
+  "portal": {
+    "clientPortal": "بوابة العميل",
+    "staffPortal": "بوابة الموظفين",
+    "dashboard": "لوحة التحكم",
+    "myAccess": "صلاحياتي",
+    "noPages": "لا توجد صفحات مخصّصة بعد. تواصل مع مديرك.",
+    "signOut": "تسجيل الخروج",
+    "signingOut": "جارٍ تسجيل الخروج…",
+    "nav": {
+      "profile": "ملفي الشخصي",
+      "appointments": "المواعيد",
+      "invoices": "الفواتير",
+      "loyalty": "نقاط الولاء",
+      "booking": "حجز خدمة",
+      "session": "جلستي",
+      "bookings": "الحجوزات",
+      "customers": "العملاء",
+      "finance": "المالية",
+      "chat": "المحادثة",
+      "workMode": "وضع العمل",
+      "recruitment": "التوظيف",
+      "analytics": "الإحصائيات"
+    }
+  },
+  "admin": {
+    "access": "وصول المسؤول",
+    "control": "التحكم بالنظام",
+    "badge": "مسؤول"
+  },
   "common": {
     "loading": "جار التحميل...",
     "error": "حدث خطأ ما.",

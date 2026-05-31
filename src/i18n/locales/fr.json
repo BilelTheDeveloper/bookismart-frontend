@@ -789,6 +789,35 @@
       "staffSeats": "{{count}} sièges staff"
     }
   },
+  "portal": {
+    "clientPortal": "Espace Client",
+    "staffPortal": "Espace Personnel",
+    "dashboard": "Tableau de bord",
+    "myAccess": "Mes accès",
+    "noPages": "Aucune page attribuée pour l'instant. Contactez votre responsable.",
+    "signOut": "Se déconnecter",
+    "signingOut": "Déconnexion…",
+    "nav": {
+      "profile": "Mon profil",
+      "appointments": "Rendez-vous",
+      "invoices": "Factures",
+      "loyalty": "Points de fidélité",
+      "booking": "Réserver un service",
+      "session": "Ma session",
+      "bookings": "Réservations",
+      "customers": "Clients",
+      "finance": "Finances",
+      "chat": "Messagerie",
+      "workMode": "Mode Travail",
+      "recruitment": "Recrutement",
+      "analytics": "Statistiques"
+    }
+  },
+  "admin": {
+    "access": "Accès administrateur",
+    "control": "Contrôle système",
+    "badge": "Admin"
+  },
   "common": {
     "loading": "Chargement...",
     "error": "Une erreur est survenue.",

@@ -83,16 +83,16 @@ const IdentityVerify = () => {
   );
 
   return (
-    <div className="p-4 md:p-8 space-y-8 bg-slate-50 min-h-screen font-sans">
+    <div className="p-4 md:p-8 space-y-8 bg-slate-50 dark:bg-slate-800/60 min-h-screen font-sans">
       {/* --- STATS SECTION --- */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <motion.div 
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm flex items-center justify-between"
+          className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between"
         >
           <div>
             <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Queue Priority</p>
-            <h3 className="text-4xl font-black text-slate-900">{requests.length}</h3>
+            <h3 className="text-4xl font-black text-slate-900 dark:text-white">{requests.length}</h3>
           </div>
           <div className="bg-indigo-50 p-4 rounded-3xl"><ShieldCheck className="text-indigo-600 w-8 h-8" /></div>
         </motion.div>
@@ -101,13 +101,13 @@ const IdentityVerify = () => {
       {/* --- DATA TABLE --- */}
       <motion.div 
         initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-        className="bg-white rounded-[3rem] border border-slate-200 shadow-xl overflow-hidden"
+        className="bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden"
       >
-        <div className="p-8 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4">
-          <h2 className="text-2xl font-black text-slate-900 tracking-tighter">Identity Verification Queue</h2>
+        <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex flex-wrap justify-between items-center gap-4">
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">Identity Verification Queue</h2>
           <button 
             onClick={fetchRequests} 
-            className="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 px-6 py-3 rounded-2xl text-xs font-black transition-all"
+            className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:bg-slate-800 px-6 py-3 rounded-2xl text-xs font-black transition-all"
           >
             <RefreshCcw className="w-4 h-4" /> REFRESH
           </button>
@@ -133,7 +133,7 @@ const IdentityVerify = () => {
                         {user.fullName[0]}
                       </div>
                       <div>
-                        <p className="font-black text-slate-900">{user.fullName}</p>
+                        <p className="font-black text-slate-900 dark:text-white">{user.fullName}</p>
                         <p className="text-xs text-slate-400 font-medium">{user.email}</p>
                       </div>
                     </div>
@@ -142,7 +142,7 @@ const IdentityVerify = () => {
                     <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[9px] font-black uppercase tracking-tighter">
                       {user.category}
                     </span>
-                    <p className="mt-1.5 font-bold text-sm text-slate-700">{user.businessName} • {user.ville}</p>
+                    <p className="mt-1.5 font-bold text-sm text-slate-700 dark:text-slate-200">{user.businessName} • {user.ville}</p>
                   </td>
                   <td className="p-6 text-right">
                     <button 
@@ -167,15 +167,15 @@ const IdentityVerify = () => {
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
               className="bg-white w-full max-w-6xl max-h-[90vh] rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col"
             >
-              <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-white">
+              <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white">
                 <div>
-                  <h3 className="text-3xl font-black text-slate-900 tracking-tighter flex items-center gap-3">
+                  <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter flex items-center gap-3">
                     <div className="w-3 h-3 bg-indigo-500 rounded-full animate-pulse" />
                     Reviewing Profile
                   </h3>
                   <p className="text-slate-400 text-[10px] font-mono tracking-widest mt-1">ID: {selectedUser._id}</p>
                 </div>
-                <button onClick={() => {setSelectedUser(null); setShowRejectInput(false)}} className="p-4 bg-slate-50 rounded-full hover:bg-rose-50 hover:text-rose-600 transition-all">
+                <button onClick={() => {setSelectedUser(null); setShowRejectInput(false)}} className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-full hover:bg-rose-50 hover:text-rose-600 transition-all">
                   <UserX className="w-6 h-6" />
                 </button>
               </div>
@@ -185,10 +185,10 @@ const IdentityVerify = () => {
                 <div className="space-y-8">
                   <h4 className="text-[10px] font-black text-indigo-500 uppercase tracking-widest border-l-4 border-indigo-500 pl-4">Evidence 01: Government ID</h4>
                   <div className="grid grid-cols-1 gap-6">
-                    <div className="rounded-[2rem] overflow-hidden border-2 border-slate-100 shadow-md group">
+                    <div className="rounded-[2rem] overflow-hidden border-2 border-slate-100 dark:border-slate-800 shadow-md group">
                       <img src={selectedUser.kyc?.idFrontUrl} className="w-full grayscale hover:grayscale-0 transition-all duration-700 cursor-zoom-in" alt="Front" />
                     </div>
-                    <div className="rounded-[2rem] overflow-hidden border-2 border-slate-100 shadow-md group">
+                    <div className="rounded-[2rem] overflow-hidden border-2 border-slate-100 dark:border-slate-800 shadow-md group">
                       <img src={selectedUser.kyc?.idBackUrl} className="w-full grayscale hover:grayscale-0 transition-all duration-700 cursor-zoom-in" alt="Back" />
                     </div>
                   </div>
@@ -209,12 +209,12 @@ const IdentityVerify = () => {
                         value={rejectionReason}
                         onChange={(e) => setRejectionReason(e.target.value)}
                         placeholder="State why this dossier was rejected..."
-                        className="w-full p-6 bg-rose-50 border-2 border-rose-100 rounded-3xl focus:outline-none focus:border-rose-400 font-bold text-slate-700"
+                        className="w-full p-6 bg-rose-50 border-2 border-rose-100 rounded-3xl focus:outline-none focus:border-rose-400 font-bold text-slate-700 dark:text-slate-200"
                         rows="4"
                       />
                       <div className="flex gap-4">
                         <button onClick={() => handleReview(selectedUser._id, 'reject')} disabled={isProcessing} className="flex-1 py-4 bg-rose-600 text-white font-black rounded-2xl text-[10px] tracking-widest">CONFIRM REJECTION</button>
-                        <button onClick={() => setShowRejectInput(false)} className="px-8 py-4 bg-slate-100 text-slate-900 font-black rounded-2xl text-[10px] tracking-widest">CANCEL</button>
+                        <button onClick={() => setShowRejectInput(false)} className="px-8 py-4 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-black rounded-2xl text-[10px] tracking-widest">CANCEL</button>
                       </div>
                     </motion.div>
                   ) : (

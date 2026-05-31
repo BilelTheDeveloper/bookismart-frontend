@@ -864,7 +864,7 @@ export default function Tutorial() {
             {/* Progress mini-bar */}
             <div className="mt-5 flex items-center gap-3">
               <div className="flex-1 h-2 bg-white/20 rounded-full overflow-hidden">
-                <div className="h-full bg-white rounded-full transition-all duration-700"
+                <div className="h-full bg-white dark:bg-slate-900 rounded-full transition-all duration-700"
                   style={{ width: `${completionPct}%` }} />
               </div>
               <span className="text-white font-black text-sm whitespace-nowrap">

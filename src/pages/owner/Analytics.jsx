@@ -20,25 +20,25 @@ const BookingsChart = ({ months }) => {
         return (
           <div key={i} className="flex-1 flex flex-col items-center gap-2 group relative">
             {/* Tooltip */}
-            <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-all bg-slate-900 text-white text-[10px] font-black py-1.5 px-3 rounded-lg whitespace-nowrap pointer-events-none z-10">
+            <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-all bg-slate-900 dark:bg-slate-700 text-white text-[10px] font-black py-1.5 px-3 rounded-lg whitespace-nowrap pointer-events-none z-10">
               {m.count} bookings · {m.completed} done
             </div>
             <div className="w-full relative" style={{ height: '160px' }}>
               {/* Background bar */}
               <div
-                className={`w-full absolute bottom-0 rounded-t-lg transition-all ${isCurrent ? 'bg-indigo-100' : 'bg-slate-100'}`}
+                className={`w-full absolute bottom-0 rounded-t-lg transition-all ${isCurrent ? 'bg-indigo-100 dark:bg-indigo-500/20' : 'bg-slate-100 dark:bg-slate-800'}`}
                 style={{ height: `${Math.max(totalPct, 4)}%` }}
               />
               {/* Completed overlay */}
               <div
-                className={`w-full absolute bottom-0 rounded-t-lg transition-all ${isCurrent ? 'bg-indigo-500' : 'bg-indigo-300'}`}
+                className={`w-full absolute bottom-0 rounded-t-lg transition-all ${isCurrent ? 'bg-indigo-500' : 'bg-indigo-300 dark:bg-indigo-400/70'}`}
                 style={{ height: `${(completedPct / 100) * Math.max(totalPct, 4)}%` }}
               />
               {isCurrent && (
                 <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-indigo-600 rounded-full" />
               )}
             </div>
-            <span className={`text-[9px] font-black uppercase ${isCurrent ? 'text-indigo-600' : 'text-slate-400'}`}>
+            <span className={`text-[9px] font-black uppercase ${isCurrent ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'}`}>
               {m.label}
             </span>
           </div>
@@ -56,11 +56,11 @@ const StatusBar = ({ label, count, total, color, icon }) => {
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <div className={`w-2 h-2 rounded-full ${color}`} />
-          <span className="text-xs font-bold text-slate-600">{label}</span>
+          <span className="text-xs font-bold text-slate-600 dark:text-slate-300">{label}</span>
         </div>
-        <span className="text-xs font-black text-slate-900">{count} <span className="text-slate-400 font-medium">({pct}%)</span></span>
+        <span className="text-xs font-black text-slate-900 dark:text-white">{count} <span className="text-slate-400 font-medium">({pct}%)</span></span>
       </div>
-      <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+      <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
         <div className={`h-full ${color} rounded-full transition-all duration-700`} style={{ width: `${pct}%` }} />
       </div>
     </div>
@@ -91,32 +91,32 @@ const Analytics = () => {
       value: (summary?.totalRevenue ?? 0).toFixed(2),
       unit: "TND",
       icon: <DollarSign size={20} />,
-      color: "text-emerald-600",
-      bg: "bg-emerald-50",
+      color: "text-emerald-600 dark:text-emerald-400",
+      bg: "bg-emerald-50 dark:bg-emerald-500/15",
     },
     {
       label: "Total Bookings",
       value: String(summary?.totalBookings ?? 0),
       unit: "Appointments",
       icon: <Calendar size={20} />,
-      color: "text-indigo-600",
-      bg: "bg-indigo-50",
+      color: "text-indigo-600 dark:text-indigo-400",
+      bg: "bg-indigo-50 dark:bg-indigo-500/15",
     },
     {
       label: "New Customers",
       value: String(summary?.newCustomers30d ?? 0),
       unit: "Last 30 Days",
       icon: <Users size={20} />,
-      color: "text-violet-600",
-      bg: "bg-violet-50",
+      color: "text-violet-600 dark:text-violet-400",
+      bg: "bg-violet-50 dark:bg-violet-500/15",
     },
     {
       label: "Avg. Ticket",
       value: (summary?.avgTicket ?? 0).toFixed(2),
       unit: "TND / Visit",
       icon: <TrendingUp size={20} />,
-      color: "text-rose-600",
-      bg: "bg-rose-50",
+      color: "text-rose-600 dark:text-rose-400",
+      bg: "bg-rose-50 dark:bg-rose-500/15",
     },
   ], [summary]);
 
@@ -137,13 +137,13 @@ const Analytics = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight">Performance Analytics</h2>
-          <p className="text-slate-500 font-medium">Live business intelligence — all data is real-time.</p>
+          <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Performance Analytics</h2>
+          <p className="text-slate-500 dark:text-slate-400 font-medium">Live business intelligence — all data is real-time.</p>
         </div>
         <button
           onClick={fetchAll}
           disabled={loading}
-          className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-2xl text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all disabled:opacity-60"
+          className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-2xl text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-100 dark:shadow-indigo-900/40 transition-all disabled:opacity-60"
         >
           <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh
         </button>
@@ -152,17 +152,17 @@ const Analytics = () => {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {kpis.map((stat, idx) => (
-          <div key={idx} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+          <div key={idx} className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
               <div className={`p-3 ${stat.bg} ${stat.color} rounded-2xl`}>{stat.icon}</div>
-              <div className="flex items-center gap-1 text-[11px] font-black px-2 py-1 rounded-full bg-emerald-50 text-emerald-600">
+              <div className="flex items-center gap-1 text-[11px] font-black px-2 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
                 <ArrowUpRight size={12} /> Live
               </div>
             </div>
             <div className="mt-4">
-              <p className="text-slate-500 text-xs font-black uppercase tracking-widest">{stat.label}</p>
-              <h3 className="text-2xl font-black text-slate-900 mt-1">
-                {loading ? <span className="animate-pulse bg-slate-100 rounded-lg inline-block w-20 h-7" /> : stat.value}
+              <p className="text-slate-500 dark:text-slate-400 text-xs font-black uppercase tracking-widest">{stat.label}</p>
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                {loading ? <span className="animate-pulse bg-slate-100 dark:bg-slate-800 rounded-lg inline-block w-20 h-7" /> : stat.value}
                 <span className="text-sm font-bold text-slate-400 ml-1">{stat.unit}</span>
               </h3>
             </div>
@@ -174,19 +174,19 @@ const Analytics = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* Monthly Bookings Chart */}
-        <div className="lg:col-span-2 bg-white p-4 sm:p-6 lg:p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
-              <BarChart3 className="text-indigo-600" /> Monthly Bookings
+            <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+              <BarChart3 className="text-indigo-600 dark:text-indigo-400" /> Monthly Bookings
             </h3>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 bg-indigo-500 rounded-full" />
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Completed</span>
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Completed</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 bg-indigo-100 rounded-full" />
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Total</span>
+                <div className="w-3 h-3 bg-indigo-100 dark:bg-indigo-500/30 rounded-full" />
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Total</span>
               </div>
             </div>
           </div>
@@ -200,16 +200,16 @@ const Analytics = () => {
         </div>
 
         {/* Booking Status Breakdown */}
-        <div className="bg-white p-4 sm:p-6 lg:p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
-          <h3 className="text-xl font-black text-slate-900 mb-2 flex items-center gap-2">
-            <CheckCircle2 className="text-indigo-600" /> Status Overview
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+          <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+            <CheckCircle2 className="text-indigo-600 dark:text-indigo-400" /> Status Overview
           </h3>
           <p className="text-xs text-slate-400 font-bold mb-6 uppercase tracking-wider">
             {statusBreakdown.total ?? 0} total appointments
           </p>
           {loading ? (
             <div className="space-y-5">
-              {[...Array(5)].map((_, i) => <div key={i} className="h-8 bg-slate-100 rounded-xl animate-pulse" />)}
+              {[...Array(5)].map((_, i) => <div key={i} className="h-8 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />)}
             </div>
           ) : (
             <div className="space-y-4">
@@ -227,14 +227,14 @@ const Analytics = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* Top Services */}
-        <div className="lg:col-span-2 bg-white p-4 sm:p-6 lg:p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
-          <h3 className="text-xl font-black text-slate-900 mb-2 flex items-center gap-2">
-            <MousePointer2 className="text-indigo-600" /> Top Services
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+          <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+            <MousePointer2 className="text-indigo-600 dark:text-indigo-400" /> Top Services
           </h3>
           <p className="text-xs text-slate-400 font-bold mb-6 uppercase tracking-wider">Last 90 days — completed bookings</p>
           {loading ? (
             <div className="space-y-5">
-              {[...Array(3)].map((_, i) => <div key={i} className="h-12 bg-slate-100 rounded-xl animate-pulse" />)}
+              {[...Array(3)].map((_, i) => <div key={i} className="h-12 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />)}
             </div>
           ) : topServices.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-slate-400">
@@ -255,13 +255,13 @@ const Analytics = () => {
                           {idx + 1}
                         </div>
                         <div>
-                          <p className="text-sm font-black text-slate-900">{service.name}</p>
-                          <p className="text-xs text-slate-500 font-bold">{service.count} bookings</p>
+                          <p className="text-sm font-black text-slate-900 dark:text-white">{service.name}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">{service.count} bookings</p>
                         </div>
                       </div>
-                      <p className="text-sm font-black text-indigo-600">{service.revenue.toFixed(2)} TND</p>
+                      <p className="text-sm font-black text-indigo-600 dark:text-indigo-400">{service.revenue.toFixed(2)} TND</p>
                     </div>
-                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                       <div className={`h-full ${colors[idx % colors.length]} rounded-full transition-all duration-700`} style={{ width: `${pct}%` }} />
                     </div>
                   </div>
@@ -274,7 +274,7 @@ const Analytics = () => {
         {/* Efficiency Panel */}
         <div className="flex flex-col gap-6">
           {/* Completion Rate */}
-          <div className="bg-slate-900 rounded-[2.5rem] p-4 sm:p-6 lg:p-8 text-white flex-1 relative overflow-hidden">
+          <div className="bg-slate-900 dark:bg-slate-950 dark:border dark:border-slate-800 rounded-[2.5rem] p-4 sm:p-6 lg:p-8 text-white flex-1 relative overflow-hidden">
             <div className="relative z-10">
               <p className="text-indigo-300 text-xs font-black uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
                 <Award size={12} /> Completion Rate
@@ -300,17 +300,17 @@ const Analytics = () => {
           </div>
 
           {/* Consult vs Booking ratio */}
-          <div className="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 border border-slate-100 dark:border-slate-800 shadow-sm">
             <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-2">
               <Clock size={12} /> Consultations Done
             </p>
             <div className="flex items-end gap-2">
-              <span className="text-3xl font-black text-slate-900">
+              <span className="text-3xl font-black text-slate-900 dark:text-white">
                 {loading ? '—' : summary?.totalConsultations ?? 0}
               </span>
               <span className="text-sm font-bold text-slate-400 mb-1">sessions</span>
             </div>
-            <div className="mt-3 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+            <div className="mt-3 h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
               <div
                 className="h-full bg-indigo-500 rounded-full transition-all duration-700"
                 style={{ width: `${Math.min(((summary?.totalConsultations ?? 0) / Math.max(summary?.totalBookings ?? 1, 1)) * 100, 100)}%` }}

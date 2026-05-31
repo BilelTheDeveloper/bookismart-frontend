@@ -60,7 +60,7 @@ const STATUS_CONFIG = {
   "no-show": {
     label: "No Show",
     dot: "bg-slate-400",
-    badge: "bg-slate-100 text-slate-600 ring-1 ring-slate-200",
+    badge: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 ring-1 ring-slate-200",
     icon: <Ban size={11} />,
   },
 };
@@ -124,11 +124,11 @@ const MiniCalendar = ({ selectedDate, onSelect }) => {
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 transition-colors">
+        <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:bg-slate-800 text-slate-500 transition-colors">
           <ChevronLeft size={15} />
         </button>
-        <span className="text-sm font-bold text-slate-700">{MONTHS[viewMonth]} {viewYear}</span>
-        <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 transition-colors">
+        <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{MONTHS[viewMonth]} {viewYear}</span>
+        <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:bg-slate-800 text-slate-500 transition-colors">
           <ChevronRight size={15} />
         </button>
       </div>
@@ -154,7 +154,7 @@ const MiniCalendar = ({ selectedDate, onSelect }) => {
                 ${isPast ? "text-slate-200 cursor-not-allowed" : "cursor-pointer hover:bg-indigo-50 hover:text-indigo-600"}
                 ${isSelected ? "bg-indigo-600 text-white shadow-md scale-110" : ""}
                 ${isToday && !isSelected ? "text-indigo-600 ring-1 ring-inset ring-indigo-200" : ""}
-                ${!isPast && !isSelected ? "text-slate-600" : ""}
+                ${!isPast && !isSelected ? "text-slate-600 dark:text-slate-300" : ""}
               `}
             >
               {date.getDate()}
@@ -235,16 +235,16 @@ const RescheduleModal = ({ booking, onClose, onSuccess }) => {
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden">
+      <div className="relative bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-100">
+        <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800">
           <div>
-            <h3 className="text-lg font-black text-slate-900">Reschedule Appointment</h3>
+            <h3 className="text-lg font-black text-slate-900 dark:text-white">Reschedule Appointment</h3>
             <p className="text-sm text-slate-500 mt-0.5">
               {booking.customerName} · {booking.service?.title}
             </p>
           </div>
-          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors text-slate-500">
+          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition-colors text-slate-500">
             <X size={16} />
           </button>
         </div>
@@ -275,12 +275,12 @@ const RescheduleModal = ({ booking, onClose, onSuccess }) => {
                 <span className="ml-2 text-slate-400 text-sm">Loading slots...</span>
               </div>
             ) : dayIsClosed ? (
-              <div className="text-center py-5 bg-slate-50 rounded-xl border border-slate-200">
+              <div className="text-center py-5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
                 <Ban size={20} className="text-slate-300 mx-auto mb-1" />
                 <p className="text-slate-400 text-sm">Closed on this day</p>
               </div>
             ) : slots.length === 0 ? (
-              <div className="text-center py-5 bg-slate-50 rounded-xl border border-slate-200">
+              <div className="text-center py-5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
                 <AlertCircle size={20} className="text-slate-300 mx-auto mb-1" />
                 <p className="text-slate-400 text-sm">No slots available</p>
               </div>
@@ -294,10 +294,10 @@ const RescheduleModal = ({ booking, onClose, onSuccess }) => {
                     className={`
                       py-2 px-1 rounded-xl text-xs font-bold transition-all
                       ${!available
-                        ? "bg-slate-50 text-slate-200 cursor-not-allowed line-through"
+                        ? "bg-slate-50 dark:bg-slate-800/60 text-slate-200 cursor-not-allowed line-through"
                         : selectedTime === time
                           ? "bg-indigo-600 text-white shadow-md shadow-indigo-200 scale-105"
-                          : "bg-slate-50 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 border border-slate-200 hover:border-indigo-200"
+                          : "bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 hover:bg-indigo-50 hover:text-indigo-600 border border-slate-200 dark:border-slate-700 hover:border-indigo-200"
                       }
                     `}
                   >
@@ -320,7 +320,7 @@ const RescheduleModal = ({ booking, onClose, onSuccess }) => {
         <div className="flex gap-3 p-6 pt-0">
           <button
             onClick={onClose}
-            className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-200 transition-colors"
+            className="flex-1 py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-bold text-sm hover:bg-slate-200 transition-colors"
           >
             Cancel
           </button>
@@ -377,20 +377,20 @@ const BookingDrawer = ({ booking, onClose, onStatusChange, onReschedule, onCompl
   return (
     <div className="fixed inset-0 z-50 flex">
       <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative ml-auto h-full w-full max-w-md bg-white shadow-2xl flex flex-col overflow-hidden">
+      <div className="relative ml-auto h-full w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl flex flex-col overflow-hidden">
 
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50">
+        <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-indigo-100 rounded-2xl flex items-center justify-center">
               <CalendarCheck size={18} className="text-indigo-600" />
             </div>
             <div>
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Booking Detail</p>
-              <h3 className="font-black text-slate-900 text-base leading-tight">{booking.customerName}</h3>
+              <h3 className="font-black text-slate-900 dark:text-white text-base leading-tight">{booking.customerName}</h3>
             </div>
           </div>
-          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-200 hover:bg-slate-300 transition-colors text-slate-600">
+          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-200 hover:bg-slate-300 transition-colors text-slate-600 dark:text-slate-300">
             <X size={16} />
           </button>
         </div>
@@ -411,15 +411,15 @@ const BookingDrawer = ({ booking, onClose, onStatusChange, onReschedule, onCompl
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <Sparkles size={15} className="text-indigo-500" />
-                <span className="text-sm font-bold text-slate-800">{booking.service?.title}</span>
+                <span className="text-sm font-bold text-slate-800 dark:text-slate-100">{booking.service?.title}</span>
               </div>
               <div className="flex items-center gap-3">
                 <CalendarDays size={15} className="text-indigo-500" />
-                <span className="text-sm font-semibold text-slate-700">{formatDisplayDate(booking.dateString)}</span>
+                <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{formatDisplayDate(booking.dateString)}</span>
               </div>
               <div className="flex items-center gap-3">
                 <Clock size={15} className="text-indigo-500" />
-                <span className="text-sm font-semibold text-slate-700">{formatTime(booking.timeSlot)}</span>
+                <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{formatTime(booking.timeSlot)}</span>
                 {booking.service?.duration && (
                   <span className="text-xs text-slate-400 font-medium">· {booking.service.duration} min</span>
                 )}
@@ -427,19 +427,19 @@ const BookingDrawer = ({ booking, onClose, onStatusChange, onReschedule, onCompl
               {booking.service?.price && (
                 <div className="flex items-center gap-3 pt-1 border-t border-indigo-100">
                   <TrendingUp size={15} className="text-indigo-500" />
-                  <span className="text-sm font-black text-slate-900">{booking.service.price}</span>
+                  <span className="text-sm font-black text-slate-900 dark:text-white">{booking.service.price}</span>
                 </div>
               )}
             </div>
           </div>
 
           {/* Customer Info */}
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3">
+          <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 space-y-3">
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Customer</p>
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <User size={15} className="text-slate-400" />
-                <span className="text-sm font-bold text-slate-800">{booking.customerName}</span>
+                <span className="text-sm font-bold text-slate-800 dark:text-slate-100">{booking.customerName}</span>
               </div>
               <div className="flex items-center gap-3">
                 <Mail size={15} className="text-slate-400" />
@@ -468,14 +468,14 @@ const BookingDrawer = ({ booking, onClose, onStatusChange, onReschedule, onCompl
           )}
 
           {/* Booking Meta */}
-          <div className="pt-2 border-t border-slate-100">
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
             <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-2">Booking ID</p>
             <p className="text-xs font-mono text-slate-400">{booking._id}</p>
           </div>
         </div>
 
         {/* Actions Footer */}
-        <div className="p-5 border-t border-slate-100 bg-slate-50">
+        <div className="p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60">
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Actions</p>
           <div className="flex flex-wrap gap-2">
             {booking.status !== 'confirmed' && booking.status !== 'completed' && booking.status !== 'no-show' && (
@@ -509,7 +509,7 @@ const BookingDrawer = ({ booking, onClose, onStatusChange, onReschedule, onCompl
                   label={actionLoading === 'no-show' ? "Saving..." : "No-show"}
                   icon={<Ban size={13} />}
                   onClick={() => handleStatus('no-show')}
-                  color="bg-slate-100 text-slate-600 hover:bg-slate-600 hover:text-white"
+                  color="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-600 hover:text-white"
                   disabled={!!actionLoading}
                 />
                 <ActionButton
@@ -538,11 +538,11 @@ const StatCard = ({ label, value, color, active, onClick }) => (
       flex flex-col gap-1 p-5 rounded-[1.75rem] border transition-all text-left w-full
       ${active
         ? "bg-indigo-600 border-indigo-600 text-white shadow-xl shadow-indigo-200 scale-[1.02]"
-        : "bg-white border-slate-100 hover:border-indigo-200 hover:shadow-lg shadow-sm"
+        : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-indigo-200 hover:shadow-lg shadow-sm"
       }
     `}
   >
-    <span className={`text-3xl font-black tracking-tight ${active ? "text-white" : "text-slate-900"}`}>
+    <span className={`text-3xl font-black tracking-tight ${active ? "text-white" : "text-slate-900 dark:text-white"}`}>
       {value ?? "—"}
     </span>
     <span className={`text-[11px] font-bold uppercase tracking-widest ${active ? "text-indigo-200" : "text-slate-400"}`}>
@@ -561,25 +561,25 @@ const BookingCard = ({ booking, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left group bg-white p-5 rounded-[1.75rem] border border-slate-100 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-50 transition-all flex items-center justify-between gap-4"
+      className="w-full text-left group bg-white dark:bg-slate-900 p-5 rounded-[1.75rem] border border-slate-100 dark:border-slate-800 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-50 transition-all flex items-center justify-between gap-4"
     >
       <div className="flex items-center gap-4 flex-1 min-w-0">
         {/* Status dot + time */}
         <div className="flex-shrink-0 text-center min-w-[58px]">
           <div className={`w-2 h-2 rounded-full mx-auto mb-1.5 ${cfg.dot}`} />
-          <p className="text-sm font-black text-slate-800">{formatTime(booking.timeSlot)}</p>
+          <p className="text-sm font-black text-slate-800 dark:text-slate-100">{formatTime(booking.timeSlot)}</p>
           <p className="text-[9px] font-bold text-slate-300 uppercase">
             {booking.service?.duration ? `${booking.service.duration}m` : "—"}
           </p>
         </div>
 
         {/* Divider */}
-        <div className="h-12 w-px bg-slate-100 flex-shrink-0" />
+        <div className="h-12 w-px bg-slate-100 dark:bg-slate-800 flex-shrink-0" />
 
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
-            <h4 className="text-sm font-black text-slate-900 truncate group-hover:text-indigo-600 transition-colors">
+            <h4 className="text-sm font-black text-slate-900 dark:text-white truncate group-hover:text-indigo-600 transition-colors">
               {booking.customerName}
             </h4>
             <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tight flex-shrink-0 ${cfg.badge}`}>
@@ -594,11 +594,11 @@ const BookingCard = ({ booking, onClick }) => {
 
       <div className="flex items-center gap-3 flex-shrink-0">
         {booking.service?.price && (
-          <span className="text-sm font-black text-slate-700 hidden sm:block">
+          <span className="text-sm font-black text-slate-700 dark:text-slate-200 hidden sm:block">
             {booking.service.price}
           </span>
         )}
-        <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-50 group-hover:bg-indigo-50 text-slate-300 group-hover:text-indigo-400 transition-all">
+        <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-800/60 group-hover:bg-indigo-50 text-slate-300 group-hover:text-indigo-400 transition-all">
           <Eye size={14} />
         </div>
       </div>
@@ -718,7 +718,7 @@ const Appointments = () => {
             <CalendarCheck size={26} />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Appointments</h1>
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Appointments</h1>
             <p className="text-slate-500 font-semibold text-sm">
               {summary?.total ?? "—"} total bookings
             </p>
@@ -731,12 +731,12 @@ const Appointments = () => {
             type="date"
             value={dateFilter}
             onChange={(e) => { setDateFilter(e.target.value); setCurrentPage(1); }}
-            className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-indigo-400 transition-colors"
+            className="px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-400 transition-colors"
           />
           {dateFilter && (
             <button
               onClick={() => { setDateFilter(""); setCurrentPage(1); }}
-              className="px-3 py-2.5 bg-slate-100 rounded-xl text-slate-500 hover:bg-slate-200 transition-colors text-xs font-bold flex items-center gap-1.5"
+              className="px-3 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-500 hover:bg-slate-200 transition-colors text-xs font-bold flex items-center gap-1.5"
             >
               <X size={12} /> Clear
             </button>
@@ -745,7 +745,7 @@ const Appointments = () => {
           <button
             onClick={() => fetchBookings()}
             disabled={loading}
-            className="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all"
+            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all"
           >
             <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
           </button>
@@ -798,7 +798,7 @@ const Appointments = () => {
           ══════════════════════════════════════════════ */}
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
         {/* Status tabs */}
-        <div className="flex gap-1 p-1.5 bg-slate-100 rounded-2xl">
+        <div className="flex gap-1 p-1.5 bg-slate-100 dark:bg-slate-800 rounded-2xl">
           {TABS.map((tab) => (
             <button
               key={tab.key}
@@ -806,7 +806,7 @@ const Appointments = () => {
               className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wide transition-all ${
                 activeStatus === tab.key
                   ? "bg-white text-indigo-600 shadow-sm"
-                  : "text-slate-500 hover:text-slate-700"
+                  : "text-slate-500 hover:text-slate-700 dark:text-slate-200"
               }`}
             >
               {tab.label}
@@ -827,7 +827,7 @@ const Appointments = () => {
             placeholder="Search by name, service..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400 focus:shadow-sm transition-all placeholder:text-slate-300"
+            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:border-indigo-400 focus:shadow-sm transition-all placeholder:text-slate-300"
           />
           {searchQuery && (
             <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500">
@@ -845,7 +845,7 @@ const Appointments = () => {
           <div className="w-14 h-14 bg-rose-50 border border-rose-100 rounded-2xl flex items-center justify-center mb-4">
             <AlertCircle className="text-rose-400" size={22} />
           </div>
-          <p className="font-bold text-slate-700 mb-1">Something went wrong</p>
+          <p className="font-bold text-slate-700 dark:text-slate-200 mb-1">Something went wrong</p>
           <p className="text-slate-400 text-sm mb-4">{error}</p>
           <button
             onClick={() => fetchBookings()}
@@ -857,22 +857,22 @@ const Appointments = () => {
       ) : loading && bookings.length === 0 ? (
         <div className="space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="bg-white rounded-[1.75rem] border border-slate-100 p-5 flex items-center gap-4 animate-pulse">
-              <div className="w-14 h-12 bg-slate-100 rounded-xl" />
-              <div className="h-10 w-px bg-slate-100" />
+            <div key={i} className="bg-white dark:bg-slate-900 rounded-[1.75rem] border border-slate-100 dark:border-slate-800 p-5 flex items-center gap-4 animate-pulse">
+              <div className="w-14 h-12 bg-slate-100 dark:bg-slate-800 rounded-xl" />
+              <div className="h-10 w-px bg-slate-100 dark:bg-slate-800" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-slate-100 rounded-lg w-40" />
-                <div className="h-3 bg-slate-50 rounded-lg w-28" />
+                <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded-lg w-40" />
+                <div className="h-3 bg-slate-50 dark:bg-slate-800/60 rounded-lg w-28" />
               </div>
             </div>
           ))}
         </div>
       ) : bookings.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-4">
+          <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center justify-center mb-4">
             <CalendarCheck size={24} className="text-slate-200" />
           </div>
-          <p className="font-black text-slate-600 text-lg mb-1">No appointments found</p>
+          <p className="font-black text-slate-600 dark:text-slate-300 text-lg mb-1">No appointments found</p>
           <p className="text-slate-400 text-sm">
             {searchQuery || dateFilter || activeStatus !== "all"
               ? "Try adjusting your filters"
@@ -907,7 +907,7 @@ const Appointments = () => {
           <button
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-500 hover:border-indigo-300 hover:text-indigo-600 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-10 h-10 flex items-center justify-center rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-500 hover:border-indigo-300 hover:text-indigo-600 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <ChevronLeft size={16} />
           </button>
@@ -930,7 +930,7 @@ const Appointments = () => {
                 className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${
                   currentPage === page
                     ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200"
-                    : "bg-white border border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-600"
+                    : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:text-indigo-600"
                 }`}
               >
                 {page}
@@ -941,7 +941,7 @@ const Appointments = () => {
           <button
             onClick={() => setCurrentPage(p => Math.min(pagination.pages, p + 1))}
             disabled={currentPage === pagination.pages}
-            className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-500 hover:border-indigo-300 hover:text-indigo-600 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-10 h-10 flex items-center justify-center rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-500 hover:border-indigo-300 hover:text-indigo-600 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <ChevronRight size={16} />
           </button>

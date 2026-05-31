@@ -6,18 +6,21 @@ import {
 } from "lucide-react";
 import { useCustomerAuth } from "../../../context/CustomerAuthContext";
 import CAPI from "../../../api/customerConfig";
+import LanguageSwitcher from "../../../components/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 const ALL_PAGES = [
-  { key: "profile",      label: "My Profile",      icon: User,      path: "profile",      always: true },
-  { key: "appointments", label: "Appointments",     icon: Calendar,  path: "appointments" },
-  { key: "invoices",     label: "Invoices",         icon: FileText,  path: "invoices" },
-  { key: "loyalty",      label: "Loyalty Points",   icon: Gift,      path: "loyalty" },
-  { key: "booking",      label: "Book a Service",   icon: BookOpen,  path: "booking" },
-  { key: "session",      label: "My Session",       icon: Zap,       path: "session",      always: true },
+  { key: "profile",      i18nKey: "portal.nav.profile",      label: "My Profile",      icon: User,      path: "profile",      always: true },
+  { key: "appointments", i18nKey: "portal.nav.appointments", label: "Appointments",    icon: Calendar,  path: "appointments" },
+  { key: "invoices",     i18nKey: "portal.nav.invoices",     label: "Invoices",        icon: FileText,  path: "invoices" },
+  { key: "loyalty",      i18nKey: "portal.nav.loyalty",      label: "Loyalty Points",  icon: Gift,      path: "loyalty" },
+  { key: "booking",      i18nKey: "portal.nav.booking",      label: "Book a Service",  icon: BookOpen,  path: "booking" },
+  { key: "session",      i18nKey: "portal.nav.session",      label: "My Session",      icon: Zap,       path: "session",      always: true },
 ];
 
 const CustomerLayout = () => {
   const { customer, loading, isAuthenticated, logoutCustomer } = useCustomerAuth();
+  const { t } = useTranslation();
   const [mobileOpen,   setMobileOpen]   = useState(false);
   const [loggingOut,   setLoggingOut]   = useState(false);
   const [liveSession,  setLiveSession]  = useState(false);
@@ -62,7 +65,7 @@ const CustomerLayout = () => {
     <>
       {/* Brand */}
       <div className="px-6 py-8 border-b border-slate-800">
-        <p className="text-xs font-black text-indigo-400 uppercase tracking-widest mb-1">Client Portal</p>
+        <p className="text-xs font-black text-indigo-400 uppercase tracking-widest mb-1">{t("portal.clientPortal")}</p>
         <h1 className="text-white font-black text-xl leading-tight">
           {customer?.businessName || "Bookiify"}
         </h1>
@@ -114,7 +117,7 @@ const CustomerLayout = () => {
                       </span>
                     )}
                   </span>
-                  <span className="flex-1">{item.label}</span>
+                  <span className="flex-1">{t(item.i18nKey, item.label)}</span>
                   {isSessionItem && liveSession && (
                     <span className="text-xs font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-1.5 py-0.5 rounded-full">LIVE</span>
                   )}
@@ -126,15 +129,18 @@ const CustomerLayout = () => {
         })}
       </nav>
 
-      {/* Logout */}
-      <div className="px-4 pb-6 border-t border-slate-800 pt-4">
+      {/* Language + Logout */}
+      <div className="px-4 pb-6 border-t border-slate-800 pt-4 space-y-2">
+        <div className="dark flex justify-center">
+          <LanguageSwitcher />
+        </div>
         <button
           onClick={handleLogout}
           disabled={loggingOut}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-rose-400 hover:bg-rose-500/10 font-bold text-sm transition-all"
         >
           {loggingOut ? <Loader2 size={18} className="animate-spin" /> : <LogOut size={18} />}
-          {loggingOut ? "Signing out…" : "Sign Out"}
+          {loggingOut ? t("portal.signingOut") : t("portal.signOut")}
         </button>
       </div>
     </>
@@ -170,7 +176,10 @@ const CustomerLayout = () => {
           <button onClick={() => setMobileOpen(true)} className="text-slate-400 hover:text-white">
             <Menu size={22} />
           </button>
-          <span className="text-white font-black text-sm">{customer?.businessName}</span>
+          <span className="text-white font-black text-sm truncate">{customer?.businessName}</span>
+          <div className="dark ms-auto">
+            <LanguageSwitcher />
+          </div>
         </div>
 
         <main className="flex-1 overflow-y-auto p-6 lg:p-10">

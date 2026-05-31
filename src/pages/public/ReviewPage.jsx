@@ -124,7 +124,7 @@ const ReviewPage = () => {
               <Star
                 key={i}
                 size={28}
-                className={i < rating ? "text-amber-400 fill-amber-400" : "text-slate-700 fill-slate-700"}
+                className={i < rating ? "text-amber-400 fill-amber-400" : "text-slate-700 dark:text-slate-200 fill-slate-700"}
               />
             ))}
           </div>
@@ -190,7 +190,7 @@ const ReviewPage = () => {
                     className={`transition-colors duration-150 ${
                       star <= displayRating
                         ? "text-amber-400 fill-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]"
-                        : "text-slate-700 fill-slate-700"
+                        : "text-slate-700 dark:text-slate-200 fill-slate-700"
                     }`}
                   />
                 </button>
@@ -215,9 +215,9 @@ const ReviewPage = () => {
               placeholder={t("review.commentPlaceholder")}
               rows={4}
               maxLength={1200}
-              className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm placeholder:text-slate-600 outline-none transition-all focus:border-amber-400/40 focus:bg-white/8 resize-none"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm placeholder:text-slate-600 dark:text-slate-300 outline-none transition-all focus:border-amber-400/40 focus:bg-white/8 resize-none"
             />
-            <p className="text-right text-[10px] text-slate-600 mt-1">{text.length} / 1200</p>
+            <p className="text-right text-[10px] text-slate-600 dark:text-slate-300 mt-1">{text.length} / 1200</p>
           </div>
 
           {/* Error */}
@@ -247,12 +247,12 @@ const ReviewPage = () => {
             )}
           </button>
 
-          <p className="text-center text-[10px] text-slate-600 mt-4">
+          <p className="text-center text-[10px] text-slate-600 dark:text-slate-300 mt-4">
             {t("review.publicNotice")}
           </p>
         </div>
 
-        <p className="text-center text-[11px] text-slate-600 mt-6">
+        <p className="text-center text-[11px] text-slate-600 dark:text-slate-300 mt-6">
           Powered by <span className="font-black text-slate-500">Bookiify</span>
         </p>
       </div>

@@ -235,21 +235,21 @@ export default function AdminRecruitment() {
         ].map(k => (
           <div key={k.label} className={`${k.bg} border rounded-2xl p-5`}>
             <p className={`text-3xl font-black ${k.color}`}>{k.val}</p>
-            <p className="text-slate-600 text-sm font-semibold mt-0.5">{k.label}</p>
+            <p className="text-slate-600 dark:text-slate-300 text-sm font-semibold mt-0.5">{k.label}</p>
           </div>
         ))}
       </div>
 
       {/* ── Tabs ── */}
-      <div className="flex items-center gap-1 bg-slate-100 rounded-2xl p-1 w-fit">
+      <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-2xl p-1 w-fit">
         {STATUS_TABS.map(t => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
             className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
               tab === t.key
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-white text-slate-900 dark:text-white shadow-sm'
+                : 'text-slate-500 hover:text-slate-700 dark:text-slate-200'
             }`}
           >
             {t.label}
@@ -261,9 +261,9 @@ export default function AdminRecruitment() {
       {loading ? (
         <div className="flex justify-center py-16"><Loader2 size={32} className="text-indigo-500 animate-spin" /></div>
       ) : jobs.length === 0 ? (
-        <div className="bg-white border border-slate-100 rounded-2xl p-16 text-center shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-16 text-center shadow-sm">
           <div className="text-5xl mb-4">📭</div>
-          <h3 className="text-xl font-black text-slate-900 mb-1">Nothing here</h3>
+          <h3 className="text-xl font-black text-slate-900 dark:text-white mb-1">Nothing here</h3>
           <p className="text-slate-500 text-sm">No job posts match this filter.</p>
         </div>
       ) : (
@@ -274,7 +274,7 @@ export default function AdminRecruitment() {
             const hasSalary = job.salaryMin || job.salaryMax;
 
             return (
-              <div key={job._id} className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+              <div key={job._id} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-start gap-5">
                   {/* Avatar */}
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white font-black text-xl flex-shrink-0 shadow-lg shadow-indigo-100">
@@ -284,9 +284,9 @@ export default function AdminRecruitment() {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 flex-wrap">
-                      <h3 className="text-slate-900 font-black text-base">{job.title}</h3>
+                      <h3 className="text-slate-900 dark:text-white font-black text-base">{job.title}</h3>
                       <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${conf.badge}`}>{conf.label}</span>
-                      <span className="text-xs text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg font-semibold">{JOB_TYPE_LABELS[job.jobType]}</span>
+                      <span className="text-xs text-slate-500 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg font-semibold">{JOB_TYPE_LABELS[job.jobType]}</span>
                     </div>
                     <p className="text-indigo-500 text-sm font-semibold mt-1">{job.businessName}</p>
                     <p className="text-slate-500 text-sm mt-1 line-clamp-2">{job.description}</p>
@@ -300,7 +300,7 @@ export default function AdminRecruitment() {
                         </span>
                       )}
                       {job.skills?.slice(0, 3).map(s => (
-                        <span key={s} className="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">{s}</span>
+                        <span key={s} className="text-xs text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">{s}</span>
                       ))}
                       {job.skills?.length > 3 && <span className="text-xs text-slate-400">+{job.skills.length - 3} more</span>}
                     </div>
@@ -321,7 +321,7 @@ export default function AdminRecruitment() {
                       className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${
                         isPending
                           ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-100'
-                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                          : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200'
                       }`}
                     >
                       <Eye size={14} />

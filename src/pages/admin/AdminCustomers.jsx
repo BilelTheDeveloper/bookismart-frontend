@@ -108,7 +108,7 @@ const ReviewModal = ({ customer, onClose, onDone }) => {
                     </div>
                   ) : (
                     <div className="aspect-[4/3] bg-slate-800 rounded-xl border border-dashed border-slate-700 flex items-center justify-center">
-                      <CreditCard size={24} className="text-slate-600" />
+                      <CreditCard size={24} className="text-slate-600 dark:text-slate-300" />
                     </div>
                   )}
                 </div>
@@ -152,7 +152,7 @@ const ReviewModal = ({ customer, onClose, onDone }) => {
                 placeholder="Explain clearly why the identity cannot be approved…"
                 className="w-full bg-slate-800 border border-slate-700 text-white placeholder-slate-600 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition-all resize-none"
               />
-              <p className="text-slate-600 text-xs mt-1">{reason.length} / 500 chars</p>
+              <p className="text-slate-600 dark:text-slate-300 text-xs mt-1">{reason.length} / 500 chars</p>
             </div>
           )}
 
@@ -226,7 +226,7 @@ const AdminCustomers = () => {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-slate-400 text-xs font-black uppercase tracking-widest mb-1">Client Verification</p>
-          <h2 className="text-2xl font-black text-slate-900">Customer Review Queue</h2>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white">Customer Review Queue</h2>
         </div>
         {statusFilter === "under_review" && pendingCount > 0 && (
           <div className="flex items-center gap-2 px-4 py-2 bg-amber-100 border border-amber-200 rounded-xl">
@@ -245,7 +245,7 @@ const AdminCustomers = () => {
             className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-black transition-all border
               ${statusFilter === key
                 ? "bg-slate-900 text-white border-slate-900 shadow-lg shadow-slate-900/20"
-                : "bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700"
+                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-200"
               }`}
           >
             <span className={statusFilter === key ? "text-white" : color}>{label}</span>
@@ -260,7 +260,7 @@ const AdminCustomers = () => {
           <span className="text-slate-400 font-medium">Loading…</span>
         </div>
       ) : customers.length === 0 ? (
-        <div className="bg-white border border-slate-100 rounded-[2.5rem] py-24 flex flex-col items-center gap-4 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2.5rem] py-24 flex flex-col items-center gap-4 shadow-sm">
           <Users size={56} className="text-slate-200" />
           <p className="text-slate-400 font-bold text-lg">No clients found</p>
           <p className="text-slate-300 text-sm">
@@ -275,11 +275,11 @@ const AdminCustomers = () => {
               active:       { badge: "bg-emerald-100 text-emerald-700 border-emerald-200", label: "Approved" },
               rejected:     { badge: "bg-rose-100 text-rose-700 border-rose-200",       label: "Rejected" },
               invited:      { badge: "bg-blue-100 text-blue-700 border-blue-200",        label: "Invited" },
-              pending_kyc:  { badge: "bg-slate-100 text-slate-700 border-slate-200",    label: "Pending KYC" },
-            }[c.status] || { badge: "bg-slate-100 text-slate-600", label: c.status };
+              pending_kyc:  { badge: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700",    label: "Pending KYC" },
+            }[c.status] || { badge: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300", label: c.status };
 
             return (
-              <div key={c._id} className="bg-white border border-slate-100 rounded-[2rem] p-6 hover:border-slate-200 hover:shadow-md transition-all">
+              <div key={c._id} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] p-6 hover:border-slate-200 dark:border-slate-700 hover:shadow-md transition-all">
                 <div className="flex items-start gap-5 flex-wrap">
                   {/* Avatar */}
                   <div className="relative shrink-0">
@@ -297,7 +297,7 @@ const AdminCustomers = () => {
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-black text-slate-900 text-lg leading-tight">{c.fullName}</h3>
+                    <h3 className="font-black text-slate-900 dark:text-white text-lg leading-tight">{c.fullName}</h3>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-slate-400 text-xs font-medium">
                       <span className="flex items-center gap-1"><Mail size={11} /> {c.email}</span>
                       <span className="flex items-center gap-1"><Phone size={11} /> {c.phone}</span>
@@ -314,11 +314,11 @@ const AdminCustomers = () => {
                       ].map(({ src, label }) => (
                         <div key={label} className="text-center">
                           {src ? (
-                            <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 ring-2 ring-slate-200">
+                            <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 ring-2 ring-slate-200">
                               <img src={src} alt={label} className="w-full h-full object-cover" />
                             </div>
                           ) : (
-                            <div className="w-14 h-14 rounded-xl bg-slate-100 border border-dashed border-slate-200 flex items-center justify-center">
+                            <div className="w-14 h-14 rounded-xl bg-slate-100 dark:bg-slate-800 border border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-center">
                               <CreditCard size={16} className="text-slate-300" />
                             </div>
                           )}
@@ -347,7 +347,7 @@ const AdminCustomers = () => {
                   {c.status !== "under_review" && (
                     <button
                       onClick={() => setSelected(c)}
-                      className="shrink-0 px-5 py-3 border border-slate-200 text-slate-500 hover:text-slate-800 hover:border-slate-300 font-black text-xs rounded-xl uppercase tracking-widest transition-all"
+                      className="shrink-0 px-5 py-3 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-100 hover:border-slate-300 font-black text-xs rounded-xl uppercase tracking-widest transition-all"
                     >
                       View Details
                     </button>

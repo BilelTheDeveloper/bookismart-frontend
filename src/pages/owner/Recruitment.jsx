@@ -226,7 +226,7 @@ function JobFormModal({ job, onClose, onSaved }) {
               onClick={() => set('isRemote', !form.isRemote)}
               className={`w-12 h-6 rounded-full transition-all flex items-center px-0.5 ${form.isRemote ? 'bg-indigo-600' : 'bg-slate-700'}`}
             >
-              <div className={`w-5 h-5 bg-white rounded-full shadow-sm transition-all ${form.isRemote ? 'translate-x-6' : 'translate-x-0'}`} />
+              <div className={`w-5 h-5 bg-white dark:bg-slate-900 rounded-full shadow-sm transition-all ${form.isRemote ? 'translate-x-6' : 'translate-x-0'}`} />
             </div>
             <span className="text-sm font-bold text-slate-300">Remote work available</span>
           </label>
@@ -485,9 +485,9 @@ export default function Recruitment() {
           { label: 'Under Review',   value: kpi.pending, icon: <Clock size={18} />, color: 'text-amber-400' },
           { label: 'Total Applicants', value: kpi.apps, icon: <Users size={18} />, color: 'text-violet-400' },
         ].map(k => (
-          <div key={k.label} className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+          <div key={k.label} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 shadow-sm">
             <div className={`${k.color} mb-3`}>{k.icon}</div>
-            <p className="text-3xl font-black text-slate-900">{k.value}</p>
+            <p className="text-3xl font-black text-slate-900 dark:text-white">{k.value}</p>
             <p className="text-slate-500 text-sm font-semibold mt-0.5">{k.label}</p>
           </div>
         ))}
@@ -496,7 +496,7 @@ export default function Recruitment() {
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-black text-slate-900">My Job Posts</h2>
+          <h2 className="text-xl font-black text-slate-900 dark:text-white">My Job Posts</h2>
           <p className="text-slate-500 text-sm mt-0.5">Create and manage recruitment offers for your business</p>
         </div>
         <button
@@ -511,9 +511,9 @@ export default function Recruitment() {
       {loading ? (
         <div className="flex justify-center py-16"><Loader2 size={32} className="text-indigo-500 animate-spin" /></div>
       ) : jobs.length === 0 ? (
-        <div className="bg-white border border-slate-100 rounded-2xl p-16 text-center shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-16 text-center shadow-sm">
           <div className="text-5xl mb-4">📋</div>
-          <h3 className="text-xl font-black text-slate-900 mb-2">No job posts yet</h3>
+          <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">No job posts yet</h3>
           <p className="text-slate-500 text-sm mb-6">Post your first job offer and start receiving applications.</p>
           <button
             onClick={() => { setEditJob(null); setShowForm(true); }}
@@ -533,13 +533,13 @@ export default function Recruitment() {
             const typeLabel = { 'full-time': 'Full Time', 'part-time': 'Part Time', 'freelance': 'Freelance', 'internship': 'Internship' }[job.jobType];
 
             return (
-              <div key={job._id} className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+              <div key={job._id} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-start gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 flex-wrap">
-                      <h3 className="text-slate-900 font-black text-base">{job.title}</h3>
+                      <h3 className="text-slate-900 dark:text-white font-black text-base">{job.title}</h3>
                       <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${conf.color}`}>{conf.label}</span>
-                      <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">{typeLabel}</span>
+                      <span className="text-xs font-semibold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">{typeLabel}</span>
                     </div>
                     <p className="text-slate-500 text-sm mt-1.5 line-clamp-1">{job.description}</p>
                     <div className="flex items-center gap-4 mt-3">
@@ -570,11 +570,11 @@ export default function Recruitment() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 mt-5 pt-5 border-t border-slate-100 flex-wrap">
+                <div className="flex items-center gap-2 mt-5 pt-5 border-t border-slate-100 dark:border-slate-800 flex-wrap">
                   {canEdit && (
                     <button
                       onClick={() => { setEditJob(job); setShowForm(true); }}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-all"
+                      className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-bold rounded-xl text-xs transition-all"
                     >
                       Edit
                     </button>
@@ -607,7 +607,7 @@ export default function Recruitment() {
                       <button
                         onClick={() => handleClose(job._id)}
                         disabled={closingId === job._id}
-                        className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold rounded-xl text-xs transition-all"
+                        className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-500 font-bold rounded-xl text-xs transition-all"
                       >
                         <Lock size={12} /> {closingId === job._id ? '...' : 'Close'}
                       </button>

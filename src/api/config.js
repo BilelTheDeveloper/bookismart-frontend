@@ -6,7 +6,7 @@ import axios from "axios";
  */
 const API = axios.create({
   // SYNC: Matches your Render deployment exactly
-  baseURL: import.meta.env.VITE_API_URL || "https://bookismart-backend-kcnn.onrender.com/api",
+  baseURL: import.meta.env.VITE_API_URL || "https://bookismart-backend-ixlp.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },

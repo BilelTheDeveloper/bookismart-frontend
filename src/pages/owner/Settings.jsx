@@ -32,7 +32,7 @@ const Toggle = ({ enabled, onChange, disabled }) => (
     disabled={disabled}
     className={`w-12 h-6 rounded-full p-1 transition-all duration-300 ${enabled ? "bg-indigo-600" : "bg-slate-200"} ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
   >
-    <div className={`w-4 h-4 bg-white rounded-full shadow transition-all duration-300 ${enabled ? "translate-x-6" : "translate-x-0"}`} />
+    <div className={`w-4 h-4 bg-white dark:bg-slate-900 rounded-full shadow transition-all duration-300 ${enabled ? "translate-x-6" : "translate-x-0"}`} />
   </button>
 );
 
@@ -43,7 +43,7 @@ const Field = ({ label, children }) => (
   </div>
 );
 
-const inputClass = "w-full px-3 sm:px-5 py-2.5 sm:py-3.5 bg-slate-50 border-2 border-transparent rounded-2xl text-sm font-bold focus:bg-white focus:border-indigo-500 transition-all outline-none disabled:text-slate-400 disabled:cursor-not-allowed";
+const inputClass = "w-full px-3 sm:px-5 py-2.5 sm:py-3.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-transparent rounded-2xl text-sm font-bold focus:bg-white focus:border-indigo-500 transition-all outline-none disabled:text-slate-400 disabled:cursor-not-allowed";
 
 const TABS = [
   { id: "profile",       label: "Profile",       icon: UserCircle },
@@ -70,11 +70,11 @@ const WebsiteQRPanel = ({ website, loading }) => {
   if (!website) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-5 text-center">
-        <div className="p-5 bg-slate-100 rounded-3xl">
+        <div className="p-5 bg-slate-100 dark:bg-slate-800 rounded-3xl">
           <Globe size={32} className="text-slate-400" />
         </div>
         <div>
-          <p className="text-lg font-black text-slate-900">No Website Yet</p>
+          <p className="text-lg font-black text-slate-900 dark:text-white">No Website Yet</p>
           <p className="text-sm text-slate-500 font-medium mt-1 max-w-xs">
             Build your public booking page first — your QR code will appear here once your site is created.
           </p>
@@ -149,19 +149,19 @@ const WebsiteQRPanel = ({ website, loading }) => {
 
       {/* QR Code display */}
       <div className="flex flex-col items-center gap-6 py-6">
-        <div ref={qrRef} className="p-6 bg-white border-2 border-slate-100 rounded-3xl shadow-lg">
+        <div ref={qrRef} className="p-6 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-3xl shadow-lg">
           <QRCode value={publicUrl} size={200} fgColor="#0f172a" bgColor="#ffffff" />
         </div>
 
         {/* URL row */}
         <div className="flex items-center gap-2 w-full max-w-sm">
-          <div className="flex-1 px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold text-slate-600 truncate">
+          <div className="flex-1 px-4 py-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-300 truncate">
             {publicUrl}
           </div>
           <button
             onClick={copyUrl}
             title="Copy link"
-            className="p-3 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all shrink-0"
+            className="p-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded-xl transition-all shrink-0"
           >
             {urlCopied ? <Check size={15} className="text-emerald-600" /> : <Copy size={15} className="text-slate-500" />}
           </button>
@@ -188,7 +188,7 @@ const WebsiteQRPanel = ({ website, loading }) => {
           </button>
           <button
             onClick={downloadSVG}
-            className="flex items-center gap-2 px-6 py-3 bg-slate-200 text-slate-700 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-300 transition-all"
+            className="flex items-center gap-2 px-6 py-3 bg-slate-200 text-slate-700 dark:text-slate-200 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-300 transition-all"
           >
             <Download size={15} /> Download SVG
           </button>
@@ -196,7 +196,7 @@ const WebsiteQRPanel = ({ website, loading }) => {
       </div>
 
       {/* Info tip */}
-      <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+      <div className="flex items-start gap-3 p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-800">
         <QrCode size={15} className="text-indigo-400 shrink-0 mt-0.5" />
         <p className="text-xs text-slate-500 font-medium">
           Print this QR code and place it at your front desk or entrance. Customers who scan it go straight to your online booking page — no app required.
@@ -309,16 +309,16 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-indigo-50 rounded-xl"><QrCode size={20} className="text-indigo-600" /></div>
             <div>
-              <p className="text-sm font-black text-slate-900">Scan with your authenticator app</p>
+              <p className="text-sm font-black text-slate-900 dark:text-white">Scan with your authenticator app</p>
               <p className="text-xs text-slate-400 font-medium">Google Authenticator, Authy, or any TOTP app</p>
             </div>
           </div>
-          <button onClick={cancel} className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400"><X size={16} /></button>
+          <button onClick={cancel} className="p-1.5 rounded-xl hover:bg-slate-100 dark:bg-slate-800 text-slate-400"><X size={16} /></button>
         </div>
 
         {/* QR Code */}
         <div className="flex justify-center">
-          <div className="bg-white p-5 rounded-2xl border-2 border-slate-100 shadow-sm inline-block">
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border-2 border-slate-100 dark:border-slate-800 shadow-sm inline-block">
             {setupData?.otpauthUri && (
               <QRCode value={setupData.otpauthUri} size={180} level="M" />
             )}
@@ -326,7 +326,7 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
         </div>
 
         {/* Manual entry */}
-        <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+        <div className="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-4 border border-slate-100 dark:border-slate-800">
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Can't scan? Enter this key manually</p>
           <div className="flex items-center gap-3">
             <code className="flex-1 text-sm font-black text-indigo-700 tracking-[0.3em] break-all">
@@ -334,7 +334,7 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
             </code>
             <button
               onClick={copySecret}
-              className="shrink-0 p-2.5 rounded-xl bg-white border border-slate-200 hover:border-indigo-300 text-slate-400 hover:text-indigo-600 transition-all"
+              className="shrink-0 p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-indigo-300 text-slate-400 hover:text-indigo-600 transition-all"
             >
               {copied ? <Check size={15} className="text-emerald-500" /> : <Copy size={15} />}
             </button>
@@ -358,10 +358,10 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
       <div className="space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-black text-slate-900">Confirm your authenticator code</p>
+            <p className="text-sm font-black text-slate-900 dark:text-white">Confirm your authenticator code</p>
             <p className="text-xs text-slate-400 font-medium mt-0.5">Enter the 6-digit code now showing in your app.</p>
           </div>
-          <button onClick={cancel} className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400"><X size={16} /></button>
+          <button onClick={cancel} className="p-1.5 rounded-xl hover:bg-slate-100 dark:bg-slate-800 text-slate-400"><X size={16} /></button>
         </div>
 
         {/* 6 digit code input */}
@@ -382,7 +382,7 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
         <InlineAlert type={alert?.type} message={alert?.message} />
 
         <div className="flex gap-3">
-          <button onClick={cancel} className="flex-1 py-3.5 bg-slate-100 text-slate-600 font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-slate-200 transition-all">
+          <button onClick={cancel} className="flex-1 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-slate-200 transition-all">
             Cancel
           </button>
           <button
@@ -404,23 +404,23 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
       <div className="space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-black text-slate-900">Disable two-factor authentication</p>
+            <p className="text-sm font-black text-slate-900 dark:text-white">Disable two-factor authentication</p>
             <p className="text-xs text-slate-400 font-medium mt-0.5">Verify your identity to turn off 2FA.</p>
           </div>
-          <button onClick={cancel} className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400"><X size={16} /></button>
+          <button onClick={cancel} className="p-1.5 rounded-xl hover:bg-slate-100 dark:bg-slate-800 text-slate-400"><X size={16} /></button>
         </div>
 
         {/* Toggle: TOTP or password */}
-        <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100">
+        <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-800">
           <button
             onClick={() => setUsePassword(false)}
-            className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${!usePassword ? "bg-white shadow text-indigo-600 border border-slate-200" : "text-slate-400"}`}
+            className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${!usePassword ? "bg-white dark:bg-slate-900 shadow text-indigo-600 border border-slate-200 dark:border-slate-700" : "text-slate-400"}`}
           >
             Authenticator code
           </button>
           <button
             onClick={() => setUsePassword(true)}
-            className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${usePassword ? "bg-white shadow text-indigo-600 border border-slate-200" : "text-slate-400"}`}
+            className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${usePassword ? "bg-white dark:bg-slate-900 shadow text-indigo-600 border border-slate-200 dark:border-slate-700" : "text-slate-400"}`}
           >
             Use password
           </button>
@@ -456,7 +456,7 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
                 className={`${inputClass} pl-10 pr-12`}
                 autoFocus
               />
-              <button onClick={() => setShowDisablePwd(v => !v)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+              <button onClick={() => setShowDisablePwd(v => !v)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-300">
                 {showDisablePwd ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
@@ -466,7 +466,7 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
         <InlineAlert type={alert?.type} message={alert?.message} />
 
         <div className="flex gap-3">
-          <button onClick={cancel} className="flex-1 py-3.5 bg-slate-100 text-slate-600 font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-slate-200 transition-all">
+          <button onClick={cancel} className="flex-1 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-slate-200 transition-all">
             Cancel
           </button>
           <button
@@ -486,13 +486,13 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
   return (
     <div className="flex items-center justify-between gap-4">
       <div className="flex items-start gap-4">
-        <div className={`p-2.5 rounded-xl shrink-0 ${enabled ? "bg-emerald-50" : "bg-slate-100"}`}>
+        <div className={`p-2.5 rounded-xl shrink-0 ${enabled ? "bg-emerald-50" : "bg-slate-100 dark:bg-slate-800"}`}>
           <KeyRound size={18} className={enabled ? "text-emerald-600" : "text-slate-400"} />
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <p className="text-sm font-black text-slate-900">Authenticator App (TOTP)</p>
-            <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${enabled ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
+            <p className="text-sm font-black text-slate-900 dark:text-white">Authenticator App (TOTP)</p>
+            <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${enabled ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 dark:bg-slate-800 text-slate-500"}`}>
               {enabled ? "Active" : "Off"}
             </span>
           </div>
@@ -649,7 +649,7 @@ const Settings = () => {
     <div className="max-w-5xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
 
       <div>
-        <h2 className="text-3xl font-black text-slate-900 tracking-tight">Business Settings</h2>
+        <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Business Settings</h2>
         <p className="text-slate-500 font-medium mt-1">Manage your profile, password, and notification preferences.</p>
       </div>
 
@@ -664,7 +664,7 @@ const Settings = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${active ? "bg-white shadow-md border border-slate-100 text-indigo-600" : "text-slate-500 hover:bg-white/60"}`}
+                className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${active ? "bg-white dark:bg-slate-900 shadow-md border border-slate-100 dark:border-slate-800 text-indigo-600" : "text-slate-500 hover:bg-white/60"}`}
               >
                 <div className="flex items-center gap-3 font-black text-sm uppercase tracking-widest">
                   <Icon size={18} /> {tab.label}
@@ -680,11 +680,11 @@ const Settings = () => {
 
           {/* ── PROFILE TAB ── */}
           {activeTab === "profile" && (
-            <section className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm space-y-6">
+            <section className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl"><UserCircle size={22} /></div>
                 <div>
-                  <h3 className="text-xl font-black text-slate-900">Profile Information</h3>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white">Profile Information</h3>
                   <p className="text-xs text-slate-400 font-bold mt-0.5">Update your business name and contact number.</p>
                 </div>
               </div>
@@ -693,14 +693,14 @@ const Settings = () => {
                 <Field label="Full Name">
                   <div className="relative">
                     <input type="text" value={profile.fullName} disabled className={inputClass} />
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400 uppercase bg-slate-100 px-2 py-0.5 rounded-full">Read-only</span>
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400 uppercase bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">Read-only</span>
                   </div>
                 </Field>
                 <Field label="Email Address">
                   <div className="relative">
                     <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input type="email" value={profile.email} disabled className={`${inputClass} pl-10`} />
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400 uppercase bg-slate-100 px-2 py-0.5 rounded-full">Read-only</span>
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400 uppercase bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">Read-only</span>
                   </div>
                 </Field>
                 <Field label="Business Name">
@@ -735,11 +735,11 @@ const Settings = () => {
             <div className="space-y-6">
 
               {/* Password change card */}
-              <section className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm space-y-6">
+              <section className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="p-3 bg-violet-50 text-violet-600 rounded-2xl"><ShieldCheck size={22} /></div>
                   <div>
-                    <h3 className="text-xl font-black text-slate-900">Change Password</h3>
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white">Change Password</h3>
                     <p className="text-xs text-slate-400 font-bold mt-0.5">Use a strong password with at least 8 characters.</p>
                   </div>
                 </div>
@@ -748,7 +748,7 @@ const Settings = () => {
                   <div className="relative">
                     <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input type={showCurrent ? "text" : "password"} value={pwd.current} onChange={(e) => setPwd((p) => ({ ...p, current: e.target.value }))} placeholder="Enter current password" className={`${inputClass} pl-10 pr-12`} />
-                    <button onClick={() => setShowCurrent(v => !v)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                    <button onClick={() => setShowCurrent(v => !v)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-300">
                       {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
@@ -759,7 +759,7 @@ const Settings = () => {
                     <div className="relative">
                       <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                       <input type={showNew ? "text" : "password"} value={pwd.newPwd} onChange={(e) => setPwd((p) => ({ ...p, newPwd: e.target.value }))} placeholder="Min. 8 characters" className={`${inputClass} pl-10 pr-12`} />
-                      <button onClick={() => setShowNew(v => !v)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                      <button onClick={() => setShowNew(v => !v)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-300">
                         {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                     </div>
@@ -768,7 +768,7 @@ const Settings = () => {
                     <div className="relative">
                       <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                       <input type={showConfirm ? "text" : "password"} value={pwd.confirm} onChange={(e) => setPwd((p) => ({ ...p, confirm: e.target.value }))} placeholder="Repeat new password" className={`${inputClass} pl-10 pr-12`} />
-                      <button onClick={() => setShowConfirm(v => !v)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                      <button onClick={() => setShowConfirm(v => !v)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-300">
                         {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                     </div>
@@ -806,11 +806,11 @@ const Settings = () => {
               </section>
 
               {/* ── 2FA CARD ── */}
-              <section className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm space-y-6">
+              <section className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl"><KeyRound size={22} /></div>
                   <div>
-                    <h3 className="text-xl font-black text-slate-900">Two-Factor Authentication</h3>
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white">Two-Factor Authentication</h3>
                     <p className="text-xs text-slate-400 font-bold mt-0.5">Add a second layer of protection to your account.</p>
                   </div>
                 </div>
@@ -818,7 +818,7 @@ const Settings = () => {
                 <TwoFactorPanel enabled={twoFaEnabled} />
 
                 {/* Info box */}
-                <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100 text-xs text-slate-500 font-medium">
+                <div className="flex items-start gap-3 p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-800 text-xs text-slate-500 font-medium">
                   <ShieldCheck size={15} className="text-indigo-400 shrink-0 mt-0.5" />
                   When 2FA is active, you will need to enter a 6-digit code from your authenticator app each time you log in, even if someone knows your password.
                 </div>
@@ -828,11 +828,11 @@ const Settings = () => {
 
           {/* ── NOTIFICATIONS TAB ── */}
           {activeTab === "notifications" && (
-            <section className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm space-y-6">
+            <section className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl"><Bell size={22} /></div>
                 <div>
-                  <h3 className="text-xl font-black text-slate-900">Email Notifications</h3>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white">Email Notifications</h3>
                   <p className="text-xs text-slate-400 font-bold mt-0.5">Choose what alerts you receive at your inbox.</p>
                 </div>
               </div>
@@ -842,12 +842,12 @@ const Settings = () => {
                   { key: "newBookingEmail", icon: <BellRing size={18} className="text-indigo-600" />, bg: "bg-indigo-50", label: "New Booking Alert", desc: "Get an email instantly whenever a customer schedules an appointment.", badge: "Recommended", badgeColor: "bg-indigo-100 text-indigo-700" },
                   { key: "cancellationEmail", icon: <BellOff size={18} className="text-rose-600" />, bg: "bg-rose-50", label: "Cancellation Alert", desc: "Get notified when a confirmed booking is cancelled.", badge: null },
                 ].map((item) => (
-                  <div key={item.key} className="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100 gap-4">
+                  <div key={item.key} className="flex items-center justify-between p-5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-800 gap-4">
                     <div className="flex items-start gap-4">
                       <div className={`p-2.5 rounded-xl ${item.bg} shrink-0`}>{item.icon}</div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="text-sm font-black text-slate-900">{item.label}</p>
+                          <p className="text-sm font-black text-slate-900 dark:text-white">{item.label}</p>
                           {item.badge && (
                             <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${item.badgeColor}`}>{item.badge}</span>
                           )}
@@ -860,10 +860,10 @@ const Settings = () => {
                 ))}
               </div>
 
-              <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+              <div className="flex items-start gap-3 p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-800">
                 <Mail size={16} className="text-slate-400 shrink-0 mt-0.5" />
                 <p className="text-xs text-slate-500 font-medium">
-                  All emails are sent to <span className="font-black text-slate-900">{profile.email}</span>. To change your email address, please contact support.
+                  All emails are sent to <span className="font-black text-slate-900 dark:text-white">{profile.email}</span>. To change your email address, please contact support.
                 </p>
               </div>
 
@@ -879,11 +879,11 @@ const Settings = () => {
 
           {/* ── WEBSITE QR CODE TAB ── */}
           {activeTab === "website" && (
-            <section className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm space-y-6">
+            <section className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl"><QrCode size={22} /></div>
                 <div>
-                  <h3 className="text-xl font-black text-slate-900">Booking QR Code</h3>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white">Booking QR Code</h3>
                   <p className="text-xs text-slate-400 font-bold mt-0.5">Let customers scan and book instantly — no link needed.</p>
                 </div>
               </div>

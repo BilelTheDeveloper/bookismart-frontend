@@ -119,7 +119,7 @@ const ReviewModal = ({ member, onClose, onDone }) => {
                   </div>
                 ) : (
                   <div className="h-32 bg-slate-800 rounded-2xl border border-slate-700 flex items-center justify-center">
-                    <p className="text-slate-600 text-xs font-bold">Not submitted</p>
+                    <p className="text-slate-600 dark:text-slate-300 text-xs font-bold">Not submitted</p>
                   </div>
                 )}
               </div>
@@ -144,7 +144,7 @@ const ReviewModal = ({ member, onClose, onDone }) => {
                       </div>
                     ) : (
                       <div className="aspect-[4/3] bg-slate-800 rounded-2xl border border-slate-700 flex items-center justify-center">
-                        <p className="text-slate-600 text-xs font-bold">Not submitted</p>
+                        <p className="text-slate-600 dark:text-slate-300 text-xs font-bold">Not submitted</p>
                       </div>
                     )}
                   </div>
@@ -279,7 +279,7 @@ const AdminStaff = () => {
       ) : members.length === 0 ? (
         <div className="bg-slate-900 border border-slate-800 rounded-[2rem] p-16 text-center">
           <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Users size={24} className="text-slate-600" />
+            <Users size={24} className="text-slate-600 dark:text-slate-300" />
           </div>
           <h3 className="text-white font-black mb-2">No records found</h3>
           <p className="text-slate-500 text-sm">No staff members match this filter.</p>
@@ -337,7 +337,7 @@ const AdminStaff = () => {
                       <img src={src} alt={label} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-slate-600 text-[9px] font-bold text-center px-1">{label}</span>
+                        <span className="text-slate-600 dark:text-slate-300 text-[9px] font-bold text-center px-1">{label}</span>
                       </div>
                     )}
                   </div>

@@ -6,21 +6,24 @@ import {
   LogOut, ChevronRight, Menu, X, User, Loader2,
 } from "lucide-react";
 import { useStaffAuth } from "../../../context/StaffAuthContext";
+import LanguageSwitcher from "../../../components/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 const PAGE_META = {
-  bookings:    { label: "Bookings",    icon: CalendarDays, path: "bookings",    color: "text-blue-400" },
-  customers:   { label: "Customers",   icon: Users,        path: "customers",   color: "text-purple-400" },
-  finance:     { label: "Finance",     icon: BarChart2,    path: "finance",     color: "text-emerald-400" },
-  chat:        { label: "Chat",        icon: MessageSquare,path: "chat",        color: "text-sky-400" },
-  invoices:    { label: "Invoices",    icon: FileText,     path: "invoices",    color: "text-amber-400" },
-  loyalty:     { label: "Loyalty",     icon: Gift,         path: "loyalty",     color: "text-pink-400" },
-  work_mode:   { label: "Work Mode",   icon: Briefcase,    path: "work-mode",   color: "text-orange-400" },
-  recruitment: { label: "Recruitment", icon: UserPlus,     path: "recruitment", color: "text-teal-400" },
-  analytics:   { label: "Analytics",   icon: TrendingUp,   path: "analytics",   color: "text-violet-400" },
+  bookings:    { label: "Bookings",    i18nKey: "portal.nav.bookings",    icon: CalendarDays, path: "bookings",    color: "text-blue-400" },
+  customers:   { label: "Customers",   i18nKey: "portal.nav.customers",   icon: Users,        path: "customers",   color: "text-purple-400" },
+  finance:     { label: "Finance",     i18nKey: "portal.nav.finance",     icon: BarChart2,    path: "finance",     color: "text-emerald-400" },
+  chat:        { label: "Chat",        i18nKey: "portal.nav.chat",        icon: MessageSquare,path: "chat",        color: "text-sky-400" },
+  invoices:    { label: "Invoices",    i18nKey: "portal.nav.invoices",    icon: FileText,     path: "invoices",    color: "text-amber-400" },
+  loyalty:     { label: "Loyalty",     i18nKey: "portal.nav.loyalty",     icon: Gift,         path: "loyalty",     color: "text-pink-400" },
+  work_mode:   { label: "Work Mode",   i18nKey: "portal.nav.workMode",    icon: Briefcase,    path: "work-mode",   color: "text-orange-400" },
+  recruitment: { label: "Recruitment", i18nKey: "portal.nav.recruitment", icon: UserPlus,     path: "recruitment", color: "text-teal-400" },
+  analytics:   { label: "Analytics",   i18nKey: "portal.nav.analytics",   icon: TrendingUp,   path: "analytics",   color: "text-violet-400" },
 };
 
 const StaffLayout = () => {
   const { staff, loading, isAuthenticated, logoutStaff } = useStaffAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   // All hooks must be called unconditionally — before any early returns
@@ -67,7 +70,7 @@ const StaffLayout = () => {
               <Briefcase size={14} className="text-violet-400" />
             </div>
             <div className="min-w-0">
-              <p className="text-white font-black text-sm tracking-tight truncate">Staff Portal</p>
+              <p className="text-white font-black text-sm tracking-tight truncate">{t("portal.staffPortal")}</p>
               <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Bookiify</p>
             </div>
           </div>
@@ -104,7 +107,7 @@ const StaffLayout = () => {
           `}
         >
           <Home size={16} className="shrink-0" />
-          {(!collapsed || mobile) && <span>Dashboard</span>}
+          {(!collapsed || mobile) && <span>{t("portal.dashboard")}</span>}
         </NavLink>
       </div>
 
@@ -113,7 +116,7 @@ const StaffLayout = () => {
         <div className="px-3 pt-2">
           {(!collapsed || mobile) && (
             <p className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] px-3 mb-2">
-              My Access
+              {t("portal.myAccess")}
             </p>
           )}
           <nav className="space-y-1">
@@ -130,7 +133,7 @@ const StaffLayout = () => {
                   `}
                 >
                   <Icon size={16} className="shrink-0" />
-                  {(!collapsed || mobile) && <span>{item.label}</span>}
+                  {(!collapsed || mobile) && <span>{t(item.i18nKey, item.label)}</span>}
                 </NavLink>
               );
             })}
@@ -140,12 +143,17 @@ const StaffLayout = () => {
 
       {navItems.length === 0 && (!collapsed || mobile) && (
         <div className="mx-3 mt-2 p-4 bg-slate-800/50 border border-slate-700 rounded-xl">
-          <p className="text-slate-500 text-xs text-center">No pages assigned yet. Contact your manager.</p>
+          <p className="text-slate-500 text-xs text-center">{t("portal.noPages")}</p>
         </div>
       )}
 
       {/* Profile footer */}
       <div className="mt-auto p-4 border-t border-slate-800">
+        {(!collapsed || mobile) && (
+          <div className="dark mb-3 flex justify-center">
+            <LanguageSwitcher />
+          </div>
+        )}
         <div className={`flex items-center ${collapsed && !mobile ? "justify-center" : "gap-3"}`}>
           <div className="w-9 h-9 rounded-xl overflow-hidden bg-violet-600/20 border border-violet-500/30 flex items-center justify-center shrink-0">
             {staff?.profilePic
@@ -214,13 +222,16 @@ const StaffLayout = () => {
           >
             <Menu size={20} />
           </button>
-          <p className="text-white font-black text-sm">Staff Portal</p>
-          <button
-            onClick={() => navigate("/staff/portal")}
-            className="w-8 h-8 bg-violet-600/20 border border-violet-500/30 rounded-xl flex items-center justify-center"
-          >
-            <User size={14} className="text-violet-400" />
-          </button>
+          <p className="text-white font-black text-sm">{t("portal.staffPortal")}</p>
+          <div className="flex items-center gap-2">
+            <div className="dark"><LanguageSwitcher /></div>
+            <button
+              onClick={() => navigate("/staff/portal")}
+              className="w-8 h-8 bg-violet-600/20 border border-violet-500/30 rounded-xl flex items-center justify-center"
+            >
+              <User size={14} className="text-violet-400" />
+            </button>
+          </div>
         </div>
 
         {/* Page content */}

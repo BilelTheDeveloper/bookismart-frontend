@@ -142,7 +142,7 @@ const CustomerSession = () => {
 
   // Socket.io: connect once, re-join room when session._id changes
   useEffect(() => {
-    const base = import.meta.env.VITE_API_URL || "https://bookismart-backend-kcnn.onrender.com";
+    const base = import.meta.env.VITE_API_URL || "https://bookismart-backend-ixlp.onrender.com";
     const origin = base.replace(/\/api$/, "");
 
     const socket = io(origin, { withCredentials: true });

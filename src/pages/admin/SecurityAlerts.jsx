@@ -5,7 +5,7 @@ const toneClass = (level) => {
   if (level === "SECURITY") return "bg-rose-50 text-rose-700 border-rose-200";
   if (level === "ERROR") return "bg-amber-50 text-amber-700 border-amber-200";
   if (level === "WARN") return "bg-indigo-50 text-indigo-700 border-indigo-200";
-  return "bg-slate-50 text-slate-700 border-slate-200";
+  return "bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700";
 };
 
 const SecurityAlerts = () => {
@@ -48,7 +48,7 @@ const SecurityAlerts = () => {
     <div className="space-y-6">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black text-slate-900">Security Alerts</h2>
+          <h2 className="text-3xl font-black text-slate-900 dark:text-white">Security Alerts</h2>
           <p className="text-slate-500 font-medium">Real-time suspicious activity feed (last 24h).</p>
         </div>
         <button onClick={load} className="px-5 py-3 rounded-2xl bg-slate-900 text-white font-black text-sm">
@@ -58,22 +58,22 @@ const SecurityAlerts = () => {
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         {[
-          ["Total", counts.total, "bg-white border-slate-100"],
+          ["Total", counts.total, "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800"],
           ["SECURITY", counts.security, "bg-rose-50 border-rose-100"],
           ["WARN", counts.warn, "bg-indigo-50 border-indigo-100"],
           ["ERROR", counts.error, "bg-amber-50 border-amber-100"],
-          ["INFO", counts.info, "bg-slate-50 border-slate-200"],
+          ["INFO", counts.info, "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700"],
         ].map(([label, value, cls]) => (
           <div key={label} className={`rounded-3xl border p-5 ${cls}`}>
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{label}</p>
-            <p className="text-3xl font-black text-slate-900 mt-1">{value}</p>
+            <p className="text-3xl font-black text-slate-900 dark:text-white mt-1">{value}</p>
           </div>
         ))}
       </div>
 
-      <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden">
         <div className="p-6 border-b border-slate-50 flex items-center justify-between">
-          <p className="font-black text-slate-900">Recent events</p>
+          <p className="font-black text-slate-900 dark:text-white">Recent events</p>
           <p className="text-xs font-bold text-slate-400">{loading ? "Loading…" : `${items.length} events`}</p>
         </div>
 
@@ -86,7 +86,7 @@ const SecurityAlerts = () => {
                     {e.level}
                   </span>
                   {e.code && (
-                    <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-[10px] font-black uppercase tracking-widest">
+                    <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[10px] font-black uppercase tracking-widest">
                       {e.code}
                     </span>
                   )}
@@ -94,13 +94,13 @@ const SecurityAlerts = () => {
                     {new Date(e.createdAt).toLocaleString()}
                   </span>
                 </div>
-                <p className="font-black text-slate-900 mt-2 break-words">{e.msg}</p>
+                <p className="font-black text-slate-900 dark:text-white mt-2 break-words">{e.msg}</p>
                 <p className="text-xs text-slate-500 font-medium mt-1 break-words">
                   {e.method} {e.path} · IP {e.ip || "—"} {e.userId ? `· user ${e.userId}` : ""}
                 </p>
               </div>
               {e.meta && Object.keys(e.meta).length > 0 && (
-                <pre className="bg-slate-50 border border-slate-100 rounded-2xl p-3 text-[11px] text-slate-700 overflow-auto max-w-full md:max-w-[420px]">
+                <pre className="bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 rounded-2xl p-3 text-[11px] text-slate-700 dark:text-slate-200 overflow-auto max-w-full md:max-w-[420px]">
 {JSON.stringify(e.meta, null, 2)}
                 </pre>
               )}

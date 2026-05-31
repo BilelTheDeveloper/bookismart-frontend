@@ -75,10 +75,10 @@ const AdminVerification = () => {
             </div>
             <span className="text-[10px] font-black uppercase tracking-[0.4em]">Security & Compliance</span>
           </div>
-          <h1 className="text-5xl font-black text-slate-900 tracking-tighter">Website Deployment</h1>
+          <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter">Website Deployment</h1>
           <p className="text-slate-500 font-medium mt-2">Review and authorize merchant digital storefronts.</p>
         </div>
-        <div className="bg-white px-8 py-4 rounded-[2rem] shadow-xl shadow-slate-200/40 border border-slate-100 flex items-center gap-4">
+        <div className="bg-white px-8 py-4 rounded-[2rem] shadow-xl shadow-slate-200/40 border border-slate-100 dark:border-slate-800 flex items-center gap-4">
           <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Awaiting Review</span>
           <span className="text-3xl font-black text-indigo-600">{pendingSites.length}</span>
         </div>
@@ -86,12 +86,12 @@ const AdminVerification = () => {
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 gap-12">
         {pendingSites.map((site) => (
-          <div key={site._id} className="bg-white rounded-[3rem] border border-slate-200 shadow-2xl shadow-slate-200/60 overflow-hidden flex flex-col lg:flex-row transition-all hover:border-indigo-300">
+          <div key={site._id} className="bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-200 dark:border-slate-700 shadow-2xl shadow-slate-200/60 overflow-hidden flex flex-col lg:flex-row transition-all hover:border-indigo-300">
             
             {/* LEFT: VISUAL PREVIEW */}
-            <div className="lg:w-2/5 bg-slate-50 p-8 border-r border-slate-100">
+            <div className="lg:w-2/5 bg-slate-50 dark:bg-slate-800/60 p-8 border-r border-slate-100 dark:border-slate-800">
               <div className="flex items-center justify-between mb-6">
-                <span className="bg-white px-4 py-2 rounded-full text-[10px] font-black text-indigo-600 shadow-sm border border-slate-100 uppercase tracking-widest">
+                <span className="bg-white px-4 py-2 rounded-full text-[10px] font-black text-indigo-600 shadow-sm border border-slate-100 dark:border-slate-800 uppercase tracking-widest">
                   {site.templateId}
                 </span>
                 <div className="flex items-center gap-2 text-slate-400">
@@ -108,7 +108,7 @@ const AdminVerification = () => {
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="aspect-square bg-white rounded-[1.5rem] overflow-hidden border border-slate-100 p-2">
+                  <div className="aspect-square bg-white dark:bg-slate-900 rounded-[1.5rem] overflow-hidden border border-slate-100 dark:border-slate-800 p-2">
                     <img src={site.about?.image} className="w-full h-full object-cover rounded-[1rem]" alt="About" />
                   </div>
                   <div className="aspect-square bg-indigo-600 rounded-[1.5rem] flex flex-col items-center justify-center text-white gap-2">
@@ -124,7 +124,7 @@ const AdminVerification = () => {
               <div>
                 <div className="flex justify-between items-start mb-8">
                   <div>
-                    <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-2">{site.name}</h2>
+                    <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2">{site.name}</h2>
                     <div className="flex flex-wrap gap-4">
                       <div className="flex items-center gap-2 text-slate-500 text-xs font-bold">
                         <Tag size={14} className="text-indigo-500" /> {site.category}
@@ -139,22 +139,22 @@ const AdminVerification = () => {
                   </div>
                   <button 
                     onClick={() => window.open(`https://bookiify.com/${site.slug}`, '_blank')}
-                    className="p-4 bg-slate-100 text-slate-600 rounded-2xl hover:bg-slate-900 hover:text-white transition-all"
+                    className="p-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl hover:bg-slate-900 hover:text-white transition-all"
                   >
                     <ExternalLink size={20} />
                   </button>
                 </div>
 
                 {/* SERVICES SNEAK PEEK */}
-                <div className="bg-slate-50 rounded-[2rem] p-6 mb-8 border border-slate-100">
+                <div className="bg-slate-50 dark:bg-slate-800/60 rounded-[2rem] p-6 mb-8 border border-slate-100 dark:border-slate-800">
                   <div className="flex items-center gap-2 mb-4">
                     <ListChecks size={16} className="text-indigo-600" />
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Service Offerings</span>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     {site.services?.slice(0, 4).map((svc, i) => (
-                      <div key={i} className="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-200/50">
-                        <span className="text-[11px] font-bold text-slate-700 truncate mr-2">{svc.title}</span>
+                      <div key={i} className="flex justify-between items-center bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700/50">
+                        <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate mr-2">{svc.title}</span>
                         <span className="text-[10px] font-black text-indigo-600">{svc.price}</span>
                       </div>
                     ))}
@@ -175,7 +175,7 @@ const AdminVerification = () => {
                 <button 
                   disabled={processingId === site._id}
                   onClick={() => handleAction(site._id, 'reject')}
-                  className="flex-1 bg-white border-2 border-rose-100 text-rose-500 h-16 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-rose-500 hover:text-white transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+                  className="flex-1 bg-white dark:bg-slate-900 border-2 border-rose-100 text-rose-500 h-16 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-rose-500 hover:text-white transition-all disabled:opacity-50 flex items-center justify-center gap-3"
                 >
                   <XCircle size={18} /> Reject
                 </button>
@@ -188,7 +188,7 @@ const AdminVerification = () => {
 
       {pendingSites.length === 0 && (
         <div className="text-center py-40">
-           <div className="inline-flex items-center justify-center w-24 h-24 bg-white rounded-[2.5rem] mb-8 shadow-sm border border-slate-100 text-slate-200">
+           <div className="inline-flex items-center justify-center w-24 h-24 bg-white dark:bg-slate-900 rounded-[2.5rem] mb-8 shadow-sm border border-slate-100 dark:border-slate-800 text-slate-200">
              <AlertCircle size={48} />
            </div>
            <h2 className="text-2xl font-black text-slate-300 uppercase tracking-widest">Queue Clear</h2>

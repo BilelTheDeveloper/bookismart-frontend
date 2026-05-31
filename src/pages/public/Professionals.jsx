@@ -23,7 +23,7 @@ const CATEGORY_META = {
   "Health & Medical":  { emoji: "🏥",  color: "bg-blue-100 text-blue-700 border-blue-200" },
   "Fitness & Gyms":    { emoji: "💪",  color: "bg-orange-100 text-orange-700 border-orange-200" },
   "Creative & Media":  { emoji: "🎨",  color: "bg-purple-100 text-purple-700 border-purple-200" },
-  "Car Services":      { emoji: "🚗",  color: "bg-slate-100 text-slate-700 border-slate-200" },
+  "Car Services":      { emoji: "🚗",  color: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700" },
   "Maintenance":       { emoji: "🔧",  color: "bg-yellow-100 text-yellow-700 border-yellow-200" },
   "Coaching & Tutors": { emoji: "📚",  color: "bg-green-100 text-green-700 border-green-200" },
   "Consultants":       { emoji: "💼",  color: "bg-indigo-100 text-indigo-700 border-indigo-200" },
@@ -84,7 +84,7 @@ const priceFrom = (services = []) => {
 
 // ─── Skeleton card ────────────────────────────────────────────────────────────
 const SkeletonCard = () => (
-  <div className="overflow-hidden rounded-[1.5rem] border border-slate-100 bg-white shadow-sm animate-pulse">
+  <div className="overflow-hidden rounded-[1.5rem] border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm animate-pulse">
     <div className="h-52 bg-slate-200" />
     <div className="p-5 space-y-3">
       <div className="h-5 bg-slate-200 rounded-lg w-3/4" />
@@ -114,7 +114,7 @@ const formatResponseTime = (hours) => {
 // ─── Professional card ────────────────────────────────────────────────────────
 const ProfessionalCard = ({ site, index }) => {
   const { t } = useTranslation();
-  const catMeta = CATEGORY_META[site.ownerId?.category] || { emoji: "🏢", color: "bg-slate-100 text-slate-700 border-slate-200" };
+  const catMeta = CATEGORY_META[site.ownerId?.category] || { emoji: "🏢", color: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700" };
   const openStatus = isOpenNow(site.businessHours || []);
   const minPrice = priceFrom(site.services || []);
   const topServices = (site.services || []).filter((s) => s.active !== false).slice(0, 2);
@@ -129,7 +129,7 @@ const ProfessionalCard = ({ site, index }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.4, delay: Math.min(index * 0.06, 0.36) }}
-      className="group relative flex flex-col overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-md shadow-slate-200/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-300/40"
+      className="group relative flex flex-col overflow-hidden rounded-[1.75rem] border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-md shadow-slate-200/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-300/40"
     >
       {/* ── Cover image ───────────────────────────────────────────────────── */}
       <div className="relative h-[13rem] overflow-hidden flex-shrink-0">
@@ -220,7 +220,7 @@ const ProfessionalCard = ({ site, index }) => {
             {site.rating ? (
               <>
                 <span className="flex gap-0.5">{renderStars(site.rating, 13)}</span>
-                <span className="text-xs font-black text-slate-800">{site.rating.toFixed(1)}</span>
+                <span className="text-xs font-black text-slate-800 dark:text-slate-100">{site.rating.toFixed(1)}</span>
                 <span className="text-[11px] text-slate-400 font-medium">({site.reviewCount} {t("professionals.reviewsUnit")})</span>
               </>
             ) : (
@@ -234,22 +234,22 @@ const ProfessionalCard = ({ site, index }) => {
         </div>
 
         {/* ── Trust metrics strip ── */}
-        <div className="grid grid-cols-3 gap-1.5 rounded-2xl bg-slate-50 border border-slate-100 p-2.5">
+        <div className="grid grid-cols-3 gap-1.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 p-2.5">
           {/* Clients */}
           <div className="text-center">
             <div className="flex items-center justify-center gap-0.5 mb-0.5">
               <Users size={10} className="text-indigo-400" />
-              <span className="text-xs font-black text-slate-800">
+              <span className="text-xs font-black text-slate-800 dark:text-slate-100">
                 {site.uniqueClients > 0 ? site.uniqueClients : "—"}
               </span>
             </div>
             <p className="text-[9px] font-semibold text-slate-400 leading-none">{t("professionals.clients")}</p>
           </div>
           {/* Completed */}
-          <div className="text-center border-x border-slate-200">
+          <div className="text-center border-x border-slate-200 dark:border-slate-700">
             <div className="flex items-center justify-center gap-0.5 mb-0.5">
               <CheckCircle2 size={10} className="text-emerald-500" />
-              <span className="text-xs font-black text-slate-800">
+              <span className="text-xs font-black text-slate-800 dark:text-slate-100">
                 {site.completedCount > 0 ? site.completedCount : "—"}
               </span>
             </div>
@@ -261,7 +261,7 @@ const ProfessionalCard = ({ site, index }) => {
               <>
                 <div className="flex items-center justify-center gap-0.5 mb-0.5">
                   <Timer size={10} className="text-violet-400" />
-                  <span className="text-xs font-black text-slate-800">{responseTime}</span>
+                  <span className="text-xs font-black text-slate-800 dark:text-slate-100">{responseTime}</span>
                 </div>
                 <p className="text-[9px] font-semibold text-slate-400 leading-none">{t("professionals.responseLabel")}</p>
               </>
@@ -269,7 +269,7 @@ const ProfessionalCard = ({ site, index }) => {
               <>
                 <div className="flex items-center justify-center gap-0.5 mb-0.5">
                   <ThumbsUp size={10} className={site.cancellationRate < 10 ? "text-emerald-500" : "text-slate-400"} />
-                  <span className="text-xs font-black text-slate-800">
+                  <span className="text-xs font-black text-slate-800 dark:text-slate-100">
                     {site.completedCount > 0 ? `${100 - (site.cancellationRate ?? 0)}%` : "—"}
                   </span>
                 </div>
@@ -285,14 +285,14 @@ const ProfessionalCard = ({ site, index }) => {
             {topServices.map((svc, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-1 rounded-lg bg-slate-50 border border-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600"
+                className="inline-flex items-center gap-1 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:text-slate-300"
               >
                 {svc.title}
                 {svc.price && <span className="text-indigo-500 font-bold">{svc.price} TND</span>}
               </span>
             ))}
             {(site.services || []).filter(s => s.active !== false).length > 2 && (
-              <span className="rounded-lg bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500">
+              <span className="rounded-lg bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-slate-500">
                 +{(site.services || []).filter(s => s.active !== false).length - 2}
               </span>
             )}
@@ -311,7 +311,7 @@ const ProfessionalCard = ({ site, index }) => {
               <span className="text-[9px] font-bold text-slate-500">{firstReview.customerName?.split(" ")[0]}</span>
             </div>
             {firstReview.text && (
-              <p className="text-[10px] text-slate-600 leading-relaxed line-clamp-2 italic">
+              <p className="text-[10px] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2 italic">
                 "{firstReview.text}"
               </p>
             )}
@@ -332,7 +332,7 @@ const ProfessionalCard = ({ site, index }) => {
           </Link>
           <Link
             to={`/p/${site.slug}`}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 transition-all hover:bg-slate-50 hover:border-slate-300 active:scale-95"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-200 transition-all hover:bg-slate-50 dark:hover:bg-slate-800/60 dark:bg-slate-800/60 hover:border-slate-300 active:scale-95"
           >
             <Globe size={13} />
             {t("professionals.viewProfile")}
@@ -581,7 +581,7 @@ const Professionals = () => {
       </section>
 
       {/* ── FILTER BAR ───────────────────────────────────────────────────────── */}
-      <div className="sticky top-[72px] z-30 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm">
+      <div className="sticky top-[72px] z-30 bg-white/95 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 shadow-sm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Main filter row */}
           <div className="flex items-center gap-3 py-3">
@@ -591,7 +591,7 @@ const Professionals = () => {
               className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition-all sm:hidden ${
                 activeFilterCount > 0
                   ? "border-indigo-300 bg-indigo-50 text-indigo-700"
-                  : "border-slate-200 bg-white text-slate-600"
+                  : "border-slate-200 dark:border-slate-700 bg-white text-slate-600 dark:text-slate-300"
               }`}
             >
               <Filter size={13} />
@@ -610,7 +610,7 @@ const Professionals = () => {
                 className={`flex-shrink-0 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all ${
                   selectedCategory === "all"
                     ? "border-indigo-600 bg-indigo-600 text-white"
-                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                    : "border-slate-200 dark:border-slate-700 bg-white text-slate-600 dark:text-slate-300 hover:border-slate-300"
                 }`}
               >
                 {t("professionals.filterAll")}
@@ -622,7 +622,7 @@ const Professionals = () => {
                   className={`flex-shrink-0 inline-flex items-center gap-1 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all ${
                     selectedCategory === cat
                       ? "border-indigo-600 bg-indigo-600 text-white"
-                      : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                      : "border-slate-200 dark:border-slate-700 bg-white text-slate-600 dark:text-slate-300 hover:border-slate-300"
                   }`}
                 >
                   <span>{meta.emoji}</span>
@@ -639,7 +639,7 @@ const Professionals = () => {
                   className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition-all ${
                     selectedCity !== "all"
                       ? "border-indigo-300 bg-indigo-50 text-indigo-700"
-                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                      : "border-slate-200 dark:border-slate-700 bg-white text-slate-700 dark:text-slate-200 hover:border-slate-300"
                   }`}
                 >
                   <MapPin size={12} />
@@ -653,13 +653,13 @@ const Professionals = () => {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -6, scale: 0.97 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 top-full mt-2 w-52 rounded-2xl border border-slate-100 bg-white shadow-xl shadow-slate-200/80 overflow-hidden z-50"
+                      className="absolute right-0 top-full mt-2 w-52 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl shadow-slate-200/80 overflow-hidden z-50"
                     >
                       <div className="max-h-64 overflow-y-auto p-1.5">
                         <button
                           onClick={() => { setSelectedCity("all"); setCityDropdownOpen(false); }}
                           className={`w-full rounded-xl px-3 py-2 text-left text-xs font-semibold transition-colors ${
-                            selectedCity === "all" ? "bg-indigo-50 text-indigo-700" : "text-slate-700 hover:bg-slate-50"
+                            selectedCity === "all" ? "bg-indigo-50 text-indigo-700" : "text-slate-700 dark:text-slate-200 hover:bg-slate-50"
                           }`}
                         >
                           {t("professionals.allCities")}
@@ -669,7 +669,7 @@ const Professionals = () => {
                             key={city}
                             onClick={() => { setSelectedCity(city); setCityDropdownOpen(false); }}
                             className={`w-full rounded-xl px-3 py-2 text-left text-xs font-semibold transition-colors ${
-                              selectedCity === city ? "bg-indigo-50 text-indigo-700 font-bold" : "text-slate-700 hover:bg-slate-50"
+                              selectedCity === city ? "bg-indigo-50 text-indigo-700 font-bold" : "text-slate-700 dark:text-slate-200 hover:bg-slate-50"
                             }`}
                           >
                             {city}
@@ -685,7 +685,7 @@ const Professionals = () => {
               <div ref={sortRef} className="relative">
                 <button
                   onClick={() => { setSortDropdownOpen((v) => !v); setCityDropdownOpen(false); }}
-                  className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 transition-all hover:border-slate-300"
+                  className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 transition-all hover:border-slate-300"
                 >
                   <ArrowUpDown size={12} />
                   <span className="hidden sm:inline">{currentSort?.label}</span>
@@ -698,7 +698,7 @@ const Professionals = () => {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -6, scale: 0.97 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 top-full mt-2 w-44 rounded-2xl border border-slate-100 bg-white shadow-xl shadow-slate-200/80 overflow-hidden z-50"
+                      className="absolute right-0 top-full mt-2 w-44 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl shadow-slate-200/80 overflow-hidden z-50"
                     >
                       <div className="p-1.5">
                         {SORT_OPTIONS.map((opt) => (
@@ -706,7 +706,7 @@ const Professionals = () => {
                             key={opt.value}
                             onClick={() => { setSortBy(opt.value); setSortDropdownOpen(false); }}
                             className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${
-                              sortBy === opt.value ? "bg-indigo-50 text-indigo-700 font-bold" : "text-slate-700 hover:bg-slate-50"
+                              sortBy === opt.value ? "bg-indigo-50 text-indigo-700 font-bold" : "text-slate-700 dark:text-slate-200 hover:bg-slate-50"
                             }`}
                           >
                             <opt.icon size={12} />
@@ -746,7 +746,7 @@ const Professionals = () => {
                   <button
                     onClick={() => setSelectedCategory("all")}
                     className={`rounded-xl border px-3 py-1.5 text-xs font-bold ${
-                      selectedCategory === "all" ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 bg-white text-slate-600"
+                      selectedCategory === "all" ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 dark:border-slate-700 bg-white text-slate-600 dark:text-slate-300"
                     }`}
                   >
                     Tous
@@ -756,7 +756,7 @@ const Professionals = () => {
                       key={cat}
                       onClick={() => setSelectedCategory(selectedCategory === cat ? "all" : cat)}
                       className={`inline-flex items-center gap-1 rounded-xl border px-3 py-1.5 text-xs font-bold ${
-                        selectedCategory === cat ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 bg-white text-slate-600"
+                        selectedCategory === cat ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 dark:border-slate-700 bg-white text-slate-600 dark:text-slate-300"
                       }`}
                     >
                       <span>{meta.emoji}</span> {cat}
@@ -781,7 +781,7 @@ const Professionals = () => {
                 {filtered.length > 99 ? "99+" : filtered.length}
               </span>
             )}
-            <p className="text-sm font-bold text-slate-700">
+            <p className="text-sm font-bold text-slate-700 dark:text-slate-200">
               {loading ? t("common.loading") : `${filtered.length} ${t("professionals.found")}`}
             </p>
           </div>
@@ -812,12 +812,12 @@ const Professionals = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white px-6 py-20 text-center"
+            className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 dark:border-slate-700 bg-white px-6 py-20 text-center"
           >
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-slate-400 text-3xl mb-4">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 text-3xl mb-4">
               🔍
             </div>
-            <h3 className="text-lg font-black text-slate-800">{t("professionals.noResults")}</h3>
+            <h3 className="text-lg font-black text-slate-800 dark:text-slate-100">{t("professionals.noResults")}</h3>
             <p className="mt-2 text-sm text-slate-500 max-w-xs">
               {t("professionals.noResultsHint")}
             </p>

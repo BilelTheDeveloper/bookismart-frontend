@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const SAPI = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://bookismart-backend-kcnn.onrender.com/api",
+  baseURL: import.meta.env.VITE_API_URL || "https://bookismart-backend-ixlp.onrender.com/api",
   headers: { "Content-Type": "application/json" },
   withCredentials: true,
 });

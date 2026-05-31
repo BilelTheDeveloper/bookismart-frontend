@@ -29,9 +29,9 @@ const STATUS_LABEL = {
 };
 
 const TXN_STATUS_STYLES = {
-  Completed: "bg-emerald-50 text-emerald-700",
-  Failed:    "bg-rose-50 text-rose-700",
-  Pending:   "bg-amber-50 text-amber-700",
+  Completed: "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400",
+  Failed:    "bg-rose-50 text-rose-700 dark:bg-rose-500/15 dark:text-rose-400",
+  Pending:   "bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400",
 };
 
 /* ─── Days remaining from a date ─── */
@@ -217,13 +217,13 @@ const Billing = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight">Billing & Subscription</h2>
-          <p className="text-slate-500 font-medium mt-1">Manage your plan, trial status, and payment history.</p>
+          <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Billing & Subscription</h2>
+          <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">Manage your plan, trial status, and payment history.</p>
         </div>
         <button
           onClick={fetchBilling}
           disabled={loading}
-          className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-2xl text-sm font-bold hover:border-indigo-400 hover:text-indigo-600 transition-all disabled:opacity-60"
+          className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-2xl text-sm font-bold hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all disabled:opacity-60"
         >
           <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh
         </button>
@@ -356,9 +356,9 @@ const Billing = () => {
 
       {/* Middle: payment method + security note */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+            <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
               <CreditCard className="text-indigo-600" /> Payment Method
             </h3>
             {isPaid && (
@@ -372,17 +372,17 @@ const Billing = () => {
               </button>
             )}
           </div>
-          <div className="flex items-center gap-4 p-5 rounded-2xl bg-slate-50 border border-dashed border-slate-200">
-            <div className="w-12 h-8 bg-slate-200 rounded-lg flex items-center justify-center text-[9px] font-black text-slate-500 uppercase">Card</div>
+          <div className="flex items-center gap-4 p-5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-dashed border-slate-200 dark:border-slate-700">
+            <div className="w-12 h-8 bg-slate-200 dark:bg-slate-700 rounded-lg flex items-center justify-center text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase">Card</div>
             <div>
               {isPaid ? (
                 <>
-                  <p className="text-sm font-black text-slate-700">Payment method on file</p>
+                  <p className="text-sm font-black text-slate-700 dark:text-slate-200">Payment method on file</p>
                   <p className="text-xs text-slate-400 font-medium mt-0.5">Managed securely via Stripe. Click "Manage" to update.</p>
                 </>
               ) : (
                 <>
-                  <p className="text-sm font-black text-slate-600 italic">No payment method added yet</p>
+                  <p className="text-sm font-black text-slate-600 dark:text-slate-300 italic">No payment method added yet</p>
                   <p className="text-xs text-slate-400 font-medium mt-0.5">Your trial is currently free of charge.</p>
                 </>
               )}
@@ -391,19 +391,19 @@ const Billing = () => {
           <p className="text-[10px] text-slate-400 font-bold mt-4 uppercase tracking-widest">Payments processed securely via Stripe.</p>
         </div>
 
-        <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm flex items-center gap-6">
-          <div className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl shrink-0"><ShieldCheck size={28} /></div>
+        <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-6">
+          <div className="p-4 bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 rounded-2xl shrink-0"><ShieldCheck size={28} /></div>
           <div>
-            <h4 className="font-black text-slate-900 text-base">Secure Billing</h4>
-            <p className="text-sm text-slate-500 font-medium mt-1">All transactions are encrypted and processed securely via certified Tunisian payment partners. Your data is never stored unencrypted.</p>
+            <h4 className="font-black text-slate-900 dark:text-white text-base">Secure Billing</h4>
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">All transactions are encrypted and processed securely via certified Tunisian payment partners. Your data is never stored unencrypted.</p>
           </div>
         </div>
       </div>
 
       {/* Bottom: transaction history */}
-      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-        <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between">
-          <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+      <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div className="px-8 py-6 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between">
+          <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
             <Clock className="text-indigo-600" /> Transaction History
           </h3>
           <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{transactions.length} records</span>
@@ -412,31 +412,31 @@ const Billing = () => {
         {loading ? (
           <div className="p-8 space-y-4">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-12 bg-slate-100 rounded-xl animate-pulse" />
+              <div key={i} className="h-12 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />
             ))}
           </div>
         ) : transactions.length === 0 ? (
           <div className="py-20 text-center">
-            <CalendarDays size={32} className="text-slate-300 mx-auto mb-3" />
+            <CalendarDays size={32} className="text-slate-300 dark:text-slate-600 mx-auto mb-3" />
             <p className="text-slate-400 font-black text-sm">No transactions yet</p>
-            <p className="text-slate-300 font-medium text-xs mt-1">Your billing history will appear here once charges begin.</p>
+            <p className="text-slate-300 dark:text-slate-600 font-medium text-xs mt-1">Your billing history will appear here once charges begin.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-slate-50">
+              <thead className="bg-slate-50 dark:bg-slate-800/50">
                 <tr>
                   {["Transaction ID", "Date", "Amount", "Status"].map((h) => (
                     <th key={h} className="px-8 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                 {transactions.map((txn, i) => (
-                  <tr key={i} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="px-8 py-5 text-sm font-bold text-slate-500">{txn.transactionId || `TXN-${String(i + 1).padStart(4, "0")}`}</td>
-                    <td className="px-8 py-5 text-sm font-bold text-slate-900">{fmtDate(txn.date)}</td>
-                    <td className="px-8 py-5 text-sm font-black text-slate-900">{(txn.amount || 0).toFixed(3)} {currency}</td>
+                  <tr key={i} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                    <td className="px-8 py-5 text-sm font-bold text-slate-500 dark:text-slate-400">{txn.transactionId || `TXN-${String(i + 1).padStart(4, "0")}`}</td>
+                    <td className="px-8 py-5 text-sm font-bold text-slate-900 dark:text-white">{fmtDate(txn.date)}</td>
+                    <td className="px-8 py-5 text-sm font-black text-slate-900 dark:text-white">{(txn.amount || 0).toFixed(3)} {currency}</td>
                     <td className="px-8 py-5">
                       <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${TXN_STATUS_STYLES[txn.status] || "bg-slate-100 text-slate-600"}`}>
                         {txn.status || "—"}

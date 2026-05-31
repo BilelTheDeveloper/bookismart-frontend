@@ -233,7 +233,7 @@ function CategoryPanel({ cat, onAsk, loadingId }) {
                 <span className="text-slate-300 text-xs font-semibold group-hover:text-white transition-colors leading-snug">
                   {q.label}
                 </span>
-                <ArrowRight size={11} className="ml-auto text-slate-700 group-hover:text-slate-400 transition-colors shrink-0" />
+                <ArrowRight size={11} className="ml-auto text-slate-700 dark:text-slate-200 group-hover:text-slate-400 transition-colors shrink-0" />
               </button>
             );
           })}
@@ -442,7 +442,7 @@ const SmartAssistant = () => {
 
         {/* Footer hint */}
         <div className="px-6 py-3 border-t border-slate-800/60 bg-slate-900/20 shrink-0">
-          <p className="text-center text-[10px] text-slate-600 font-medium">
+          <p className="text-center text-[10px] text-slate-600 dark:text-slate-300 font-medium">
             Select a question from the left panel · Data updates in real time from your bookings
           </p>
         </div>

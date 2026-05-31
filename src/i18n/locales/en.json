@@ -789,6 +789,35 @@
       "staffSeats": "{{count}} staff seats"
     }
   },
+  "portal": {
+    "clientPortal": "Client Portal",
+    "staffPortal": "Staff Portal",
+    "dashboard": "Dashboard",
+    "myAccess": "My Access",
+    "noPages": "No pages assigned yet. Contact your manager.",
+    "signOut": "Sign Out",
+    "signingOut": "Signing out…",
+    "nav": {
+      "profile": "My Profile",
+      "appointments": "Appointments",
+      "invoices": "Invoices",
+      "loyalty": "Loyalty Points",
+      "booking": "Book a Service",
+      "session": "My Session",
+      "bookings": "Bookings",
+      "customers": "Customers",
+      "finance": "Finance",
+      "chat": "Chat",
+      "workMode": "Work Mode",
+      "recruitment": "Recruitment",
+      "analytics": "Analytics"
+    }
+  },
+  "admin": {
+    "access": "Administrator Access",
+    "control": "System Control",
+    "badge": "Admin"
+  },
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong.",

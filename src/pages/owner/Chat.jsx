@@ -142,7 +142,7 @@ function MessageBubble({ msg, isOwn }) {
             </a>
           )}
         </div>
-        <p className="text-[10px] text-slate-600 px-1">
+        <p className="text-[10px] text-slate-600 dark:text-slate-300 px-1">
           {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </p>
       </div>
@@ -311,7 +311,7 @@ export default function Chat() {
             <div className="flex justify-center py-8"><Loader2 size={24} className="text-indigo-500 animate-spin" /></div>
           ) : filteredRooms.length === 0 ? (
             <div className="text-center py-12">
-              <Hash size={28} className="text-slate-700 mx-auto mb-2" />
+              <Hash size={28} className="text-slate-700 dark:text-slate-200 mx-auto mb-2" />
               <p className="text-slate-500 text-xs">No rooms yet</p>
               <button onClick={() => setShowCreate(true)} className="mt-3 text-indigo-400 text-xs font-bold hover:text-indigo-300">
                 + Create one
@@ -332,7 +332,7 @@ export default function Chat() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <p className={`text-sm font-bold truncate ${isActive ? 'text-indigo-300' : 'text-slate-200'}`}>{room.name}</p>
-                      <p className="text-[10px] text-slate-600 flex-shrink-0 ml-1">{timeAgo}</p>
+                      <p className="text-[10px] text-slate-600 dark:text-slate-300 flex-shrink-0 ml-1">{timeAgo}</p>
                     </div>
                     <p className="text-xs text-slate-500 truncate mt-0.5">{room.lastMessage || 'No messages yet'}</p>
                   </div>
@@ -394,7 +394,7 @@ export default function Chat() {
                 <div className="flex justify-center py-8"><Loader2 size={24} className="text-indigo-500 animate-spin" /></div>
               ) : messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
-                  <MessageSquare size={28} className="text-slate-700" />
+                  <MessageSquare size={28} className="text-slate-700 dark:text-slate-200" />
                   <p className="text-slate-500 text-sm">No messages yet. Say hello! 👋</p>
                 </div>
               ) : (
@@ -427,7 +427,7 @@ export default function Chat() {
                   {sending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
                 </button>
               </div>
-              <p className="text-[10px] text-slate-600 mt-1.5 px-1">Press Enter to send · Shift+Enter for new line</p>
+              <p className="text-[10px] text-slate-600 dark:text-slate-300 mt-1.5 px-1">Press Enter to send · Shift+Enter for new line</p>
             </div>
           </>
         )}

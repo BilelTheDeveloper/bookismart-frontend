@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 let socket;
 
 const getSocketUrl = () => {
-  const apiBase = import.meta.env.VITE_API_URL || "https://bookismart-backend-kcnn.onrender.com/api";
+  const apiBase = import.meta.env.VITE_API_URL || "https://bookismart-backend-ixlp.onrender.com/api";
   // socket server is the same host, without `/api`
   return apiBase.replace(/\/api\/?$/, "");
 };

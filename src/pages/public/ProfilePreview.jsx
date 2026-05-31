@@ -113,7 +113,7 @@ const PresentationReelSection = ({ reel }) => {
           )}
         </div>
 
-        <p className="mt-4 text-center text-xs font-medium text-slate-600">
+        <p className="mt-4 text-center text-xs font-medium text-slate-600 dark:text-slate-300">
           {t("profile.tapToPlayPause")}
         </p>
       </div>
@@ -316,7 +316,7 @@ const ReviewsSection = ({ ownerId, initialReviews, initialRating, initialCount }
                   </div>
                   <div className="flex gap-0.5 flex-shrink-0">
                     {Array.from({ length: 5 }, (_, j) => (
-                      <Star key={j} size={13} className={j < r.rating ? "text-amber-400 fill-amber-400" : "text-slate-700 fill-slate-700"} />
+                      <Star key={j} size={13} className={j < r.rating ? "text-amber-400 fill-amber-400" : "text-slate-700 dark:text-slate-200 fill-slate-700"} />
                     ))}
                   </div>
                 </div>

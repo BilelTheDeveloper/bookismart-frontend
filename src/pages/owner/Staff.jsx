@@ -504,9 +504,9 @@ const Staff = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm">
         <div>
-          <h2 className="text-2xl font-black text-slate-900">Team Members</h2>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white">Team Members</h2>
           <p className="text-slate-500 text-sm mt-0.5">{counts.active} active · {counts.invited} pending invite · {counts.pending} under review</p>
         </div>
         <button
@@ -526,7 +526,7 @@ const Staff = () => {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search by name or email…"
-            className="w-full bg-white border border-slate-200 text-slate-800 placeholder-slate-400 rounded-2xl pl-9 pr-4 py-2.5 text-sm outline-none focus:border-indigo-400 transition-all"
+            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 rounded-2xl pl-9 pr-4 py-2.5 text-sm outline-none focus:border-indigo-400 transition-all"
           />
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -539,7 +539,7 @@ const Staff = () => {
             <button
               key={f.key}
               onClick={() => setStatusFilter(f.key)}
-              className={`px-4 py-2.5 rounded-2xl text-xs font-black transition-all border ${statusFilter === f.key ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}
+              className={`px-4 py-2.5 rounded-2xl text-xs font-black transition-all border ${statusFilter === f.key ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-indigo-300'}`}
             >
               {f.label}
             </button>
@@ -556,11 +556,11 @@ const Staff = () => {
 
       {/* Staff grid */}
       {filtered.length === 0 ? (
-        <div className="bg-white border border-slate-100 rounded-[2rem] p-16 text-center">
-          <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] p-16 text-center">
+          <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Users size={24} className="text-slate-400" />
           </div>
-          <h3 className="text-slate-700 font-black mb-2">{search ? 'No results found' : 'No team members yet'}</h3>
+          <h3 className="text-slate-700 dark:text-slate-200 font-black mb-2">{search ? 'No results found' : 'No team members yet'}</h3>
           <p className="text-slate-400 text-sm">
             {search ? 'Try a different search term.' : 'Invite your first team member to get started.'}
           </p>
@@ -576,19 +576,19 @@ const Staff = () => {
             return (
               <div
                 key={member._id}
-                className="bg-white border border-slate-100 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-all group"
+                className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-all group"
               >
                 {/* Top row */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-slate-100 overflow-hidden border border-slate-200 flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0">
                       {member.profilePic
                         ? <img src={member.profilePic} alt="" className="w-full h-full object-cover" />
-                        : <span className="text-slate-600 font-black text-lg">{member.fullName?.charAt(0)}</span>
+                        : <span className="text-slate-600 dark:text-slate-300 font-black text-lg">{member.fullName?.charAt(0)}</span>
                       }
                     </div>
                     <div className="min-w-0">
-                      <p className="text-slate-900 font-black text-sm truncate">{member.fullName}</p>
+                      <p className="text-slate-900 dark:text-white font-black text-sm truncate">{member.fullName}</p>
                       <p className="text-slate-500 text-xs truncate">{member.email}</p>
                     </div>
                   </div>
@@ -610,13 +610,13 @@ const Staff = () => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => setDetailMember(member)}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-slate-50 border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 font-black text-xs rounded-xl transition-all"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-indigo-300 hover:bg-indigo-50 text-slate-600 dark:text-slate-300 hover:text-indigo-600 font-black text-xs rounded-xl transition-all"
                   >
                     <Shield size={12} /> Access
                   </button>
                   <button
                     onClick={() => { setEditMember(member); setShowModal(true); }}
-                    className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-slate-50 border border-slate-200 hover:border-slate-300 text-slate-500 font-black text-xs rounded-xl transition-all"
+                    className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-500 font-black text-xs rounded-xl transition-all"
                     title="Edit"
                   >
                     <Edit2 size={12} />
@@ -634,7 +634,7 @@ const Staff = () => {
                   <button
                     onClick={() => deleteMember(member._id)}
                     disabled={isActing}
-                    className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-slate-50 border border-slate-200 hover:border-rose-300 hover:bg-rose-50 text-slate-400 hover:text-rose-500 font-black text-xs rounded-xl transition-all disabled:opacity-50"
+                    className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-rose-300 hover:bg-rose-50 text-slate-400 hover:text-rose-500 font-black text-xs rounded-xl transition-all disabled:opacity-50"
                     title="Remove"
                   >
                     <Trash2 size={12} />

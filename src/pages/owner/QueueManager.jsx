@@ -139,7 +139,7 @@ function BookingRow({ booking, onAdd, addLoading }) {
     <div className="flex items-center gap-3 px-4 py-3.5 rounded-xl border border-slate-800/50 bg-slate-900/30 hover:bg-slate-800/30 transition-colors">
       <div className="shrink-0 text-center min-w-[44px]">
         <p className="text-base font-black text-white leading-none">{fmtSlot(booking.timeSlot)}</p>
-        <p className="text-[9px] font-bold text-slate-600 uppercase tracking-wider mt-0.5">slot</p>
+        <p className="text-[9px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mt-0.5">slot</p>
       </div>
 
       <div className="w-px h-8 bg-slate-800 shrink-0" />
@@ -209,10 +209,10 @@ function Empty({ icon: Icon, title, sub }) {
   return (
     <div className="flex flex-col items-center justify-center py-10 text-center">
       <div className="w-14 h-14 rounded-2xl bg-slate-800/60 border border-slate-700/40 flex items-center justify-center mb-3">
-        <Icon size={24} className="text-slate-600" />
+        <Icon size={24} className="text-slate-600 dark:text-slate-300" />
       </div>
       <p className="text-slate-400 font-bold text-sm">{title}</p>
-      {sub && <p className="text-slate-600 text-xs mt-1">{sub}</p>}
+      {sub && <p className="text-slate-600 dark:text-slate-300 text-xs mt-1">{sub}</p>}
     </div>
   );
 }
@@ -401,11 +401,11 @@ export default function QueueManager() {
             ) : (
               <div className="rounded-2xl border border-slate-800/60 bg-slate-900/30 p-6 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-slate-800/60 border border-slate-700 flex items-center justify-center">
-                  <CheckCircle2 size={18} className="text-slate-600" />
+                  <CheckCircle2 size={18} className="text-slate-600 dark:text-slate-300" />
                 </div>
                 <div>
                   <p className="text-slate-300 font-bold text-sm">No active session</p>
-                  <p className="text-slate-600 text-xs mt-0.5">Call a waiting client to start</p>
+                  <p className="text-slate-600 dark:text-slate-300 text-xs mt-0.5">Call a waiting client to start</p>
                 </div>
               </div>
             )}
@@ -417,7 +417,7 @@ export default function QueueManager() {
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Waiting Queue</p>
               <div className="flex-1 h-px bg-slate-800" />
               {waiting.length > 0 && (
-                <span className="text-[10px] font-black text-slate-600">{waiting.length} client{waiting.length > 1 ? 's' : ''}</span>
+                <span className="text-[10px] font-black text-slate-600 dark:text-slate-300">{waiting.length} client{waiting.length > 1 ? 's' : ''}</span>
               )}
             </div>
 
@@ -440,7 +440,7 @@ export default function QueueManager() {
           </div>
 
           {inProgress && waiting.length > 0 && (
-            <p className="text-[11px] text-slate-600 font-semibold text-center">
+            <p className="text-[11px] text-slate-600 dark:text-slate-300 font-semibold text-center">
               Complete the current session to call the next client
             </p>
           )}
@@ -479,7 +479,7 @@ export default function QueueManager() {
 
           {bookings.length > 0 && notInQueue.length < bookings.length && (
             <div className="mt-4 pt-3 border-t border-slate-800/60">
-              <p className="text-[11px] text-slate-600 font-semibold text-center">
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-semibold text-center">
                 {bookings.length - notInQueue.length} booking{bookings.length - notInQueue.length > 1 ? 's' : ''} already in queue
               </p>
             </div>

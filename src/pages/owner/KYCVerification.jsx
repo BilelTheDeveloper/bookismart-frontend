@@ -11,7 +11,7 @@ import {
 function DocCard({ label, field, file, onFile }) {
   return (
     <label className={`relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-3xl cursor-pointer transition-all duration-300 group ${
-      file ? "border-emerald-500 bg-emerald-50/30" : "border-slate-200 bg-white hover:border-indigo-400"
+      file ? "border-emerald-500 bg-emerald-50/30 dark:bg-emerald-500/10" : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-indigo-400"
     }`}>
       <input type="file" className="hidden" accept="image/*" onChange={(e) => onFile(field, e.target.files[0])} />
       {file ? (
@@ -19,12 +19,12 @@ function DocCard({ label, field, file, onFile }) {
           <div className="bg-emerald-500 rounded-full p-2 mx-auto mb-3 w-fit">
             <Check className="w-6 h-6 text-white" />
           </div>
-          <p className="text-emerald-700 font-black text-xs uppercase tracking-tighter">{label} Uploaded</p>
-          <p className="text-emerald-600 text-[10px] mt-1 truncate max-w-[120px]">{file.name}</p>
+          <p className="text-emerald-700 dark:text-emerald-400 font-black text-xs uppercase tracking-tighter">{label} Uploaded</p>
+          <p className="text-emerald-600 dark:text-emerald-500 text-[10px] mt-1 truncate max-w-[120px]">{file.name}</p>
         </div>
       ) : (
         <div className="text-center">
-          <Upload className="w-8 h-8 text-slate-300 group-hover:text-indigo-500 mb-3 mx-auto transition-colors" />
+          <Upload className="w-8 h-8 text-slate-300 dark:text-slate-600 group-hover:text-indigo-500 mb-3 mx-auto transition-colors" />
           <p className="text-slate-400 font-bold text-xs uppercase tracking-tighter">{label}</p>
         </div>
       )}
@@ -164,11 +164,11 @@ export default function KYCVerification() {
   if (accountStatus === "active") {
     return (
       <div className="max-w-lg mx-auto text-center py-16">
-        <div className="p-6 bg-emerald-50 rounded-full w-fit mx-auto mb-6">
-          <CheckCircle2 size={48} className="text-emerald-600" />
+        <div className="p-6 bg-emerald-50 dark:bg-emerald-500/15 rounded-full w-fit mx-auto mb-6">
+          <CheckCircle2 size={48} className="text-emerald-600 dark:text-emerald-400" />
         </div>
-        <h2 className="text-3xl font-black text-slate-900 mb-3">You're Verified</h2>
-        <p className="text-slate-500 font-bold">Your identity has been confirmed. You have full access to all features.</p>
+        <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-3">You're Verified</h2>
+        <p className="text-slate-500 dark:text-slate-400 font-bold">Your identity has been confirmed. You have full access to all features.</p>
       </div>
     );
   }
@@ -177,14 +177,14 @@ export default function KYCVerification() {
   if (accountStatus === "review") {
     return (
       <div className="max-w-lg mx-auto text-center py-16">
-        <div className="p-6 bg-amber-50 rounded-full w-fit mx-auto mb-6">
-          <Clock size={48} className="text-amber-500" />
+        <div className="p-6 bg-amber-50 dark:bg-amber-500/15 rounded-full w-fit mx-auto mb-6">
+          <Clock size={48} className="text-amber-500 dark:text-amber-400" />
         </div>
-        <h2 className="text-3xl font-black text-slate-900 mb-3">Under Review</h2>
-        <p className="text-slate-500 font-bold leading-relaxed">
+        <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-3">Under Review</h2>
+        <p className="text-slate-500 dark:text-slate-400 font-bold leading-relaxed">
           Your documents are with our compliance team. You'll receive an email within <strong>24 hours</strong>.
         </p>
-        <div className="mt-8 p-5 bg-amber-50 border border-amber-200 rounded-2xl text-sm text-amber-800 font-bold">
+        <div className="mt-8 p-5 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-2xl text-sm text-amber-800 dark:text-amber-300 font-bold">
           📧 Confirmation sent to <span className="underline">{user?.email}</span>
         </div>
       </div>
@@ -200,12 +200,12 @@ export default function KYCVerification() {
 
       {/* Header */}
       <div className="flex items-center gap-4">
-        <div className="p-4 bg-indigo-50 rounded-2xl">
-          <ShieldCheck size={28} className="text-indigo-600" />
+        <div className="p-4 bg-indigo-50 dark:bg-indigo-500/15 rounded-2xl">
+          <ShieldCheck size={28} className="text-indigo-600 dark:text-indigo-400" />
         </div>
         <div>
-          <h1 className="text-3xl font-black text-slate-900">Identity Verification</h1>
-          <p className="text-slate-500 font-bold text-sm mt-0.5">
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white">Identity Verification</h1>
+          <p className="text-slate-500 dark:text-slate-400 font-bold text-sm mt-0.5">
             {accountStatus === "rejected"
               ? "Your previous submission was rejected. Please resubmit with correct documents."
               : "Upload your documents to unlock full dashboard access."}
@@ -215,11 +215,11 @@ export default function KYCVerification() {
 
       {/* Rejection banner */}
       {accountStatus === "rejected" && (
-        <div className="flex items-start gap-3 p-4 bg-rose-50 border border-rose-200 rounded-2xl">
+        <div className="flex items-start gap-3 p-4 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 rounded-2xl">
           <XCircle className="text-rose-500 flex-shrink-0 mt-0.5" size={18} />
           <div>
-            <p className="font-black text-rose-700 text-sm">Rejected</p>
-            <p className="text-rose-600 text-sm mt-0.5">{rejectionReason || "Documents could not be verified. Please resubmit clear photos."}</p>
+            <p className="font-black text-rose-700 dark:text-rose-400 text-sm">Rejected</p>
+            <p className="text-rose-600 dark:text-rose-400 text-sm mt-0.5">{rejectionReason || "Documents could not be verified. Please resubmit clear photos."}</p>
           </div>
         </div>
       )}
@@ -228,7 +228,7 @@ export default function KYCVerification() {
       {!showCamera ? (
         <>
           <section className="space-y-4">
-            <h2 className="text-sm font-black text-slate-700 uppercase tracking-widest">Step 1 — ID Documents</h2>
+            <h2 className="text-sm font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Step 1 — ID Documents</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <DocCard label="ID Card Front" field="idFront"   file={files.idFront}  onFile={setFile} />
               <DocCard label="ID Card Back"  field="idBack"    file={files.idBack}   onFile={setFile} />
@@ -237,13 +237,13 @@ export default function KYCVerification() {
 
           {/* Step 2 — Liveness */}
           <section className="space-y-4">
-            <h2 className="text-sm font-black text-slate-700 uppercase tracking-widest">Step 2 — Biometric Scan</h2>
+            <h2 className="text-sm font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Step 2 — Biometric Scan</h2>
             {files.livenessVideo ? (
-              <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl">
-                <CheckCircle2 className="text-emerald-600" size={20} />
+              <div className="flex items-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 rounded-2xl">
+                <CheckCircle2 className="text-emerald-600 dark:text-emerald-400" size={20} />
                 <div>
-                  <p className="font-black text-emerald-700 text-sm">Liveness recorded</p>
-                  <button onClick={() => setFiles((p) => ({ ...p, livenessVideo: null }))} className="text-xs text-slate-500 hover:text-rose-500 font-bold underline mt-0.5">
+                  <p className="font-black text-emerald-700 dark:text-emerald-400 text-sm">Liveness recorded</p>
+                  <button onClick={() => setFiles((p) => ({ ...p, livenessVideo: null }))} className="text-xs text-slate-500 dark:text-slate-400 hover:text-rose-500 font-bold underline mt-0.5">
                     Re-record
                   </button>
                 </div>

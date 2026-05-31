@@ -123,16 +123,16 @@ function TransactionModal({ onClose, onSave, editing }) {
 
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 relative" onClick={e => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-lg p-8 relative" onClick={e => e.stopPropagation()}>
         <button onClick={onClose} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700 transition-colors">
           <X size={22} />
         </button>
-        <h2 className="text-2xl font-black text-slate-900 mb-6">
+        <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-6">
           {editing ? "Edit Transaction" : "Add Transaction"}
         </h2>
 
         {/* Type Tabs */}
-        <div className="flex gap-2 mb-6 p-1 bg-slate-100 rounded-2xl">
+        <div className="flex gap-2 mb-6 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl">
           {["income", "expense"].map(t => (
             <button key={t} onClick={() => set("type", t)}
               className={`flex-1 py-2.5 rounded-xl font-black text-sm capitalize transition-all ${
@@ -147,43 +147,43 @@ function TransactionModal({ onClose, onSave, editing }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">Amount (TND)</label>
+              <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Amount (TND)</label>
               <input type="number" step="0.001" min="0.001" value={form.amount} onChange={e => set("amount", e.target.value)}
-                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
+                className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
                 placeholder="0.000" required />
             </div>
             <div>
-              <label className="block text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">Date</label>
+              <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Date</label>
               <input type="date" value={form.date} onChange={e => set("date", e.target.value)}
-                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all" />
+                className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all" />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">Category</label>
+            <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Category</label>
             <select value={form.category} onChange={e => set("category", e.target.value)}
-              className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all appearance-none bg-white" required>
+              className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all appearance-none bg-white dark:bg-slate-800" required>
               <option value="">Select category...</option>
               {cats.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
           </div>
 
           <div>
-            <label className="block text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">Description</label>
+            <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Description</label>
             <input type="text" value={form.description} onChange={e => set("description", e.target.value)}
-              className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
+              className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
               placeholder="e.g. Monthly rent payment" maxLength={300} required />
           </div>
 
           <div>
-            <label className="block text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">Notes (optional)</label>
+            <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Notes (optional)</label>
             <textarea value={form.notes} onChange={e => set("notes", e.target.value)}
-              className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all resize-none"
+              className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all resize-none"
               placeholder="Additional details..." rows={2} maxLength={1000} />
           </div>
 
           {error && (
-            <div className="flex items-center gap-2 text-rose-600 bg-rose-50 px-4 py-3 rounded-xl text-sm font-bold">
+            <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 px-4 py-3 rounded-xl text-sm font-bold">
               <AlertCircle size={16} /> {error}
             </div>
           )}
@@ -303,11 +303,11 @@ const Finance = () => {
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tighter">Finance Hub</h1>
-          <p className="text-slate-500 font-medium mt-1">Track income, expenses & profit/loss in real time.</p>
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">Finance Hub</h1>
+          <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">Track income, expenses & profit/loss in real time.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={handleExport} className="flex items-center gap-2 px-4 py-2.5 border border-slate-200 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all">
+          <button onClick={handleExport} className="flex items-center gap-2 px-4 py-2.5 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all">
             <Download size={16} /> Export CSV
           </button>
           <button onClick={() => { setEditing(null); setShowModal(true); }}
@@ -343,7 +343,7 @@ const Finance = () => {
             sub: "TVA estimate"
           },
         ].map((card, i) => (
-          <div key={i} className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+          <div key={i} className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-100 dark:border-slate-800 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div className={`p-3 ${card.bg} ${card.color} rounded-2xl`}>{card.icon}</div>
               <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{card.label}</span>
@@ -355,10 +355,10 @@ const Finance = () => {
       </div>
 
       {/* ── P&L Chart + Year selector ── */}
-      <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+            <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
               <BarChart2 size={22} className="text-indigo-500" /> Monthly P&L — {year}
             </h3>
             <p className="text-slate-400 text-sm font-medium mt-1">Income vs. expenses by month</p>
@@ -367,10 +367,10 @@ const Finance = () => {
             {years.map(y => (
               <button key={y} onClick={() => setYear(y)}
                 className={`px-4 py-2 rounded-xl text-sm font-black transition-all ${
-                  year === y ? "bg-indigo-600 text-white shadow-md" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  year === y ? "bg-indigo-600 text-white shadow-md" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                 }`}>{y}</button>
             ))}
-            <button onClick={loadPL} className="p-2 bg-slate-100 text-slate-500 rounded-xl hover:bg-slate-200 transition-all">
+            <button onClick={loadPL} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
               <RefreshCw size={16} />
             </button>
           </div>
@@ -389,14 +389,14 @@ const Finance = () => {
       </div>
 
       {/* ── Transactions Table ── */}
-      <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-slate-50 flex items-center justify-between gap-4 flex-wrap">
-          <h3 className="text-xl font-black text-slate-900">All Transactions</h3>
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between gap-4 flex-wrap">
+          <h3 className="text-xl font-black text-slate-900 dark:text-white">All Transactions</h3>
           <div className="flex items-center gap-3 flex-wrap">
             {/* Type filter */}
             <div className="relative">
               <select value={filterType} onChange={e => { setFilterType(e.target.value); setPage(1); }}
-                className="appearance-none border border-slate-200 rounded-xl px-4 py-2 pr-8 text-sm font-bold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                className="appearance-none border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl px-4 py-2 pr-8 text-sm font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400">
                 <option value="">All types</option>
                 <option value="income">Income</option>
                 <option value="expense">Expense</option>
@@ -406,7 +406,7 @@ const Finance = () => {
             {/* Category filter */}
             <div className="relative">
               <select value={filterCat} onChange={e => { setFilterCat(e.target.value); setPage(1); }}
-                className="appearance-none border border-slate-200 rounded-xl px-4 py-2 pr-8 text-sm font-bold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                className="appearance-none border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl px-4 py-2 pr-8 text-sm font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400">
                 <option value="">All categories</option>
                 {[...INCOME_CATS, ...EXPENSE_CATS].map(c => (
                   <option key={c.value} value={c.value}>{c.label}</option>
@@ -430,25 +430,25 @@ const Finance = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-slate-50/70">
+                  <tr className="bg-slate-50/70 dark:bg-slate-800/50">
                     {["Date","Type","Category","Description","Amount","Actions"].map(h => (
                       <th key={h} className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{h}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-50">
+                <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                   {transactions.map(txn => (
-                    <tr key={txn._id} className="hover:bg-slate-50/50 transition-all group">
+                    <tr key={txn._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-all group">
                       <td className="px-6 py-4 text-sm font-bold text-slate-500">
                         {new Date(txn.date).toLocaleDateString("en-GB")}
                       </td>
                       <td className="px-6 py-4">
                         <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
-                          txn.type === "income" ? "bg-indigo-50 text-indigo-600" : "bg-rose-50 text-rose-500"
+                          txn.type === "income" ? "bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400" : "bg-rose-50 dark:bg-rose-500/15 text-rose-500 dark:text-rose-400"
                         }`}>{txn.type}</span>
                       </td>
                       <td className="px-6 py-4 text-sm font-bold text-slate-600">{getCatLabel(txn.category)}</td>
-                      <td className="px-6 py-4 text-sm font-bold text-slate-900 max-w-[200px] truncate">{txn.description}</td>
+                      <td className="px-6 py-4 text-sm font-bold text-slate-900 dark:text-white max-w-[200px] truncate">{txn.description}</td>
                       <td className={`px-6 py-4 text-sm font-black ${txn.type === "income" ? "text-emerald-600" : "text-rose-500"}`}>
                         {txn.type === "income" ? "+" : "−"}{fmt(txn.amount)} TND
                       </td>
@@ -471,17 +471,17 @@ const Finance = () => {
             </div>
             {/* Pagination */}
             {total > 30 && (
-              <div className="px-6 py-4 border-t border-slate-50 flex items-center justify-between">
+              <div className="px-6 py-4 border-t border-slate-50 dark:border-slate-800 flex items-center justify-between">
                 <p className="text-sm font-bold text-slate-400">
                   Showing {(page - 1) * 30 + 1}–{Math.min(page * 30, total)} of {total}
                 </p>
                 <div className="flex gap-2">
                   <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-                    className="px-4 py-2 text-sm font-bold border border-slate-200 rounded-xl disabled:opacity-40 hover:bg-slate-50 transition-all">
+                    className="px-4 py-2 text-sm font-bold border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl disabled:opacity-40 hover:bg-slate-50 transition-all">
                     Prev
                   </button>
                   <button onClick={() => setPage(p => p + 1)} disabled={page * 30 >= total}
-                    className="px-4 py-2 text-sm font-bold border border-slate-200 rounded-xl disabled:opacity-40 hover:bg-slate-50 transition-all">
+                    className="px-4 py-2 text-sm font-bold border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl disabled:opacity-40 hover:bg-slate-50 transition-all">
                     Next
                   </button>
                 </div>
@@ -493,8 +493,8 @@ const Finance = () => {
 
       {/* ── Category Breakdown ── */}
       {pl?.categoryBreakdown && Object.keys(pl.categoryBreakdown).length > 0 && (
-        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
-          <h3 className="text-xl font-black text-slate-900 mb-6">Category Breakdown</h3>
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-8">
+          <h3 className="text-xl font-black text-slate-900 dark:text-white mb-6">Category Breakdown</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {Object.entries(pl.categoryBreakdown)
               .sort(([,a],[,b]) => b - a)
@@ -502,9 +502,9 @@ const Finance = () => {
               .map(([cat, amount]) => {
                 const isIncome = INCOME_CATS.find(c => c.value === cat);
                 return (
-                  <div key={cat} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+                  <div key={cat} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl">
                     <div>
-                      <p className="text-sm font-black text-slate-900">{getCatLabel(cat)}</p>
+                      <p className="text-sm font-black text-slate-900 dark:text-white">{getCatLabel(cat)}</p>
                       <span className={`text-[10px] font-black uppercase ${isIncome ? "text-indigo-500" : "text-rose-500"}`}>
                         {isIncome ? "income" : "expense"}
                       </span>

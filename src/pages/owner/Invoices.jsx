@@ -9,11 +9,11 @@ import API from "../../api/config";
 const fmt = (n) => (n ?? 0).toLocaleString("en", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 
 const STATUS_CONFIG = {
-  draft:     { label: "Draft",     color: "bg-slate-100 text-slate-600",   icon: <FileText size={12} /> },
+  draft:     { label: "Draft",     color: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300",   icon: <FileText size={12} /> },
   sent:      { label: "Sent",      color: "bg-blue-50 text-blue-600",     icon: <Mail size={12} /> },
   paid:      { label: "Paid",      color: "bg-emerald-50 text-emerald-600",icon: <CheckCircle2 size={12} /> },
   overdue:   { label: "Overdue",   color: "bg-rose-50 text-rose-600",     icon: <AlertTriangle size={12} /> },
-  cancelled: { label: "Cancelled", color: "bg-slate-100 text-slate-400",   icon: <Ban size={12} /> },
+  cancelled: { label: "Cancelled", color: "bg-slate-100 dark:bg-slate-800 text-slate-400",   icon: <Ban size={12} /> },
 };
 
 // ── Invoice Form Modal ────────────────────────────────────────────────────────
@@ -63,12 +63,12 @@ function InvoiceFormModal({ onClose, onSave, editing }) {
 
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-start justify-center p-4 overflow-y-auto" onClick={onClose}>
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl my-8 relative" onClick={e => e.stopPropagation()}>
-        <div className="p-8 border-b border-slate-100">
-          <button onClick={onClose} className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 transition-colors">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-2xl my-8 relative" onClick={e => e.stopPropagation()}>
+        <div className="p-8 border-b border-slate-100 dark:border-slate-800">
+          <button onClick={onClose} className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 dark:text-slate-200 transition-colors">
             <X size={22} />
           </button>
-          <h2 className="text-2xl font-black text-slate-900">{editing ? "Edit Invoice" : "Create Invoice"}</h2>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white">{editing ? "Edit Invoice" : "Create Invoice"}</h2>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
@@ -79,25 +79,25 @@ function InvoiceFormModal({ onClose, onSave, editing }) {
               <div>
                 <label className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-1.5">Full Name *</label>
                 <input value={form.customer.name} onChange={e => setCustomer("name", e.target.value)}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400"
                   placeholder="Amine Gharbi" required />
               </div>
               <div>
                 <label className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-1.5">Email *</label>
                 <input type="email" value={form.customer.email} onChange={e => setCustomer("email", e.target.value)}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400"
                   placeholder="client@email.com" required />
               </div>
               <div>
                 <label className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-1.5">Phone</label>
                 <input value={form.customer.phone} onChange={e => setCustomer("phone", e.target.value)}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400"
                   placeholder="+216 XX XXX XXX" />
               </div>
               <div>
                 <label className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-1.5">Address</label>
                 <input value={form.customer.address} onChange={e => setCustomer("address", e.target.value)}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400"
                   placeholder="Tunis, Tunisia" />
               </div>
             </div>
@@ -117,19 +117,19 @@ function InvoiceFormModal({ onClose, onSave, editing }) {
                 <div key={idx} className="grid grid-cols-12 gap-2 items-center">
                   <div className="col-span-5">
                     <input value={item.description} onChange={e => setItem(idx, "description", e.target.value)}
-                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                      className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400"
                       placeholder="Service description" required />
                   </div>
                   <div className="col-span-2">
                     <input type="number" min="0.01" step="0.01" value={item.quantity} onChange={e => setItem(idx, "quantity", e.target.value)}
-                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-center focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                      className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-bold text-center focus:outline-none focus:ring-2 focus:ring-indigo-400" />
                   </div>
                   <div className="col-span-3">
                     <input type="number" min="0" step="0.001" value={item.unitPrice} onChange={e => setItem(idx, "unitPrice", e.target.value)}
-                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-right focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                      className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-bold text-right focus:outline-none focus:ring-2 focus:ring-indigo-400" />
                   </div>
                   <div className="col-span-2 flex items-center justify-end gap-1">
-                    <span className="text-sm font-black text-slate-700">
+                    <span className="text-sm font-black text-slate-700 dark:text-slate-200">
                       {fmt((parseFloat(item.quantity) || 0) * (parseFloat(item.unitPrice) || 0))}
                     </span>
                     {form.items.length > 1 && (
@@ -153,21 +153,21 @@ function InvoiceFormModal({ onClose, onSave, editing }) {
               <div>
                 <label className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-1.5">Tax Rate (%)</label>
                 <input type="number" min="0" max="100" step="0.1" value={form.taxRate} onChange={e => setForm(f => ({ ...f, taxRate: e.target.value }))}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                  className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400" />
               </div>
               <div>
                 <label className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-1.5">Discount (TND)</label>
                 <input type="number" min="0" step="0.001" value={form.discount} onChange={e => setForm(f => ({ ...f, discount: e.target.value }))}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                  className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400" />
               </div>
               <div>
                 <label className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-1.5">Due Date</label>
                 <input type="date" value={form.dueDate} onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400" required />
+                  className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400" required />
               </div>
             </div>
-            <div className="bg-slate-50 rounded-2xl p-5 flex flex-col justify-center space-y-3">
-              <div className="flex justify-between text-sm font-bold text-slate-600">
+            <div className="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-5 flex flex-col justify-center space-y-3">
+              <div className="flex justify-between text-sm font-bold text-slate-600 dark:text-slate-300">
                 <span>Subtotal</span><span>{fmt(subtotal)} TND</span>
               </div>
               {parseFloat(form.discount) > 0 && (
@@ -175,10 +175,10 @@ function InvoiceFormModal({ onClose, onSave, editing }) {
                   <span>Discount</span><span>−{fmt(parseFloat(form.discount) || 0)} TND</span>
                 </div>
               )}
-              <div className="flex justify-between text-sm font-bold text-slate-600">
+              <div className="flex justify-between text-sm font-bold text-slate-600 dark:text-slate-300">
                 <span>TVA ({form.taxRate}%)</span><span>{fmt(taxAmount)} TND</span>
               </div>
-              <div className="border-t border-slate-200 pt-3 flex justify-between font-black text-lg text-slate-900">
+              <div className="border-t border-slate-200 dark:border-slate-700 pt-3 flex justify-between font-black text-lg text-slate-900 dark:text-white">
                 <span>Total</span><span className="text-indigo-600">{fmt(total)} TND</span>
               </div>
             </div>
@@ -187,7 +187,7 @@ function InvoiceFormModal({ onClose, onSave, editing }) {
           <div>
             <label className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-1.5">Notes (optional)</label>
             <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
-              className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
+              className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
               rows={2} placeholder="Payment instructions, thank-you note..." />
           </div>
 
@@ -199,7 +199,7 @@ function InvoiceFormModal({ onClose, onSave, editing }) {
 
           <div className="flex gap-3">
             <button type="button" onClick={onClose}
-              className="flex-1 py-3 border border-slate-200 text-slate-600 rounded-2xl font-black hover:bg-slate-50 transition-all">
+              className="flex-1 py-3 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-2xl font-black hover:bg-slate-50 dark:hover:bg-slate-800/60 dark:bg-slate-800/60 transition-all">
               Cancel
             </button>
             <button type="submit" disabled={saving}
@@ -220,9 +220,9 @@ function InvoicePreviewModal({ invoice, onClose, onSend, onMarkPaid, onEdit, sen
 
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative" onClick={e => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative" onClick={e => e.stopPropagation()}>
         {/* Toolbar */}
-        <div className="sticky top-0 bg-white/95 backdrop-blur border-b border-slate-100 px-8 py-4 flex items-center justify-between z-10 rounded-t-3xl">
+        <div className="sticky top-0 bg-white/95 backdrop-blur border-b border-slate-100 dark:border-slate-800 px-8 py-4 flex items-center justify-between z-10 rounded-t-3xl">
           <div className="flex items-center gap-3">
             <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase ${cfg.color}`}>
               {cfg.icon} {cfg.label}
@@ -233,7 +233,7 @@ function InvoicePreviewModal({ invoice, onClose, onSend, onMarkPaid, onEdit, sen
             {invoice.status !== "paid" && invoice.status !== "cancelled" && (
               <>
                 <button onClick={() => { onEdit(invoice); onClose(); }}
-                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-black text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 transition-all">
+                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-black text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 dark:bg-slate-800/60 transition-all">
                   <Edit2 size={14} /> Edit
                 </button>
                 {invoice.status !== "paid" && (
@@ -250,10 +250,10 @@ function InvoicePreviewModal({ invoice, onClose, onSend, onMarkPaid, onEdit, sen
                 )}
               </>
             )}
-            <button onClick={handlePrint} className="p-2 text-slate-400 hover:text-slate-700 border border-slate-200 rounded-xl transition-all">
+            <button onClick={handlePrint} className="p-2 text-slate-400 hover:text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl transition-all">
               <Printer size={16} />
             </button>
-            <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-700 transition-all">
+            <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-700 dark:text-slate-200 transition-all">
               <X size={20} />
             </button>
           </div>
@@ -280,7 +280,7 @@ function InvoicePreviewModal({ invoice, onClose, onSend, onMarkPaid, onEdit, sen
           {/* Bill To */}
           <div className="mb-8">
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Bill To</p>
-            <p className="text-xl font-black text-slate-900">{invoice.customer.name}</p>
+            <p className="text-xl font-black text-slate-900 dark:text-white">{invoice.customer.name}</p>
             <p className="text-slate-500 font-bold">{invoice.customer.email}</p>
             {invoice.customer.phone && <p className="text-slate-500 font-bold">{invoice.customer.phone}</p>}
             {invoice.customer.address && <p className="text-slate-500 font-bold">{invoice.customer.address}</p>}
@@ -289,7 +289,7 @@ function InvoicePreviewModal({ invoice, onClose, onSend, onMarkPaid, onEdit, sen
           {/* Items */}
           <table className="w-full border-collapse mb-8">
             <thead>
-              <tr className="bg-slate-50">
+              <tr className="bg-slate-50 dark:bg-slate-800/60">
                 <th className="px-4 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest rounded-l-xl">Description</th>
                 <th className="px-4 py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Qty</th>
                 <th className="px-4 py-3 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Unit Price</th>
@@ -299,10 +299,10 @@ function InvoicePreviewModal({ invoice, onClose, onSend, onMarkPaid, onEdit, sen
             <tbody>
               {invoice.items.map((item, i) => (
                 <tr key={i} className="border-b border-slate-50">
-                  <td className="px-4 py-4 font-bold text-slate-900">{item.description}</td>
-                  <td className="px-4 py-4 text-center font-bold text-slate-600">{item.quantity}</td>
-                  <td className="px-4 py-4 text-right font-bold text-slate-600">{fmt(item.unitPrice)} TND</td>
-                  <td className="px-4 py-4 text-right font-black text-slate-900">{fmt(item.total)} TND</td>
+                  <td className="px-4 py-4 font-bold text-slate-900 dark:text-white">{item.description}</td>
+                  <td className="px-4 py-4 text-center font-bold text-slate-600 dark:text-slate-300">{item.quantity}</td>
+                  <td className="px-4 py-4 text-right font-bold text-slate-600 dark:text-slate-300">{fmt(item.unitPrice)} TND</td>
+                  <td className="px-4 py-4 text-right font-black text-slate-900 dark:text-white">{fmt(item.total)} TND</td>
                 </tr>
               ))}
             </tbody>
@@ -311,7 +311,7 @@ function InvoicePreviewModal({ invoice, onClose, onSend, onMarkPaid, onEdit, sen
           {/* Totals */}
           <div className="flex justify-end mb-8">
             <div className="w-72 space-y-2">
-              <div className="flex justify-between text-sm font-bold text-slate-600">
+              <div className="flex justify-between text-sm font-bold text-slate-600 dark:text-slate-300">
                 <span>Subtotal</span><span>{fmt(invoice.subtotal)} TND</span>
               </div>
               {invoice.discount > 0 && (
@@ -319,20 +319,20 @@ function InvoicePreviewModal({ invoice, onClose, onSend, onMarkPaid, onEdit, sen
                   <span>Discount</span><span>−{fmt(invoice.discount)} TND</span>
                 </div>
               )}
-              <div className="flex justify-between text-sm font-bold text-slate-600">
+              <div className="flex justify-between text-sm font-bold text-slate-600 dark:text-slate-300">
                 <span>TVA ({invoice.taxRate}%)</span><span>{fmt(invoice.taxAmount)} TND</span>
               </div>
-              <div className="flex justify-between items-center font-black text-xl pt-3 border-t border-slate-200">
-                <span className="text-slate-900">Total Due</span>
+              <div className="flex justify-between items-center font-black text-xl pt-3 border-t border-slate-200 dark:border-slate-700">
+                <span className="text-slate-900 dark:text-white">Total Due</span>
                 <span className="text-indigo-600">{fmt(invoice.total)} TND</span>
               </div>
             </div>
           </div>
 
           {invoice.notes && (
-            <div className="bg-slate-50 rounded-2xl p-6">
+            <div className="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-6">
               <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Notes</p>
-              <p className="text-slate-600 font-medium text-sm">{invoice.notes}</p>
+              <p className="text-slate-600 dark:text-slate-300 font-medium text-sm">{invoice.notes}</p>
             </div>
           )}
         </div>
@@ -438,7 +438,7 @@ const Invoices = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tighter">Invoices</h1>
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">Invoices</h1>
           <p className="text-slate-500 font-medium mt-1">Create, send & track professional invoices.</p>
         </div>
         <button onClick={() => { setEditing(null); setShowForm(true); }}
@@ -455,7 +455,7 @@ const Invoices = () => {
           { label: "Pending (Sent)", value: stats.pending, icon: <Clock size={18} />, color: "text-blue-600", bg: "bg-blue-50" },
           { label: "Overdue", value: stats.overdue, icon: <AlertTriangle size={18} />, color: "text-rose-600", bg: "bg-rose-50" },
         ].map((s, i) => (
-          <div key={i} className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+          <div key={i} className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-100 dark:border-slate-800 shadow-sm">
             <div className={`inline-flex p-3 ${s.bg} ${s.color} rounded-2xl mb-4`}>{s.icon}</div>
             <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
             <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">{s.label}</p>
@@ -464,12 +464,12 @@ const Invoices = () => {
       </div>
 
       {/* Invoices Table */}
-      <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
         <div className="p-6 border-b border-slate-50 flex items-center justify-between gap-4 flex-wrap">
-          <h3 className="text-xl font-black text-slate-900">All Invoices</h3>
+          <h3 className="text-xl font-black text-slate-900 dark:text-white">All Invoices</h3>
           <div className="relative">
             <select value={filterStatus} onChange={e => { setFilterStatus(e.target.value); setPage(1); }}
-              className="appearance-none border border-slate-200 rounded-xl px-4 py-2 pr-8 text-sm font-bold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400">
+              className="appearance-none border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 pr-8 text-sm font-bold text-slate-700 dark:text-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400">
               <option value="">All statuses</option>
               {Object.entries(STATUS_CONFIG).map(([k, v]) => (
                 <option key={k} value={k}>{v.label}</option>
@@ -505,7 +505,7 @@ const Invoices = () => {
                       <tr key={inv._id} className="hover:bg-slate-50/50 transition-all group cursor-pointer" onClick={() => setPreview(inv)}>
                         <td className="px-6 py-4 text-sm font-black text-indigo-600">{inv.invoiceNumber}</td>
                         <td className="px-6 py-4">
-                          <p className="text-sm font-black text-slate-900">{inv.customer.name}</p>
+                          <p className="text-sm font-black text-slate-900 dark:text-white">{inv.customer.name}</p>
                           <p className="text-xs text-slate-400 font-bold">{inv.customer.email}</p>
                         </td>
                         <td className="px-6 py-4 text-sm font-bold text-slate-500">
@@ -514,7 +514,7 @@ const Invoices = () => {
                         <td className={`px-6 py-4 text-sm font-bold ${
                           inv.status === "overdue" ? "text-rose-500" : "text-slate-500"
                         }`}>{new Date(inv.dueDate).toLocaleDateString("en-GB")}</td>
-                        <td className="px-6 py-4 text-sm font-black text-slate-900">{fmt(inv.total)} TND</td>
+                        <td className="px-6 py-4 text-sm font-black text-slate-900 dark:text-white">{fmt(inv.total)} TND</td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase ${cfg.color}`}>
                             {cfg.icon} {cfg.label}
@@ -548,9 +548,9 @@ const Invoices = () => {
                 <p className="text-sm font-bold text-slate-400">Showing {(page-1)*20+1}–{Math.min(page*20,total)} of {total}</p>
                 <div className="flex gap-2">
                   <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page === 1}
-                    className="px-4 py-2 text-sm font-bold border border-slate-200 rounded-xl disabled:opacity-40 hover:bg-slate-50 transition-all">Prev</button>
+                    className="px-4 py-2 text-sm font-bold border border-slate-200 dark:border-slate-700 rounded-xl disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800/60 dark:bg-slate-800/60 transition-all">Prev</button>
                   <button onClick={() => setPage(p => p+1)} disabled={page*20 >= total}
-                    className="px-4 py-2 text-sm font-bold border border-slate-200 rounded-xl disabled:opacity-40 hover:bg-slate-50 transition-all">Next</button>
+                    className="px-4 py-2 text-sm font-bold border border-slate-200 dark:border-slate-700 rounded-xl disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800/60 dark:bg-slate-800/60 transition-all">Next</button>
                 </div>
               </div>
             )}

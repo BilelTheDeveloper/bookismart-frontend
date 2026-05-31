@@ -82,7 +82,7 @@ function QueueCard({ c, active, onClick }) {
         <p className={`text-sm font-black truncate ${active ? "text-white" : "text-slate-200"}`}>{c.customerName}</p>
         <p className="text-[10px] text-slate-500 font-medium truncate">{c.serviceTitle} · {c.timeSlot}</p>
       </div>
-      <ChevronRight size={13} className={`flex-shrink-0 transition-opacity ${active ? "text-indigo-400 opacity-100" : "text-slate-600 opacity-0 group-hover:opacity-60"}`} />
+      <ChevronRight size={13} className={`flex-shrink-0 transition-opacity ${active ? "text-indigo-400 opacity-100" : "text-slate-600 dark:text-slate-300 opacity-0 group-hover:opacity-60"}`} />
     </button>
   );
 }
@@ -158,7 +158,7 @@ function NotesPanel({ consultation, onCheckpointChange, checkpointData }) {
           <div className="flex items-center gap-2 mb-2">
             <Bookmark size={13} className="text-indigo-400" />
             <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Last Checkpoint</p>
-            <span className="text-[9px] text-slate-600 ml-auto">{lastCheckpoint.date}</span>
+            <span className="text-[9px] text-slate-600 dark:text-slate-300 ml-auto">{lastCheckpoint.date}</span>
           </div>
           <p className="text-xs font-bold text-white">{lastCheckpoint.service}</p>
           {lastCheckpoint.summary && (
@@ -224,7 +224,7 @@ function NotesPanel({ consultation, onCheckpointChange, checkpointData }) {
 
         <div className="space-y-2">
           {notes.profileNotes?.length === 0 && !showAddForm && (
-            <p className="text-xs text-slate-600 text-center py-3">No notes yet</p>
+            <p className="text-xs text-slate-600 dark:text-slate-300 text-center py-3">No notes yet</p>
           )}
           {notes.profileNotes?.map(n => (
             <div key={n._id} className="flex items-start gap-2 group">
@@ -237,7 +237,7 @@ function NotesPanel({ consultation, onCheckpointChange, checkpointData }) {
               <button
                 onClick={() => deleteNote(n._id)}
                 disabled={deleting === n._id}
-                className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-rose-500/20 text-slate-600 hover:text-rose-400 transition-all flex-shrink-0 mt-0.5"
+                className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-rose-500/20 text-slate-600 dark:text-slate-300 hover:text-rose-400 transition-all flex-shrink-0 mt-0.5"
               >
                 {deleting === n._id ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />}
               </button>
@@ -252,7 +252,7 @@ function NotesPanel({ consultation, onCheckpointChange, checkpointData }) {
           <CheckCheck size={13} className="text-emerald-400" />
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Session Checkpoint</p>
         </div>
-        <p className="text-[10px] text-slate-600 mb-2">Saved when you click Done. Auto-shows next visit.</p>
+        <p className="text-[10px] text-slate-600 dark:text-slate-300 mb-2">Saved when you click Done. Auto-shows next visit.</p>
         <textarea
           value={checkpointData.summary}
           onChange={e => onCheckpointChange("summary", e.target.value)}
@@ -280,7 +280,7 @@ function NotesPanel({ consultation, onCheckpointChange, checkpointData }) {
               <div key={cp._id} className="pl-3 border-l-2 border-slate-700">
                 <div className="flex items-center gap-2 mb-0.5">
                   <p className="text-[10px] font-bold text-slate-400">{cp.date}</p>
-                  <p className="text-[10px] text-slate-600">· {cp.service}</p>
+                  <p className="text-[10px] text-slate-600 dark:text-slate-300">· {cp.service}</p>
                 </div>
                 {cp.summary && <p className="text-[11px] text-slate-400 leading-relaxed">{cp.summary}</p>}
                 {cp.nextAction && (
@@ -590,15 +590,15 @@ const WorkMode = () => {
         <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1.5" style={{ scrollbarWidth: "none" }}>
           {queue.length === 0 && startableBookings.length === 0 && (
             <div className="py-12 text-center">
-              <Users size={28} className="text-slate-700 mx-auto mb-3" />
-              <p className="text-slate-600 font-bold text-sm">No active sessions</p>
-              <p className="text-slate-700 text-xs mt-1">Start from a confirmed booking below</p>
+              <Users size={28} className="text-slate-700 dark:text-slate-200 mx-auto mb-3" />
+              <p className="text-slate-600 dark:text-slate-300 font-bold text-sm">No active sessions</p>
+              <p className="text-slate-700 dark:text-slate-200 text-xs mt-1">Start from a confirmed booking below</p>
             </div>
           )}
 
           {queue.length > 0 && (
             <>
-              <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest px-1 mb-2">Queue</p>
+              <p className="text-[9px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest px-1 mb-2">Queue</p>
               {queue.map(c => (
                 <QueueCard
                   key={c._id}
@@ -614,7 +614,7 @@ const WorkMode = () => {
         {/* Bookings to start */}
         {startableBookings.length > 0 && (
           <div className="border-t border-slate-800 px-3 py-3 space-y-1.5">
-            <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest px-1 mb-2">Start Session</p>
+            <p className="text-[9px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest px-1 mb-2">Start Session</p>
             {startableBookings.slice(0, 4).map(b => (
               <button
                 key={b._id}
@@ -625,11 +625,11 @@ const WorkMode = () => {
                 <Play size={12} className="text-slate-500 group-hover:text-indigo-400 flex-shrink-0 transition-colors" />
                 <div className="flex-1 min-w-0 text-left">
                   <p className="text-xs font-bold text-slate-300 truncate">{b.customerName}</p>
-                  <p className="text-[10px] text-slate-600 truncate">{b.service?.title} · {b.timeSlot}</p>
+                  <p className="text-[10px] text-slate-600 dark:text-slate-300 truncate">{b.service?.title} · {b.timeSlot}</p>
                 </div>
                 {startingId === b._id
                   ? <Loader2 size={12} className="animate-spin text-slate-500 flex-shrink-0" />
-                  : <ChevronRight size={12} className="text-slate-700 group-hover:text-indigo-400 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-all" />
+                  : <ChevronRight size={12} className="text-slate-700 dark:text-slate-200 group-hover:text-indigo-400 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-all" />
                 }
               </button>
             ))}
@@ -643,10 +643,10 @@ const WorkMode = () => {
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <div className="w-20 h-20 rounded-2xl bg-slate-800/60 flex items-center justify-center mx-auto mb-4">
-                <Zap size={32} className="text-slate-600" />
+                <Zap size={32} className="text-slate-600 dark:text-slate-300" />
               </div>
               <p className="text-slate-500 font-black text-base">Select or start a session</p>
-              <p className="text-slate-700 text-sm mt-1">Choose a customer from the queue on the left</p>
+              <p className="text-slate-700 dark:text-slate-200 text-sm mt-1">Choose a customer from the queue on the left</p>
             </div>
           </div>
         ) : (
@@ -688,7 +688,7 @@ const WorkMode = () => {
             <div className="flex-1 overflow-y-auto px-6 py-4" style={{ scrollbarWidth: "thin", scrollbarColor: "#1e293b transparent" }}>
               {(selected.messages || []).length === 0 ? (
                 <div className="flex items-center justify-center h-full">
-                  <p className="text-slate-700 text-sm font-medium">Session started — send a message</p>
+                  <p className="text-slate-700 dark:text-slate-200 text-sm font-medium">Session started — send a message</p>
                 </div>
               ) : (
                 <>
@@ -754,8 +754,8 @@ const WorkMode = () => {
           ) : (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <StickyNote size={28} className="text-slate-700 mx-auto mb-2" />
-                <p className="text-slate-600 text-xs font-bold">Select a session to view notes</p>
+                <StickyNote size={28} className="text-slate-700 dark:text-slate-200 mx-auto mb-2" />
+                <p className="text-slate-600 dark:text-slate-300 text-xs font-bold">Select a session to view notes</p>
               </div>
             </div>
           )}

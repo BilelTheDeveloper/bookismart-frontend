@@ -107,22 +107,22 @@ const ThemeGallery = () => {
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
       {/* --- HEADER SECTION --- */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
         <div>
-          <div className="flex items-center gap-2 text-indigo-600 mb-2">
+          <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 mb-2">
             <Sparkles size={18} />
             <span className="text-xs font-black uppercase tracking-widest">Theme Engine v1.0</span>
           </div>
-          <h2 className="text-3xl font-black text-slate-900 capitalize">
-            {safeCategory.replace(/([A-Z])/g, ' $1').trim()} <span className="text-slate-400 font-medium italic">Templates</span>
+          <h2 className="text-3xl font-black text-slate-900 dark:text-white capitalize">
+            {safeCategory.replace(/([A-Z])/g, ' $1').trim()} <span className="text-slate-400 dark:text-slate-500 font-medium italic">Templates</span>
           </h2>
-          <p className="text-slate-500 mt-1 font-medium">
+          <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium">
             Designs optimized for your specific industry and brand aesthetic.
           </p>
         </div>
-        <div className="bg-slate-50 px-5 py-3 rounded-2xl border border-slate-100 flex items-center gap-3">
-            <Layout size={18} className="text-indigo-600" />
-            <span className="text-sm font-black text-slate-600 uppercase tracking-tighter">
+        <div className="bg-slate-50 dark:bg-slate-800 px-5 py-3 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center gap-3">
+            <Layout size={18} className="text-indigo-600 dark:text-indigo-400" />
+            <span className="text-sm font-black text-slate-600 dark:text-slate-300 uppercase tracking-tighter">
               {filteredThemes.length} Designs Ready
             </span>
         </div>
@@ -136,8 +136,8 @@ const ThemeGallery = () => {
           return (
             <div 
               key={theme.id} 
-              className={`group relative bg-white rounded-[3rem] overflow-hidden border-2 transition-all duration-500 ${
-                isLive ? "border-indigo-500 shadow-2xl shadow-indigo-100" : "border-transparent shadow-sm hover:shadow-xl hover:border-slate-200"
+              className={`group relative bg-white dark:bg-slate-900 rounded-[3rem] overflow-hidden border-2 transition-all duration-500 ${
+                isLive ? "border-indigo-500 shadow-2xl shadow-indigo-100 dark:shadow-indigo-900/40" : "border-transparent dark:border-slate-800 shadow-sm hover:shadow-xl hover:border-slate-200 dark:hover:border-slate-700"
               }`}
             >
               <div className="relative h-72 overflow-hidden">
@@ -169,7 +169,7 @@ const ThemeGallery = () => {
               </div>
 
               <div className="p-8">
-                <p className="text-slate-500 text-sm font-medium leading-relaxed mb-8 line-clamp-2">
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed mb-8 line-clamp-2">
                   {theme.description}
                 </p>
                 
