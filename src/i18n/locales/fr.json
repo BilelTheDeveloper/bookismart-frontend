@@ -98,6 +98,57 @@
       "titleHighlight": "les Professionnels.",
       "description": "Découvrez les avis des propriétaires qui ont développé leur activité avec Bookiify.",
       "words": ["FIABLE", "SÉCURISÉ", "INTELLIGENT", "RAPIDE"]
+    },
+    "stats": {
+      "badge": "Impact réel",
+      "title": "Approuvé par les entreprises",
+      "titleHighlight": "à travers la Tunisie.",
+      "desc": "Rejoignez la communauté grandissante de professionnels qui ont choisi Bookiify pour gérer leur activité.",
+      "businesses": "Entreprises actives",
+      "bookings": "Réservations gérées",
+      "cities": "Villes couvertes",
+      "rating": "Note moyenne"
+    },
+    "pricing": {
+      "badge": "Tarifs simples",
+      "title": "Commencez gratuitement,",
+      "titleHighlight": "évoluez quand vous voulez.",
+      "desc": "90 jours entièrement gratuits — sans carte bancaire. Passez à un plan supérieur quand votre activité est prête.",
+      "mostPopular": "Le plus populaire",
+      "perMonth": "/mois",
+      "free": {
+        "name": "Essai gratuit",
+        "price": "0 DT",
+        "duration": "pendant 90 jours",
+        "desc": "Accès complet à toutes les fonctionnalités. Testez Bookiify avec vos vrais clients.",
+        "cta": "Commencer gratuitement",
+        "features": ["Les 16 fonctionnalités incluses", "Jusqu'à 100 réservations/mois", "1 compte personnel", "Notifications par email", "KYC requis pour l'activation"]
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "49 DT",
+        "duration": "/mois",
+        "desc": "Pour les entreprises en croissance avec un volume élevé et des besoins d'équipe.",
+        "cta": "Obtenir Pro",
+        "features": ["Réservations illimitées", "Jusqu'à 5 comptes personnel", "Rappels WhatsApp", "Assistant IA", "Analytiques avancées", "Support prioritaire"]
+      },
+      "business": {
+        "name": "Business",
+        "price": "99 DT",
+        "duration": "/mois",
+        "desc": "Pour les établissements établis avec de grandes équipes et des opérations à fort volume.",
+        "cta": "Obtenir Business",
+        "features": ["Tout ce qui est dans Pro", "Personnel illimité", "Branding personnalisé", "Account manager dédié", "Accès API", "Multi-sites"]
+      }
+    },
+    "finalCta": {
+      "badge": "Commencez aujourd'hui",
+      "title": "Votre activité mérite",
+      "titleHighlight": "des outils plus intelligents.",
+      "desc": "Rejoignez 500+ professionnels en Tunisie qui gèrent leurs rendez-vous, leur équipe et leurs revenus — sur une seule plateforme.",
+      "primary": "Créer mon compte gratuit",
+      "secondary": "Voir comment ça marche",
+      "note": "Sans carte bancaire · Essai gratuit 90 jours · Annulable à tout moment"
     }
   },
   "footer": {
@@ -352,71 +403,178 @@
   },
   "howItWorks": {
     "badge": "Le processus",
-    "title": "3 étapes pour automatiser",
-    "titleSub": "votre activité.",
-    "description": "Nous supprimons la complexité technique pour que vous puissiez vous concentrer sur votre métier et vos clients.",
+    "title": "Lancez-vous en",
+    "titleSub": "6 étapes simples.",
+    "description": "De la création de compte à votre première réservation automatisée — nous vous guidons à chaque étape.",
     "steps": [
       {
-        "title": "Créez votre boutique intelligente",
-        "desc": "Inscrivez-vous en 60 secondes. Personnalisez vos services, fixez vos prix et lancez votre lien de réservation dédié."
+        "title": "Créez votre compte",
+        "desc": "Inscrivez-vous en moins de 60 secondes. Renseignez votre nom d'entreprise, catégorie et ville.",
+        "detail": "Votre compte est créé instantanément. Le système vous guide à travers un onboarding simple en 5 étapes."
       },
       {
-        "title": "Intégrez votre équipe",
-        "desc": "Ajoutez vos collaborateurs et assignez leurs horaires. Chaque membre dispose de son propre mini-tableau de bord."
+        "title": "Vérifiez votre identité (KYC)",
+        "desc": "Uploadez votre carte d'identité nationale (recto-verso) et enregistrez une vidéo selfie de 5 secondes.",
+        "detail": "Notre équipe examine vos documents en moins de 24 heures. Vous recevez un email dès l'activation."
       },
       {
-        "title": "Automatisez les réservations",
-        "desc": "Vos clients réservent 24h/24. Notre liste d'attente intelligente et les paiements Flouci gèrent le reste pendant que vous travaillez."
+        "title": "Créez votre profil business",
+        "desc": "Choisissez un thème pour votre catégorie, ajoutez vos services avec tarifs et uploadez votre galerie.",
+        "detail": "Votre profil devient votre page de réservation publique — partageable partout en un lien."
+      },
+      {
+        "title": "Configurez vos opérations",
+        "desc": "Définissez vos horaires, pauses, intervalles de repos entre RDV et votre capacité journalière maximale.",
+        "detail": "Invitez votre personnel via des liens sécurisés. Chaque membre a un accès selon son rôle et ses horaires."
+      },
+      {
+        "title": "Partagez votre lien de réservation",
+        "desc": "Partagez votre lien Bookiify sur WhatsApp, Instagram, Google Maps ou votre propre site.",
+        "detail": "Les clients réservent 24h/24 sans créer de compte. Vous recevez une notification pour chaque nouvelle réservation."
+      },
+      {
+        "title": "Gérez et grandissez automatiquement",
+        "desc": "Les rappels sont envoyés, les factures générées, les points fidélité attribués — tout automatiquement.",
+        "detail": "Utilisez l'assistant IA et les analytiques pour repérer les tendances et continuer à progresser."
       }
     ],
-    "ctaTitle": "Prêt à transformer votre activité ?",
-    "ctaSub": "Démarrez votre parcours de 90 jours aujourd'hui.",
-    "getStarted": "Démarrer",
-    "viewServices": "Voir les services"
-  },
-  "services": {
-    "badge": "Nos fonctionnalités",
-    "title": "La solution complète",
-    "titleHighlight": "pour votre activité.",
-    "description": "Nous fournissons l'infrastructure. Vous apportez l'expertise. Ensemble, nous construisons l'avenir des services en Tunisie.",
-    "startFreeTrial": "Essai gratuit",
-    "seeHowItWorks": "Comment ça marche",
-    "items": [
+    "faqTitle": "Questions fréquentes",
+    "faq": [
       {
-        "title": "Système de réservation intelligent",
-        "desc": "Une expérience de réservation fluide, sans compte pour vos clients. Optimisé pour les utilisateurs mobiles en Tunisie.",
-        "features": ["Confirmation instantanée", "Sans mot de passe", "Synchronisation agenda"]
+        "q": "Combien de temps prend la vérification KYC ?",
+        "a": "Notre équipe examine les documents d'identité en moins de 24 heures. Vous recevez une notification par email dès que votre compte est activé."
       },
       {
-        "title": "Tableau de bord multi-utilisateurs",
-        "desc": "Gérez toute votre équipe. Assignez des rôles, suivez les performances et consultez les plannings individuels sans effort.",
-        "features": ["Comptes du personnel", "Permissions par rôle", "Analytiques en temps réel"]
+        "q": "Les clients doivent-ils créer un compte pour réserver ?",
+        "a": "Non. Bookiify est entièrement sans compte pour les clients. Ils visitent votre lien, choisissent un service, un horaire et confirment — sans mot de passe ni application."
+      },
+      {
+        "q": "Que se passe-t-il quand une réservation est annulée ?",
+        "a": "Si la Liste d'attente intelligente est activée, le prochain client éligible reçoit automatiquement une invitation à prendre le créneau libéré via un lien sécurisé à usage unique."
+      },
+      {
+        "q": "Puis-je gérer plusieurs membres du personnel ?",
+        "a": "Oui. Vous pouvez inviter un personnel illimité avec différents rôles — Manager, Réceptionniste ou Staff. Chacun reçoit un lien de connexion sécurisé et un accès adapté à son rôle."
+      },
+      {
+        "q": "Bookiify est-il disponible en dehors de la Tunisie ?",
+        "a": "Actuellement, Bookiify est centré sur le marché tunisien avec un support local des villes et une intégration de paiement tunisienne. L'expansion internationale est dans notre feuille de route."
+      }
+    ],
+    "ownerView": "Pour les propriétaires",
+    "clientView": "Pour les clients",
+    "ownerTitle": "Configurez une fois,",
+    "ownerTitleHighlight": "pilote automatique pour toujours.",
+    "clientTitle": "Réservez en 3 clics,",
+    "clientTitleHighlight": "sans créer de compte.",
+    "ownerPoints": ["Profil créé en moins de 10 minutes", "Partagez votre lien partout", "Notifié à chaque nouvelle réservation", "L'IA et les analytiques gèrent le reste"],
+    "clientPoints": ["Choisissez un service et un créneau", "Entrez nom, téléphone et email", "Confirmez — c'est réservé !", "Rappel reçu 2h avant le rendez-vous"],
+    "ctaTitle": "Prêt à transformer votre activité ?",
+    "ctaSub": "Démarrez votre essai gratuit de 90 jours aujourd'hui.",
+    "getStarted": "Commencer gratuitement",
+    "viewServices": "Voir toutes les fonctionnalités"
+  },
+  "services": {
+    "badge": "Fonctionnalités",
+    "title": "Tous les outils dont votre",
+    "titleHighlight": "activité a besoin.",
+    "description": "16 fonctionnalités entièrement intégrées — réservation, équipe, finance, IA et présence en ligne. Une seule plateforme pour tout gérer.",
+    "startFreeTrial": "Commencer — 90 jours gratuits",
+    "seeHowItWorks": "Comment ça marche",
+    "groupBooking": "Réservation & Opérations",
+    "groupBookingDesc": "Tout pour remplir votre calendrier et gérer votre journée",
+    "groupTeam": "Équipe & Communication",
+    "groupTeamDesc": "Gérez le personnel, le chat et les opérations quotidiennes",
+    "groupFinance": "Finance & Revenus",
+    "groupFinanceDesc": "Suivez l'argent, envoyez des factures et fidélisez vos clients",
+    "groupIntelligence": "Intelligence & Présence en ligne",
+    "groupIntelligenceDesc": "IA, analytiques, site web et sécurité",
+    "items": [
+      {
+        "title": "Réservation en ligne intelligente",
+        "desc": "Les clients réservent 24h/24 en 3 clics — sans compte, sans mot de passe. Mobile-optimisé avec disponibilité en temps réel et anti-double réservation.",
+        "features": ["Sans compte pour les clients", "Disponibilité en temps réel", "Anti double-réservation", "Confirmation SMS/Email instantanée"]
+      },
+      {
+        "title": "Écran file d'attente en direct",
+        "desc": "Un affichage TV pour votre salle d'attente. Positions des clients, minuteurs de session en direct et temps d'attente estimés — via WebSocket.",
+        "features": ["Protection prénom uniquement", "Minuteur en direct", "Actualisation WebSocket", "Compatible TV et tablette"]
+      },
+      {
+        "title": "Gestion des consultations",
+        "desc": "Démarrez une session chronométrée en temps réel avec chaque client. Messagerie en cours de session, accès worker et marquage de complétion instantané.",
+        "features": ["Minuteur de session en temps réel", "Messagerie en cours de session", "Lien d'accès worker", "Historique des sessions"]
       },
       {
         "title": "Liste d'attente intelligente",
-        "desc": "Ne laissez jamais un créneau vide dans votre planning. Quand un client annule, notre système notifie automatiquement le suivant.",
-        "features": ["Remplissage auto", "Notifications SMS", "File prioritaire"]
+        "desc": "Quand une réservation est annulée, le client suivant reçoit automatiquement une invitation à prendre le créneau libéré — zéro place vide.",
+        "features": ["Offre auto à l'annulation", "Jeton d'acceptation horodaté", "Système de priorité", "Aucun créneau perdu"]
       },
       {
-        "title": "Paiements sécurisés (Flouci)",
-        "desc": "Intégré au portefeuille numérique leader en Tunisie. Acceptez des acomptes ou paiements complets en toute sécurité.",
-        "features": ["Intégration Flouci", "Ultra-sécurisé", "Facturation automatique"]
+        "title": "Gestion du personnel",
+        "desc": "Invitez toute votre équipe via des liens sécurisés à usage unique. Assignez des rôles (Manager, Réceptionniste, Staff) et gérez les horaires individuels.",
+        "features": ["Rôles Manager / Réceptionniste / Staff", "Planning par jour configurable", "Onboarding par lien d'invitation", "Désactivation instantanée"]
       },
       {
-        "title": "CRM & Historique clients",
-        "desc": "Gardez un dossier digital de chaque client. Connaissez ses préférences, services passés et dépenses totales en un coup d'œil.",
-        "features": ["Profils clients", "Historique des visites", "Notes de préférences"]
+        "title": "Chat en temps réel",
+        "desc": "Messagerie WebSocket intégrée pour la communication interne. Plusieurs salons, indicateurs de saisie, badges de non-lus et notifications push.",
+        "features": ["Plusieurs salons de discussion", "Indicateurs de saisie", "Badges messages non lus", "Notifications push en temps réel"]
       },
       {
-        "title": "Marketing & Visibilité",
-        "desc": "Faites-vous découvrir dans votre ville. Votre activité apparaît dans nos catégories intelligentes pour attirer de nouveaux clients.",
-        "features": ["SEO optimisé", "Découverte locale", "Gestion des avis"]
+        "title": "Mode Travail",
+        "desc": "Une vue quotidienne simplifiée, optimisée mobile. Gérez la file en direct, les clients sans RDV et laissez le personnel rejoindre sans connexion séparée.",
+        "features": ["Interface mobile optimisée", "Réservation sans RDV", "Lien d'invitation sécurisé", "Gestion de la file en direct"]
+      },
+      {
+        "title": "Rappels automatisés",
+        "desc": "Les clients reçoivent des confirmations de réservation, rappels à 24h et alertes à 2h avant le RDV. Les propriétaires sont notifiés pour chaque nouvelle réservation.",
+        "features": ["Rappels email à 24h", "Alerte à 2h avant RDV", "Notification nouvelle réservation", "Emails de demande d'avis"]
+      },
+      {
+        "title": "Suivi des revenus & finances",
+        "desc": "Tableau de bord financier complet avec graphiques journaliers, hebdomadaires et mensuels, journal des transactions et comparaisons de périodes.",
+        "features": ["Graphiques de revenus (jour/sem/mois)", "Journal des transactions", "Revenus par service", "Comparaison de périodes"]
+      },
+      {
+        "title": "Gestion des factures",
+        "desc": "Générez automatiquement des factures à la complétion d'une réservation. Envoyez des PDFs professionnels par email avec calcul de TVA automatique.",
+        "features": ["Facture auto à la complétion", "Export PDF et envoi par email", "Calcul TVA (19%)", "Suivi brouillon / envoyée / payée"]
+      },
+      {
+        "title": "Programme de fidélité",
+        "desc": "Récompensez vos habitués avec des points ou des cartes tampons qui permettent d'obtenir des services gratuits. Fonctionne automatiquement à chaque complétion.",
+        "features": ["Mode points ou tampons", "Attribution automatique", "Règles de remboursement personnalisées", "Classement des meilleurs clients"]
+      },
+      {
+        "title": "Système de recrutement",
+        "desc": "Publiez des offres d'emploi visibles sur la page Trouver du travail de Bookiify. Recevez des candidatures, évaluez les profils et recrutez directement.",
+        "features": ["Annonces publiques", "Boîte de réception des candidatures", "Workflow accepter / refuser", "Annonces vérifiées par admin"]
+      },
+      {
+        "title": "Assistant IA Smart",
+        "desc": "Un conseiller IA 24h/24 intégré à votre tableau de bord. Obtenez des conseils stratégiques, des idées marketing et des scripts clients instantanément.",
+        "features": ["Conseils stratégiques business", "Générateur d'idées marketing", "Insights basés sur les données", "Scripts de gestion clients"]
+      },
+      {
+        "title": "Analytiques & Insights",
+        "desc": "Analyses approfondies des tendances de réservation, des meilleurs services, des taux de complétion et des heures de pointe. Décidez avec de vraies données.",
+        "features": ["Graphiques de tendances", "Classement des meilleurs services", "Taux de complétion", "Clients nouveaux vs récurrents"]
+      },
+      {
+        "title": "Créateur de site web",
+        "desc": "Plus de 20 thèmes professionnels pour chaque catégorie. Ajoutez vos services, galerie, horaires et obtenez une page de réservation publique instantanément.",
+        "features": ["20+ thèmes par catégorie", "Galerie avant/après", "Horaires & pauses configurables", "Revue admin & publication"]
+      },
+      {
+        "title": "Sécurité Enterprise",
+        "desc": "Vérification KYC, authentification 2FA TOTP, blacklist de session Redis, fingerprinting d'appareils et journal complet d'événements de sécurité.",
+        "features": ["Vérification d'identité KYC", "Double authentification (2FA TOTP)", "Fingerprinting d'appareils", "Journal d'audit de sécurité"]
       }
     ],
     "ctaTitle": "Tout pour évoluer,",
-    "ctaTitleHighlight": "90 jours gratuits.",
-    "ctaDesc": "Passez à la vitesse supérieure avec notre écosystème ultra-sécurisé.",
-    "createAccount": "Créer un compte",
+    "ctaTitleHighlight": "90 jours entièrement gratuits.",
+    "ctaDesc": "Sans carte bancaire. Accès complet dès le premier jour. Passez à un plan supérieur quand vous êtes prêt.",
+    "createAccount": "Créer mon compte gratuit",
     "signIn": "Se connecter"
   },
   "common": {

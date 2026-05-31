@@ -98,6 +98,57 @@
       "titleHighlight": "Professionals.",
       "description": "Hear from the business owners who scaled their projects with Bookiify.",
       "words": ["RELIABLE", "SECURE", "SMART", "FAST"]
+    },
+    "stats": {
+      "badge": "Real Impact",
+      "title": "Trusted by businesses",
+      "titleHighlight": "across Tunisia.",
+      "desc": "Join the growing community of service professionals who chose Bookiify to run their business.",
+      "businesses": "Active Businesses",
+      "bookings": "Bookings Managed",
+      "cities": "Cities Covered",
+      "rating": "Average Rating"
+    },
+    "pricing": {
+      "badge": "Simple pricing",
+      "title": "Start free,",
+      "titleHighlight": "scale when ready.",
+      "desc": "90 days completely free — no credit card required. Upgrade when your business is ready to grow.",
+      "mostPopular": "Most Popular",
+      "perMonth": "/month",
+      "free": {
+        "name": "Free Trial",
+        "price": "0 DT",
+        "duration": "for 90 days",
+        "desc": "Full access to every feature. Test Bookiify with your real clients and team.",
+        "cta": "Start Free Now",
+        "features": ["All 16 features included", "Up to 100 bookings/month", "1 staff account", "Email notifications", "KYC required to activate"]
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "49 DT",
+        "duration": "/month",
+        "desc": "For growing businesses that need higher volume and team tools.",
+        "cta": "Get Pro",
+        "features": ["Unlimited bookings", "Up to 5 staff accounts", "WhatsApp reminders", "AI Smart Assistant", "Advanced analytics", "Priority support"]
+      },
+      "business": {
+        "name": "Business",
+        "price": "99 DT",
+        "duration": "/month",
+        "desc": "For established businesses with large teams and high-volume operations.",
+        "cta": "Get Business",
+        "features": ["Everything in Pro", "Unlimited staff accounts", "Custom branding", "Dedicated account manager", "API access", "Multi-location support"]
+      }
+    },
+    "finalCta": {
+      "badge": "Get started today",
+      "title": "Your business deserves",
+      "titleHighlight": "smarter tools.",
+      "desc": "Join 500+ professionals in Tunisia managing their appointments, staff, and revenue — all in one platform.",
+      "primary": "Create Your Free Account",
+      "secondary": "See How It Works",
+      "note": "No credit card required · 90-day free trial · Cancel anytime"
     }
   },
   "footer": {
@@ -352,71 +403,178 @@
   },
   "howItWorks": {
     "badge": "The process",
-    "title": "3 steps to automate",
-    "titleSub": "your business flow.",
-    "description": "We remove technical complexity so you can focus on your craft and customers.",
+    "title": "Go live in",
+    "titleSub": "6 simple steps.",
+    "description": "From account creation to your first automated booking — we guide you through every step.",
     "steps": [
       {
-        "title": "Create Your Smart Shop",
-        "desc": "Sign up in 60 seconds. Customize your services, set your prices, and launch your dedicated booking link."
+        "title": "Create Your Account",
+        "desc": "Sign up in under 60 seconds. Enter your business name, category, and city.",
+        "detail": "Your account is created instantly. The system guides you through a simple 5-step onboarding flow."
       },
       {
-        "title": "Onboard Your Staff",
-        "desc": "Add your team members and assign their schedules. Each staff member gets their own mini-dashboard."
+        "title": "Verify Your Identity (KYC)",
+        "desc": "Upload your national ID card (front & back) and record a 5-second selfie video.",
+        "detail": "Our team reviews your documents within 24 hours. You get an email the moment your account is activated."
       },
       {
-        "title": "Automate Bookings",
-        "desc": "Your clients book 24/7. Our Smart Waiting List and Flouci payments handle the rest while you work."
+        "title": "Build Your Business Profile",
+        "desc": "Choose a theme for your category, add your services with prices, and upload your gallery.",
+        "detail": "Your profile becomes your public booking page — shareable on WhatsApp, Instagram, and everywhere."
+      },
+      {
+        "title": "Configure Your Operations",
+        "desc": "Set your working hours, breaks, rest intervals between appointments, and daily capacity.",
+        "detail": "Invite your staff via secure links. Each member gets role-based access and their own schedule."
+      },
+      {
+        "title": "Share Your Booking Link",
+        "desc": "Share your unique Bookiify link on WhatsApp status, Instagram bio, Google Maps, or your website.",
+        "detail": "Clients book 24/7 without creating an account. You get instant notifications for every new booking."
+      },
+      {
+        "title": "Manage & Grow Automatically",
+        "desc": "Reminders are sent, invoices generated, loyalty points awarded — all automatically.",
+        "detail": "Use the AI assistant and analytics to spot patterns and keep growing. Your business runs on autopilot."
       }
     ],
+    "faqTitle": "Frequently Asked Questions",
+    "faq": [
+      {
+        "q": "How long does KYC verification take?",
+        "a": "Our team reviews identity documents within 24 hours. You receive an email notification the moment your account is activated."
+      },
+      {
+        "q": "Can customers book without creating an account?",
+        "a": "Yes. Bookiify is completely account-free for end customers. They visit your link, pick a service, choose a time, and confirm — no passwords, no app to download."
+      },
+      {
+        "q": "What happens when a booking is cancelled?",
+        "a": "If the Smart Waitlist is enabled, the next eligible client is automatically offered the freed slot via a timed email invitation with a secure one-time link."
+      },
+      {
+        "q": "Can I manage multiple staff members?",
+        "a": "Yes. You can invite unlimited staff with different roles — Manager, Receptionist, or Staff. Each gets a secure login link and role-appropriate dashboard access."
+      },
+      {
+        "q": "Is Bookiify available outside Tunisia?",
+        "a": "Currently Bookiify is focused on the Tunisian market with local city support and Tunisian payment integration. International expansion is on our roadmap."
+      }
+    ],
+    "ownerView": "For Business Owners",
+    "clientView": "For Clients",
+    "ownerTitle": "You set up once,",
+    "ownerTitleHighlight": "it runs on autopilot.",
+    "clientTitle": "Book in 3 clicks,",
+    "clientTitleHighlight": "no account needed.",
+    "ownerPoints": ["Build your profile in under 10 minutes", "Share your booking link anywhere", "Get notified for every new booking", "AI & analytics handle the insights"],
+    "clientPoints": ["Pick a service and time slot", "Enter your name, phone and email", "Confirm — you're booked!", "Receive a reminder 2h before your appointment"],
     "ctaTitle": "Ready to transform your business?",
-    "ctaSub": "Start your 90-day journey today.",
-    "getStarted": "Get Started",
-    "viewServices": "View Services"
+    "ctaSub": "Start your free 90-day journey today.",
+    "getStarted": "Get Started — It's Free",
+    "viewServices": "View All Features"
   },
   "services": {
-    "badge": "Our capabilities",
-    "title": "The complete",
-    "titleHighlight": "business engine.",
-    "description": "We provide the infrastructure. You provide the expertise. Together, we build the future of service-based business in Tunisia.",
-    "startFreeTrial": "Start Free Trial",
+    "badge": "Platform Features",
+    "title": "Every tool your business",
+    "titleHighlight": "will ever need.",
+    "description": "16 fully integrated features — booking, team, finance, AI, and online presence. One platform to run your entire business.",
+    "startFreeTrial": "Start Free — 90 Days",
     "seeHowItWorks": "See How It Works",
+    "groupBooking": "Booking & Operations",
+    "groupBookingDesc": "Everything to fill your calendar and run your day",
+    "groupTeam": "Team & Communication",
+    "groupTeamDesc": "Manage staff, chat, and daily operations",
+    "groupFinance": "Finance & Revenue",
+    "groupFinanceDesc": "Track money, send invoices, and reward loyalty",
+    "groupIntelligence": "Intelligence & Online Presence",
+    "groupIntelligenceDesc": "AI, analytics, website builder, and security",
     "items": [
       {
-        "title": "Smart Booking System",
-        "desc": "A seamless, account-free booking experience for your clients. Optimized for mobile users in Tunisia.",
-        "features": ["Instant Confirmation", "No Password Required", "Calendar Sync"]
+        "title": "Smart Online Booking",
+        "desc": "Clients book 24/7 in 3 clicks — no account, no password required. Fully mobile-optimized with real-time slot availability and anti double-booking protection.",
+        "features": ["Account-free for clients", "Real-time slot availability", "Anti double-booking lock", "Instant SMS/Email confirmation"]
       },
       {
-        "title": "Multi-User Dashboard",
-        "desc": "Manage your entire team. Assign specific roles, track performance, and view individual schedules effortlessly.",
-        "features": ["Staff Accounts", "Role Permissions", "Real-time Analytics"]
+        "title": "Live Queue Screen",
+        "desc": "A TV display designed for your waiting room. Shows client positions, live session timers, and estimated wait times — updated in real-time via WebSocket.",
+        "features": ["First-name privacy protection", "Live countdown timer", "WebSocket auto-refresh", "Works on any TV or tablet"]
       },
       {
-        "title": "Smart Waiting List",
-        "desc": "Never leave a gap in your schedule. When a client cancels, our system automatically notifies the next person in line.",
-        "features": ["Auto-Fill Gaps", "SMS Notifications", "Priority Queue"]
+        "title": "Consultation Management",
+        "desc": "Start a real-time timed session with each client. Built-in countdown timer, in-session messaging, worker access, and instant completion marking.",
+        "features": ["Real-time session timer", "In-session messaging", "Worker role access link", "Session history log"]
       },
       {
-        "title": "Secure Payments (Flouci)",
-        "desc": "Integrated with Tunisia's leading digital wallet. Accept deposits or full payments securely and instantly.",
-        "features": ["Flouci Integration", "Ultra-Secure", "Automated Invoicing"]
+        "title": "Smart Waitlist",
+        "desc": "When a booking is cancelled, the next eligible client is automatically offered the freed slot via a timed email invitation — zero empty slots.",
+        "features": ["Auto-offer on cancellation", "Timed acceptance token", "Priority queue system", "Zero wasted slots"]
       },
       {
-        "title": "CRM & Client History",
-        "desc": "Keep a digital record of every client. Know their preferences, past services, and total spending at a glance.",
-        "features": ["Client Profiles", "Visit History", "Preference Notes"]
+        "title": "Staff Management",
+        "desc": "Invite your entire team via secure one-time links. Assign roles (Manager, Receptionist, Staff), set individual schedules, and deactivate access instantly.",
+        "features": ["Manager / Receptionist / Staff roles", "Per-day schedule config", "Invite-link onboarding", "Instant deactivation"]
       },
       {
-        "title": "Business Marketing",
-        "desc": "Get discovered in your city. Your business appears in our smart categories, helping new clients find you.",
-        "features": ["SEO Optimized", "City Discovery", "Review Management"]
+        "title": "Real-time Chat",
+        "desc": "Built-in WebSocket messaging for owner-to-staff communication. Multiple rooms, typing indicators, unread badges, and push notifications.",
+        "features": ["Multiple chat rooms", "Typing indicators", "Unread message badges", "Real-time push notifications"]
+      },
+      {
+        "title": "Work Mode",
+        "desc": "A simplified mobile-first daily operations view. Manage your live queue, handle walk-in clients, and let staff join via a secure link — no login needed.",
+        "features": ["Mobile-optimized UI", "Walk-in booking", "Secure staff invite link", "Live queue management"]
+      },
+      {
+        "title": "Automated Reminders",
+        "desc": "Clients receive automatic booking confirmations, 24-hour reminders, and 2-hour pre-appointment alerts. Owners get notified of every new booking.",
+        "features": ["24h reminder emails", "2h pre-appointment alert", "New booking notification", "Review request emails"]
+      },
+      {
+        "title": "Finance & Revenue Tracking",
+        "desc": "Full financial dashboard with daily, weekly, and monthly revenue charts, transaction logs, service breakdowns, and period-over-period comparison.",
+        "features": ["Revenue charts (daily/weekly/monthly)", "Transaction history log", "Revenue by service", "Period comparison"]
+      },
+      {
+        "title": "Invoice Management",
+        "desc": "Auto-generate branded invoices when bookings are completed. Send professional PDF invoices to clients by email. Track draft, sent, paid, and overdue.",
+        "features": ["Auto-invoice on completion", "PDF export & email send", "Tax calculation (19% TVA)", "Draft / Sent / Paid tracking"]
+      },
+      {
+        "title": "Customer Loyalty Program",
+        "desc": "Reward your regulars with points or stamp cards that earn free services and discounts. Runs automatically on every completed booking.",
+        "features": ["Points or stamps mode", "Auto-award on completion", "Custom redemption rules", "Customer leaderboard"]
+      },
+      {
+        "title": "Recruitment System",
+        "desc": "Post job openings that appear on the Bookiify Find Work discovery page. Receive applications, review candidates, and hire directly from your dashboard.",
+        "features": ["Public job listings", "Application inbox", "Accept / Reject workflow", "Admin-reviewed listings"]
+      },
+      {
+        "title": "AI Smart Assistant",
+        "desc": "A 24/7 AI advisor built directly into your dashboard. Get business strategy advice, marketing ideas, data insights, and customer-handling scripts instantly.",
+        "features": ["Business strategy advice", "Marketing ideas generator", "Data-driven insights", "Customer handling scripts"]
+      },
+      {
+        "title": "Analytics & Insights",
+        "desc": "Deep-dive into booking trends, top services, completion rates, peak hours, and seasonal patterns. Make every decision backed by real data.",
+        "features": ["Booking trend charts", "Top services ranking", "Completion rate tracking", "New vs returning clients"]
+      },
+      {
+        "title": "Website Builder",
+        "desc": "20+ professional templates for every service category. Add services, gallery, opening hours, and get a public booking page instantly — no coding needed.",
+        "features": ["20+ category themes", "Before/after gallery", "Working hours & breaks", "Admin review & publish"]
+      },
+      {
+        "title": "Enterprise Security",
+        "desc": "KYC identity verification, 2FA TOTP authentication, Redis session blacklisting, device fingerprinting, and a full security event audit log.",
+        "features": ["KYC identity verification", "Two-factor auth (2FA TOTP)", "Device fingerprinting", "Security event audit log"]
       }
     ],
     "ctaTitle": "Everything you need to scale,",
-    "ctaTitleHighlight": "90 days free.",
-    "ctaDesc": "Take your business to the next level with our ultra-secure ecosystem.",
-    "createAccount": "Create Account",
+    "ctaTitleHighlight": "90 days completely free.",
+    "ctaDesc": "No credit card required. Full access from day one. Upgrade when you're ready.",
+    "createAccount": "Create Free Account",
     "signIn": "Sign In"
   },
   "common": {
