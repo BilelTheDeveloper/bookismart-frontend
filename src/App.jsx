@@ -30,23 +30,22 @@ import SecurityAlerts from "./pages/admin/SecurityAlerts.jsx";
 // --- Owner Pages ---
 import OwnerDashboardLayout from "./pages/owner/DashboardLayout";
 import OwnerOverview from "./pages/owner/Overview";
-import ThemeGallery from "./pages/owner/ThemeGallery"; 
-import SetupTemplate from "./pages/owner/SetupTemplate"; 
+import ThemeGallery from "./pages/owner/ThemeGallery";
+import SetupTemplate from "./pages/owner/SetupTemplate";
 import Billing from "./pages/owner/Billing";
 import Analytics from "./pages/owner/Analytics";
 import Finance from "./pages/owner/Finance";
 import Invoices from "./pages/owner/Invoices";
 import Loyalty from "./pages/owner/Loyalty";
 import Appointments from "./pages/owner/Appointments";
-import Customers from "./pages/owner/Customers";
 import Settings from "./pages/owner/Settings";
 import KYCVerification from "./pages/owner/KYCVerification";
 import WorkMode from "./pages/owner/WorkMode";
 import SmartAssistant from "./pages/owner/SmartAssistant";
-import CustomerHistory from "./pages/owner/CustomerHistory";
 import Recruitment from "./pages/owner/Recruitment";
 import Staff from "./pages/owner/Staff";
 import Chat from "./pages/owner/Chat";
+import Tutorial from "./pages/owner/Tutorial";
 import WorkerWorkMode from "./pages/workmode/WorkerWorkMode";
 
 // --- Customer Portal ---
@@ -61,8 +60,6 @@ import CustomerBooking from "./pages/customer/portal/CustomerBooking";
 import CustomerSession from "./pages/customer/portal/CustomerSession";
 import { CustomerAuthProvider } from "./context/CustomerAuthContext";
 
-// --- Owner: Customer access ---
-import CustomerAccessPage from "./pages/owner/CustomerAccessPage";
 import QueueManager from "./pages/owner/QueueManager";
 
 // --- Admin: Customer + Staff review ---
@@ -206,20 +203,19 @@ function App() {
               </AdminGuard>
             } 
           >
-            <Route path="dashboard" element={<OwnerOverview />} />
-            <Route path="dashboard/bookings" element={<Appointments />} />
-            <Route path="dashboard/customers" element={<Customers />} />
-            <Route path="dashboard/customers/:customerKey" element={<CustomerHistory />} />
-            <Route path="dashboard/finance" element={<Finance />} />
-            <Route path="dashboard/invoices" element={<Invoices />} />
-            <Route path="dashboard/loyalty" element={<Loyalty />} />
-            <Route path="dashboard/billing" element={<Billing />} />
-            <Route path="dashboard/themes" element={<ThemeGallery />} /> 
-            <Route path="theme/customize-site" element={<SetupTemplate />} />
-            <Route path="dashboard/stats" element={<Analytics />} />
-            <Route path="dashboard/settings" element={<Settings />} />
-            <Route path="dashboard/kyc"      element={<KYCVerification />} />
-            <Route path="dashboard/work-mode" element={<WorkMode />} />
+            <Route path="dashboard"             element={<OwnerOverview />} />
+            <Route path="dashboard/tutorial"    element={<Tutorial />} />
+            <Route path="dashboard/bookings"    element={<Appointments />} />
+            <Route path="dashboard/finance"     element={<Finance />} />
+            <Route path="dashboard/invoices"    element={<Invoices />} />
+            <Route path="dashboard/loyalty"     element={<Loyalty />} />
+            <Route path="dashboard/billing"     element={<Billing />} />
+            <Route path="dashboard/themes"      element={<ThemeGallery />} />
+            <Route path="theme/customize-site"  element={<SetupTemplate />} />
+            <Route path="dashboard/stats"       element={<Analytics />} />
+            <Route path="dashboard/settings"    element={<Settings />} />
+            <Route path="dashboard/kyc"         element={<KYCVerification />} />
+            <Route path="dashboard/work-mode"   element={<WorkMode />} />
             <Route path="dashboard/recruitment" element={<Recruitment />} />
             <Route path="dashboard/staff"       element={<Staff />} />
             <Route path="dashboard/chat"        element={<Chat />} />
@@ -257,18 +253,6 @@ function App() {
             <Route path="work-mode"   element={<WorkMode />} />
             <Route path="recruitment" element={<div className="text-white p-8 font-bold">Recruitment — coming soon</div>} />
             <Route path="analytics"   element={<div className="text-white p-8 font-bold">Analytics — coming soon</div>} />
-          </Route>
-
-          {/* --- 8. Owner: Customer access management --- */}
-          <Route
-            path="/owner/dashboard/customers/:id/access"
-            element={
-              <AdminGuard allowedRoles={["owner"]}>
-                <OwnerDashboardLayout />
-              </AdminGuard>
-            }
-          >
-            <Route index element={<CustomerAccessPage />} />
           </Route>
 
           {/* Fallback */}

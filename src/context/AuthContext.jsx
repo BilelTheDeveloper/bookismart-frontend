@@ -64,10 +64,17 @@ export const AuthProvider = ({ children }) => {
 
   /**
    * 🔑 LOGIN HANDLER
+   * Also increments the login counter used to redirect new users to the Tutorial
+   * for their first 3 logins, and sets a one-shot flag consumed by DashboardLayout.
    */
   const loginUser = (userData) => {
     setUser(userData);
     setIsAuthenticated(true);
+    const count = parseInt(localStorage.getItem("bookiify_login_count") || "0") + 1;
+    localStorage.setItem("bookiify_login_count", String(count));
+    if (count <= 3) {
+      localStorage.setItem("bookiify_show_tutorial", "1");
+    }
   };
 
   /**

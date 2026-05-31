@@ -440,8 +440,19 @@ const DashboardLayout = () => {
   /* ── Route Enforcement ── */
   useEffect(() => {
     if (!user) return;
+
+    // First-3-login tutorial redirect: consume the one-shot flag set in loginUser
+    if (localStorage.getItem("bookiify_show_tutorial") === "1") {
+      localStorage.removeItem("bookiify_show_tutorial");
+      navigate("/owner/dashboard/tutorial", { replace: true });
+      return;
+    }
+
     const state = getAccessState(user);
     const path  = location.pathname;
+
+    // Tutorial is always accessible — never block it
+    if (path.startsWith("/owner/dashboard/tutorial")) return;
 
     if (state === "unverified" || state === "review") {
       if (path !== "/owner/dashboard/kyc" && path !== "/owner/dashboard") {

@@ -7,7 +7,7 @@ import {
   BarChart3, LogOut, ChevronLeft, ChevronRight, Wallet, Palette,
   Power, FileText, Star, Briefcase, Globe, Zap, Sparkles,
   ShieldCheck, Lock, MessageSquare, BadgeCheck, Clock,
-  AlertTriangle, RefreshCw, MonitorPlay,
+  AlertTriangle, RefreshCw, MonitorPlay, BookOpen,
 } from "lucide-react";
 
 /* ─── Access State Helpers ─── */
@@ -33,7 +33,8 @@ const NAV_SECTIONS = [
   {
     label: "Main",
     items: [
-      { name: "Overview", icon: LayoutDashboard, path: "/owner/dashboard" },
+      { name: "Overview",   icon: LayoutDashboard, path: "/owner/dashboard"          },
+      { name: "Tutorial",   icon: BookOpen,        path: "/owner/dashboard/tutorial", badge: "NEW" },
     ],
   },
   {
@@ -41,7 +42,6 @@ const NAV_SECTIONS = [
     items: [
       { name: "Appointments", icon: CalendarCheck,  path: "/owner/dashboard/bookings"    },
       { name: "Queue Screen", icon: MonitorPlay,    path: "/owner/dashboard/queue"       },
-      { name: "Customers",    icon: Users,          path: "/owner/dashboard/customers"   },
       { name: "Recruitment",  icon: Briefcase,      path: "/owner/dashboard/recruitment" },
       { name: "Staff",        icon: Users,          path: "/owner/dashboard/staff"       },
       { name: "Chat",         icon: MessageSquare,  path: "/owner/dashboard/chat"        },
@@ -276,6 +276,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, onMobileClose }) => {
     path === "/owner/dashboard" ? location.pathname === path : location.pathname.startsWith(path);
 
   const isAllowed = (path) => {
+    // Tutorial is always accessible regardless of account state
+    if (path.startsWith("/owner/dashboard/tutorial")) return true;
     if (accessState === "trial") return true;
     if (accessState === "expired") return ["/owner/dashboard", "/owner/dashboard/billing"].some(a => path === a || path.startsWith(a));
     return ["/owner/dashboard", "/owner/dashboard/kyc"].some(a => path === a || path.startsWith(a));
