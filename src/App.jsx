@@ -80,6 +80,8 @@ import FindWorkPage from "./pages/public/FindWork/FindWorkPage";
 import JobDetailPage from "./pages/public/FindWork/JobDetailPage";
 import ReviewPage from "./pages/public/ReviewPage";
 import DisplayScreen from "./pages/public/DisplayScreen";
+import PrivacyPolicy from "./pages/public/PrivacyPolicy";
+import Terms from "./pages/public/Terms";
 
 /**
  * 🛡️ SECURITY WATCHDOG
@@ -168,6 +170,8 @@ function App() {
           <Route path="/work-mode/worker" element={<WorkerWorkMode />} />
           <Route path="/find-work" element={<FindWorkPage />} />
           <Route path="/find-work/:id" element={<JobDetailPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<Terms />} />
 
           {/* --- 2. Auth Routes --- */}
           <Route path="/signup" element={<SignupLayout />} />

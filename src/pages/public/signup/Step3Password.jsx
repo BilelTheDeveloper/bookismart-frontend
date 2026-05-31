@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Loader2, ShieldCheck } from "lucide-react";
 import { passwordBlacklist } from "../../../utils/passwordBlacklist";
 
 const Step3Password = ({ formData, setFormData, onPrev, onSubmit, submitting, submitError }) => {
   const [strength, setStrength] = useState({ score: 0, label: "Empty", color: "bg-slate-200" });
   const [error, setError] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const validatePassword = (pass) => {
     if (!pass) return { score: 0, label: "Empty", color: "bg-slate-200" };
@@ -35,7 +37,7 @@ const Step3Password = ({ formData, setFormData, onPrev, onSubmit, submitting, su
     setStrength(validatePassword(formData.password));
   }, [formData.password]);
 
-  const canSubmit = strength.score === 100 && !error && !submitting;
+  const canSubmit = strength.score === 100 && !error && !submitting && termsAccepted;
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -95,6 +97,40 @@ const Step3Password = ({ formData, setFormData, onPrev, onSubmit, submitting, su
         {submitError && (
           <p className="p-4 bg-rose-50 text-rose-600 text-sm font-bold rounded-2xl border border-rose-100">
             ⚠ {submitError}
+          </p>
+        )}
+      </div>
+
+      {/* Terms & Privacy acceptance */}
+      <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5 space-y-3">
+        <label className="flex items-start gap-3.5 cursor-pointer group">
+          <div className="relative mt-0.5 flex-shrink-0">
+            <input
+              type="checkbox"
+              checked={termsAccepted}
+              onChange={e => setTermsAccepted(e.target.checked)}
+              className="peer w-5 h-5 rounded-lg border-2 border-slate-300 text-indigo-600 focus:ring-indigo-500 transition-all cursor-pointer appearance-none checked:bg-indigo-600 checked:border-indigo-600"
+            />
+            <span className="absolute inset-0 flex items-center justify-center text-white opacity-0 peer-checked:opacity-100 pointer-events-none text-[10px] font-black">✓</span>
+          </div>
+          <span className="text-sm text-slate-600 leading-relaxed font-medium">
+            I have read and agree to the{" "}
+            <Link to="/terms" target="_blank" rel="noopener noreferrer"
+              className="text-indigo-600 font-black underline underline-offset-2 hover:text-indigo-500 transition-colors">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link to="/privacy-policy" target="_blank" rel="noopener noreferrer"
+              className="text-indigo-600 font-black underline underline-offset-2 hover:text-indigo-500 transition-colors">
+              Privacy Policy
+            </Link>
+            . I certify that the information I provided is accurate and authentic.
+          </span>
+        </label>
+        {!termsAccepted && strength.score === 100 && (
+          <p className="flex items-center gap-2 text-xs font-bold text-amber-600 bg-amber-50 border border-amber-100 px-3 py-2 rounded-xl">
+            <ShieldCheck size={13} />
+            Please accept the terms to create your account.
           </p>
         )}
       </div>
