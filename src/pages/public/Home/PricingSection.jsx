@@ -2,9 +2,12 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { Check, Sparkles, Zap, Building2, Star } from "lucide-react";
+import { Check, Sparkles, Zap, Building2, Star, User, Layers } from "lucide-react";
 
-const PLAN_KEYS = ["free", "pro", "business"];
+const PLAN_SETS = {
+  individual: ["free", "pro", "business"],
+  organization: ["orgStarter", "orgPro", "orgEnterprise"],
+};
 const PLAN_ICONS = [Star, Zap, Building2];
 const PLAN_ACCENTS = [
   { border: "border-slate-200 dark:border-slate-700", badge: "", button: "bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100" },
@@ -15,6 +18,8 @@ const PLAN_ACCENTS = [
 const PricingSection = () => {
   const { t } = useTranslation();
   const mostPopular = t("home.pricing.mostPopular");
+  const [audience, setAudience] = useState("individual");
+  const PLAN_KEYS = PLAN_SETS[audience];
 
   return (
     <section className="relative overflow-hidden bg-slate-950 py-20 md:py-28">
@@ -47,6 +52,31 @@ const PricingSection = () => {
           <p className="mt-4 text-slate-400 font-medium text-base sm:text-lg max-w-lg mx-auto">
             {t("home.pricing.desc")}
           </p>
+
+          {/* Individual / Organization toggle */}
+          <div className="mt-8 inline-flex items-center gap-1 rounded-2xl border border-slate-700 bg-slate-900/70 p-1">
+            {[
+              { id: "individual", label: t("home.pricing.toggleIndividual"), icon: User },
+              { id: "organization", label: t("home.pricing.toggleOrganization"), icon: Layers },
+            ].map((opt) => {
+              const OptIcon = opt.icon;
+              const active = audience === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  onClick={() => setAudience(opt.id)}
+                  className={`flex items-center gap-2 rounded-xl px-4 sm:px-5 py-2.5 text-sm font-black transition-all ${
+                    active
+                      ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-900/40"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <OptIcon size={15} />
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
         </motion.div>
 
         {/* Cards */}

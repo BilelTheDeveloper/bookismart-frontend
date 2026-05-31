@@ -44,6 +44,7 @@ import WorkMode from "./pages/owner/WorkMode";
 import SmartAssistant from "./pages/owner/SmartAssistant";
 import Recruitment from "./pages/owner/Recruitment";
 import Staff from "./pages/owner/Staff";
+import Branches from "./pages/owner/Branches";
 import Chat from "./pages/owner/Chat";
 import Tutorial from "./pages/owner/Tutorial";
 import WorkerWorkMode from "./pages/workmode/WorkerWorkMode";
@@ -222,6 +223,7 @@ function App() {
             <Route path="dashboard/work-mode"   element={<WorkMode />} />
             <Route path="dashboard/recruitment" element={<Recruitment />} />
             <Route path="dashboard/staff"       element={<Staff />} />
+            <Route path="dashboard/branches"    element={<Branches />} />
             <Route path="dashboard/chat"        element={<Chat />} />
             <Route path="dashboard/smart-ai"    element={<SmartAssistant />} />
             <Route path="dashboard/queue"       element={<QueueManager />} />

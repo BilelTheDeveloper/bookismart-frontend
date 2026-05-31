@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import LanguageSwitcher from "./LanguageSwitcher";
+import ThemeToggle from "./ThemeToggle";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    DEMO NOTIFICATIONS
@@ -308,17 +309,17 @@ const Navbar = () => {
       ═══════════════════════════════════════════════════════ */}
       <nav
         aria-label="Main navigation"
-        className={`sticky top-0 left-0 right-0 z-[100] transition-all duration-300 ${
+        className={`dark sticky top-0 left-0 right-0 z-[100] transition-all duration-300 ${
           scrolled
-            ? "py-2 bg-white/95 shadow-lg shadow-slate-900/8 border-b border-slate-100"
-            : "py-3 bg-white/80"
+            ? "py-2 bg-slate-950/95 shadow-lg shadow-black/40 border-b border-white/10"
+            : "py-3 bg-slate-950/70"
         } backdrop-blur-2xl`}
       >
         <div className="mx-auto max-w-[1400px] px-4 sm:px-6 xl:px-10">
           <div className={`flex items-center justify-between gap-4 transition-all duration-300 rounded-2xl ${
             scrolled
               ? "bg-transparent px-0"
-              : "bg-white/60 border border-white/80 px-4 sm:px-6 py-2 shadow-sm shadow-slate-900/5"
+              : "bg-white/5 border border-white/10 px-4 sm:px-6 py-2 shadow-sm shadow-black/20"
           }`}>
 
             {/* ── BRAND ── */}
@@ -330,8 +331,8 @@ const Navbar = () => {
                 <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white" />
               </div>
               <div className="leading-none">
-                <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 group-hover:text-indigo-700 transition-colors">
-                  Book<span className="text-indigo-600">iify</span>
+                <span className="text-xl sm:text-2xl font-black tracking-tight text-white group-hover:text-indigo-300 transition-colors">
+                  Book<span className="text-indigo-400">iify</span>
                 </span>
                 <p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400 mt-0.5 hidden sm:block">
                   Professional Booking Suite
@@ -352,12 +353,12 @@ const Navbar = () => {
                     onMouseLeave={() => setActiveHover(null)}
                     className={`group relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                       active
-                        ? "text-indigo-700 bg-indigo-50"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                        ? "text-indigo-300 bg-indigo-500/15"
+                        : "text-slate-300 hover:text-white hover:bg-white/10"
                     }`}
                   >
                     <Icon size={15} className={`flex-shrink-0 transition-all duration-200 ${
-                      active ? "text-indigo-500" : "text-slate-400 group-hover:text-indigo-400"
+                      active ? "text-indigo-400" : "text-slate-400 group-hover:text-indigo-300"
                     }`} />
                     <span className="whitespace-nowrap">{link.name}</span>
                     {active && (
@@ -381,12 +382,15 @@ const Navbar = () => {
               {isAuthenticated && user ? (
                 /* ─── AUTHENTICATED ─── */
                 <>
+                  {/* Theme toggle */}
+                  <ThemeToggle className="hidden sm:inline-flex" />
+
                   {/* Notification bell */}
                   <div className="relative" ref={notifRef}>
                     <button
                       onClick={() => { setNotifOpen(p => !p); setProfileOpen(false); }}
                       className={`relative p-2.5 rounded-xl transition-all ${
-                        notifOpen ? "bg-indigo-50 text-indigo-600" : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                        notifOpen ? "bg-indigo-500/15 text-indigo-300" : "text-slate-300 hover:bg-white/10 hover:text-white"
                       }`}
                       aria-label="Notifications"
                     >
@@ -400,14 +404,14 @@ const Navbar = () => {
                     {notifOpen && <NotificationDropdown onClose={() => setNotifOpen(false)} />}
                   </div>
 
-                  <div className="w-px h-7 bg-slate-200" />
+                  <div className="w-px h-7 bg-white/15" />
 
                   {/* Profile */}
                   <div className="relative" ref={profileRef}>
                     <button
                       onClick={() => { setProfileOpen(p => !p); setNotifOpen(false); }}
                       className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl transition-all ${
-                        profileOpen ? "bg-slate-100" : "hover:bg-slate-50"
+                        profileOpen ? "bg-white/10" : "hover:bg-white/10"
                       }`}
                     >
                       <div className="relative">
@@ -421,8 +425,8 @@ const Navbar = () => {
                         <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-white" />
                       </div>
                       <div className="hidden sm:block text-left">
-                        <p className="text-xs font-black text-slate-900 leading-none">{user.fullName?.split(" ")[0]}</p>
-                        <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider mt-0.5">{user.role}</p>
+                        <p className="text-xs font-black text-white leading-none">{user.fullName?.split(" ")[0]}</p>
+                        <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mt-0.5">{user.role}</p>
                       </div>
                       <ChevronDown size={13} className={`hidden sm:block text-slate-400 transition-transform duration-300 ${profileOpen ? "rotate-180" : ""}`} />
                     </button>
@@ -435,22 +439,25 @@ const Navbar = () => {
                 /* ─── GUEST ─── */
                 <>
                   {/* AI badge */}
-                  <span className="hidden xl:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-xs font-bold text-indigo-700 flex-shrink-0 whitespace-nowrap">
-                    <Sparkles size={12} className="text-indigo-500" />
+                  <span className="hidden xl:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/30 bg-indigo-500/15 text-xs font-bold text-indigo-300 flex-shrink-0 whitespace-nowrap">
+                    <Sparkles size={12} className="text-indigo-400" />
                     AI-Powered Platform
                   </span>
+
+                  {/* Theme toggle */}
+                  <ThemeToggle />
 
                   {/* Language switcher */}
                   <div className="hidden md:block">
                     <LanguageSwitcher />
                   </div>
 
-                  <div className="hidden sm:block w-px h-6 bg-slate-200" />
+                  <div className="hidden sm:block w-px h-6 bg-white/15" />
 
                   {/* Login */}
                   <Link
                     to="/login"
-                    className="hidden sm:flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-700 hover:text-indigo-700 hover:bg-slate-50 rounded-xl transition-all"
+                    className="hidden sm:flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-200 hover:text-white hover:bg-white/10 rounded-xl transition-all"
                   >
                     <LogIn size={15} />
                     Login
@@ -473,7 +480,7 @@ const Navbar = () => {
               {/* Mobile hamburger */}
               <button
                 onClick={() => setMobileOpen(true)}
-                className="lg:hidden p-2.5 rounded-xl text-slate-700 hover:bg-slate-100 transition-all ml-1"
+                className="lg:hidden p-2.5 rounded-xl text-slate-200 hover:bg-white/10 transition-all ml-1"
                 aria-label="Open menu"
               >
                 <Menu size={22} />
@@ -496,22 +503,22 @@ const Navbar = () => {
 
       {/* Panel */}
       <div
-        className={`fixed top-0 right-0 h-full w-[min(88vw,360px)] z-[160] bg-white shadow-2xl shadow-slate-900/30 flex flex-col transition-transform duration-300 ease-out lg:hidden ${
+        className={`dark fixed top-0 right-0 h-full w-[min(88vw,360px)] z-[160] bg-slate-950 shadow-2xl shadow-black/50 flex flex-col transition-transform duration-300 ease-out lg:hidden ${
           mobileOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Drawer header */}
-        <div className="flex items-center justify-between px-5 py-5 border-b border-slate-100">
+        <div className="flex items-center justify-between px-5 py-5 border-b border-white/10">
           <Link to="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-md shadow-indigo-200">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-md shadow-indigo-900/40">
               <span className="text-lg font-black italic text-white">B</span>
             </div>
-            <span className="font-black text-xl tracking-tight text-slate-900">
-              Book<span className="text-indigo-600">iify</span>
+            <span className="font-black text-xl tracking-tight text-white">
+              Book<span className="text-indigo-400">iify</span>
             </span>
           </Link>
           <button onClick={() => setMobileOpen(false)}
-            className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all">
+            className="p-2 rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition-all">
             <X size={20} />
           </button>
         </div>
@@ -530,11 +537,11 @@ const Navbar = () => {
                 to={link.href}
                 onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-3.5 px-4 py-3.5 rounded-2xl transition-all ${
-                  active ? "bg-indigo-50 text-indigo-700" : "text-slate-700 hover:bg-slate-50"
+                  active ? "bg-indigo-500/15 text-indigo-300" : "text-slate-200 hover:bg-white/10"
                 }`}
               >
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                  active ? "bg-indigo-100 text-indigo-600" : "bg-slate-100 text-slate-500"
+                  active ? "bg-indigo-500/20 text-indigo-300" : "bg-white/10 text-slate-400"
                 }`}>
                   <Icon size={18} />
                 </div>
@@ -547,7 +554,7 @@ const Navbar = () => {
             );
           })}
 
-          <div className="h-px bg-slate-100 my-4" />
+          <div className="h-px bg-white/10 my-4" />
 
           {isAuthenticated && user ? (
             <div className="space-y-2">
@@ -583,6 +590,10 @@ const Navbar = () => {
                 </div>
                 <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
               </Link>
+              <div className="flex items-center justify-center gap-3 py-1">
+                <LanguageSwitcher />
+                <ThemeToggle variant="pill" />
+              </div>
               <button
                 onClick={() => { setMobileOpen(false); logoutUser(); }}
                 className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl bg-rose-50 text-rose-500 font-bold text-sm hover:bg-rose-100 transition-colors"
@@ -592,13 +603,14 @@ const Navbar = () => {
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="flex justify-center py-2">
+              <div className="flex items-center justify-center gap-3 py-2">
                 <LanguageSwitcher />
+                <ThemeToggle variant="pill" />
               </div>
               <Link
                 to="/login"
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold text-sm transition-colors"
+                className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-bold text-sm transition-colors"
               >
                 <LogIn size={18} /> Login to your account
               </Link>
@@ -622,10 +634,10 @@ const Navbar = () => {
                   { icon: "🔒", label: "Enterprise-grade security",   sub: "Redis sessions + device fingerprinting" },
                   { icon: "👥", label: "Staff & team management",     sub: "Role-based access for your entire team" },
                 ].map((f, i) => (
-                  <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-colors">
+                  <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-colors">
                     <span className="text-xl flex-shrink-0">{f.icon}</span>
                     <div>
-                      <p className="text-xs font-bold text-slate-800">{f.label}</p>
+                      <p className="text-xs font-bold text-slate-200">{f.label}</p>
                       <p className="text-[10px] text-slate-400">{f.sub}</p>
                     </div>
                   </div>
@@ -636,7 +648,7 @@ const Navbar = () => {
         </div>
 
         {/* Drawer footer */}
-        <div className="px-5 py-4 border-t border-slate-100 bg-slate-50/60">
+        <div className="px-5 py-4 border-t border-white/10 bg-white/5">
           <p className="text-[10px] text-slate-400 font-medium text-center">
             © {new Date().getFullYear()} Bookiify — Professional Booking Suite for Tunisia
           </p>

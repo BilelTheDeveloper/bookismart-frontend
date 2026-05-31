@@ -22,7 +22,7 @@ const LanguageSwitcher = () => {
     >
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50"
+        className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-700"
       >
         <Globe size={13} />
         <span>{current.flag} {current.label}</span>
@@ -36,7 +36,7 @@ const LanguageSwitcher = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-2 w-40 rounded-2xl border border-slate-100 bg-white shadow-xl overflow-hidden z-50"
+            className="absolute right-0 top-full mt-2 w-40 rounded-2xl border border-slate-100 bg-white shadow-xl overflow-hidden z-50 dark:border-slate-700 dark:bg-slate-900 dark:shadow-black/40"
           >
             <div className="p-1.5">
               {LANGS.map((lang) => (
@@ -45,8 +45,8 @@ const LanguageSwitcher = () => {
                   onClick={() => { i18n.changeLanguage(lang.code); setOpen(false); }}
                   className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold transition-colors ${
                     i18n.language?.slice(0, 2) === lang.code
-                      ? 'bg-indigo-50 text-indigo-700 font-bold'
-                      : 'text-slate-700 hover:bg-slate-50'
+                      ? 'bg-indigo-50 text-indigo-700 font-bold dark:bg-indigo-500/15 dark:text-indigo-300'
+                      : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
                   }`}
                 >
                   <span className="text-base">{lang.flag}</span>

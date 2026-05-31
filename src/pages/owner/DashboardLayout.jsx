@@ -7,6 +7,8 @@ import { useNotifications } from "../../context/NotificationContext";
 import API from "../../api/config";
 import CommandPalette from "../../components/CommandPalette";
 import NotificationToast from "../../components/NotificationToast";
+import ThemeToggle from "../../components/ThemeToggle";
+import LanguageSwitcher from "../../components/LanguageSwitcher";
 import {
   Search, Bell, ChevronDown, Settings as SettingsIcon,
   LogOut, Globe, X, CheckCheck, Trash2, BookOpen, Star,
@@ -471,26 +473,15 @@ const DashboardLayout = () => {
   const [isNotifOpen,    setIsNotifOpen]   = useState(false);
   const [isPaletteOpen,  setIsPaletteOpen] = useState(false);
   const [isHelpOpen,     setIsHelpOpen]    = useState(false);
-  const [isLangOpen,     setIsLangOpen]    = useState(false);
-  const [lang,           setLang]          = useState(() => localStorage.getItem("bookiify_lang") || "FR");
-  const [isDark,         setIsDark]        = useState(() => localStorage.getItem("bookiify_theme") === "dark");
 
   const profileRef = useRef(null);
   const notifRef   = useRef(null);
-  const langRef    = useRef(null);
-
-  /* Dark mode effect */
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDark);
-    localStorage.setItem("bookiify_theme", isDark ? "dark" : "light");
-  }, [isDark]);
 
   /* Close dropdowns on outside click */
   useEffect(() => {
     const handler = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) setIsProfileOpen(false);
       if (notifRef.current   && !notifRef.current.contains(e.target))   setIsNotifOpen(false);
-      if (langRef.current    && !langRef.current.contains(e.target))    setIsLangOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -559,42 +550,11 @@ const DashboardLayout = () => {
           {/* Right side */}
           <div className="flex items-center gap-1.5 sm:gap-2">
 
-            {/* Language toggle */}
-            <div className="relative" ref={langRef}>
-              <button
-                onClick={() => setIsLangOpen(p => !p)}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all text-sm font-black"
-              >
-                <Globe size={16} />
-                <span>{lang}</span>
-              </button>
-              {isLangOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-black/40 py-1.5 z-50">
-                  {LANGS.map(l => (
-                    <button
-                      key={l.code}
-                      onClick={() => { setLang(l.code); localStorage.setItem("bookiify_lang", l.code); setIsLangOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 ${
-                        lang === l.code ? "text-indigo-600" : "text-slate-700 dark:text-slate-300"
-                      }`}
-                    >
-                      <span>{l.flag}</span>
-                      <span>{l.label}</span>
-                      {lang === l.code && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-500" />}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            {/* Language switcher (real i18n) */}
+            <LanguageSwitcher />
 
             {/* Dark mode toggle */}
-            <button
-              onClick={() => setIsDark(p => !p)}
-              className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            >
-              {isDark ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} />}
-            </button>
+            <ThemeToggle />
 
             <div className="h-8 w-[1px] bg-slate-200 dark:bg-slate-700" />
 

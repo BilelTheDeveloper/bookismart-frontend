@@ -11,9 +11,11 @@ import {
 } from "lucide-react";
 import { logout } from "../../../services/authService";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const OnboardingStatus = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleRefresh = () => {
     // Reload the page to trigger the App.js logic/user check again
@@ -41,31 +43,31 @@ const OnboardingStatus = () => {
             <Clock className="w-10 h-10 text-indigo-400" />
           </motion.div>
           <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter mb-4">
-            Identity Under <span className="text-indigo-400">Review</span>
+            {t("auth.onboardingStatus.title")} <span className="text-indigo-400">{t("auth.onboardingStatus.titleHighlight")}</span>
           </h1>
           <p className="text-slate-400 text-lg font-medium max-w-md mx-auto">
-            Our compliance team is currently verifying your KYC documents. This usually takes less than 24 hours.
+            {t("auth.onboardingStatus.subtitle")}
           </p>
         </div>
 
         {/* Status Steps */}
         <div className="space-y-4 mb-10">
-          <StatusCard 
-            icon={FileCheck} 
-            title="Application Submitted" 
-            desc="We have received your professional credentials."
+          <StatusCard
+            icon={FileCheck}
+            title={t("auth.onboardingStatus.step1Title")}
+            desc={t("auth.onboardingStatus.step1Desc")}
             completed
           />
-          <StatusCard 
-            icon={ShieldCheck} 
-            title="KYC Verification" 
-            desc="Checking ID validity and liveness video..."
+          <StatusCard
+            icon={ShieldCheck}
+            title={t("auth.onboardingStatus.step2Title")}
+            desc={t("auth.onboardingStatus.step2Desc")}
             loading
           />
-          <StatusCard 
-            icon={ExternalLink} 
-            title="Final Approval" 
-            desc="Granting access to the Bookiify Dashboard."
+          <StatusCard
+            icon={ExternalLink}
+            title={t("auth.onboardingStatus.step3Title")}
+            desc={t("auth.onboardingStatus.step3Desc")}
             pending
           />
         </div>
@@ -77,21 +79,21 @@ const OnboardingStatus = () => {
             className="flex items-center justify-center gap-3 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl transition-all shadow-lg shadow-indigo-600/20 active:scale-95 group"
           >
             <RefreshCcw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-700" />
-            CHECK STATUS
+            {t("auth.onboardingStatus.checkStatus")}
           </button>
-          
-          <button 
+
+          <button
             onClick={logout}
             className="flex items-center justify-center gap-3 py-4 bg-white/5 hover:bg-white/10 text-slate-300 font-black rounded-2xl border border-white/10 transition-all active:scale-95"
           >
             <LogOut className="w-5 h-5" />
-            SIGN OUT
+            {t("auth.onboardingStatus.signOut")}
           </button>
         </div>
 
         {/* Support Footer */}
         <p className="text-center mt-8 text-slate-500 text-sm font-bold tracking-tight">
-          Need help? Contact <span className="text-indigo-400 cursor-pointer hover:underline">support@bookiify.com</span>
+          {t("auth.onboardingStatus.needHelp")} <span className="text-indigo-400 cursor-pointer hover:underline">support@bookiify.com</span>
         </p>
       </motion.div>
     </div>

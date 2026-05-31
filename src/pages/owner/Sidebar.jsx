@@ -7,7 +7,7 @@ import {
   BarChart3, LogOut, ChevronLeft, ChevronRight, Wallet, Palette,
   Power, FileText, Star, Briefcase, Globe, Zap, Sparkles,
   ShieldCheck, Lock, MessageSquare, BadgeCheck, Clock,
-  AlertTriangle, RefreshCw, MonitorPlay, BookOpen,
+  AlertTriangle, RefreshCw, MonitorPlay, BookOpen, Building2,
 } from "lucide-react";
 
 /* ─── Access State Helpers ─── */
@@ -265,6 +265,14 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, onMobileClose }) => {
   const daysLeft    = getTrialDaysLeft(user?.trialEndsAt);
   const initials    = user?.fullName?.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() || "OW";
 
+  // Organization accounts get a "Branches" item in the Management section.
+  const isOrg = user?.accountType === "organization";
+  const navSections = NAV_SECTIONS.map((section) =>
+    section.label === "Management" && isOrg
+      ? { ...section, items: [{ name: "Branches", icon: Building2, path: "/owner/dashboard/branches" }, ...section.items] }
+      : section
+  );
+
   const handleLogout = async () => {
     try { await API.post("/auth/logout"); } catch { /* swallow */ } finally {
       localStorage.removeItem("user");
@@ -338,7 +346,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, onMobileClose }) => {
 
       {/* Nav */}
       <nav className="flex-1 px-2 overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: "none" }}>
-        {NAV_SECTIONS.map((section, si) => (
+        {navSections.map((section, si) => (
           <div key={section.label} className={si > 0 ? "mt-4" : ""}>
             {!isCollapsed && (
               <p className="px-3 text-[9px] font-black text-slate-600 uppercase tracking-[0.22em] mb-1.5">{section.label}</p>
