@@ -37,6 +37,10 @@ import Analytics from "./pages/owner/Analytics";
 import Finance from "./pages/owner/Finance";
 import Invoices from "./pages/owner/Invoices";
 import Loyalty from "./pages/owner/Loyalty";
+import Packages from "./pages/owner/Packages";
+import NoShowProtection from "./pages/owner/NoShowProtection";
+import Marketing from "./pages/owner/Marketing";
+import Payments from "./pages/owner/Payments";
 import Appointments from "./pages/owner/Appointments";
 import Settings from "./pages/owner/Settings";
 import KYCVerification from "./pages/owner/KYCVerification";
@@ -215,6 +219,10 @@ function App() {
             <Route path="dashboard/finance"     element={<Finance />} />
             <Route path="dashboard/invoices"    element={<Invoices />} />
             <Route path="dashboard/loyalty"     element={<Loyalty />} />
+            <Route path="dashboard/packages"    element={<Packages />} />
+            <Route path="dashboard/payments"    element={<Payments />} />
+            <Route path="dashboard/no-show"     element={<NoShowProtection />} />
+            <Route path="dashboard/marketing"   element={<Marketing />} />
             <Route path="dashboard/billing"     element={<Billing />} />
             <Route path="dashboard/themes"      element={<ThemeGallery />} />
             <Route path="theme/customize-site"  element={<SetupTemplate />} />

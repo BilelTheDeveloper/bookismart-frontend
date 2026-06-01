@@ -10,6 +10,7 @@ import API from "../../../api/config";
 import { useAuth } from "../../../context/AuthContext";
 import { SECTIONS, SECTION_LIST } from "./sections";
 import { BUILDER_TEMPLATES, blankSite, make } from "./templates";
+import { generateSite, GENERATOR_ACCENTS } from "./generator";
 
 const ACCENT_SWATCHES = ["#6366f1", "#0d9488", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#0ea5e9", "#f97316"];
 
@@ -87,6 +88,8 @@ const WebsiteBuilder = () => {
   const [rightTab, setRightTab] = useState("section"); // section | theme
   const [addOpen, setAddOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [genOpen, setGenOpen] = useState(false);
+  const [genVibe, setGenVibe] = useState({ accent: "#6366f1", mode: "dark" });
   const dragIndex = useRef(null);
 
   /* Load existing builder site */
@@ -115,6 +118,19 @@ const WebsiteBuilder = () => {
     setPhase("edit");
   };
   const startBlank = () => { setSections(blankSite()); setTheme({ accent: "#6366f1", mode: "dark" }); setPhase("edit"); };
+  const runGenerate = () => {
+    const { sections: secs, theme: th } = generateSite({
+      businessName: siteName || user?.businessName,
+      category: user?.category,
+      city: user?.ville,
+      vibe: genVibe,
+    });
+    setSections(secs);
+    setTheme(th);
+    setGenOpen(false);
+    setSelectedId(null);
+    setPhase("edit");
+  };
 
   const updateSelected = (key, val) => setSections((prev) => prev.map((s) => (s.id === selectedId ? { ...s, settings: { ...s.settings, [key]: val } } : s)));
   const addSection = (type) => { const sec = make(type); setSections((p) => [...p, sec]); setSelectedId(sec.id); setRightTab("section"); setAddOpen(false); };
@@ -150,6 +166,22 @@ const WebsiteBuilder = () => {
             <p className="text-slate-400 font-medium mt-4 text-lg">Start from a ready-made template and tweak it — or build from a blank canvas, section by section.</p>
           </div>
 
+          {/* Featured: Generate with AI */}
+          <button onClick={() => setGenOpen(true)} className="group w-full text-left rounded-3xl p-7 sm:p-9 mb-5 relative overflow-hidden transition-all hover:scale-[1.005]" style={{ background: "linear-gradient(120deg,#4f46e5,#7c3aed 55%,#0ea5e9)" }}>
+            <div className="absolute -top-16 -right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl" />
+            <div className="relative flex flex-col sm:flex-row sm:items-center gap-5">
+              <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center shrink-0"><Wand2 size={26} /></div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-2xl font-black">Generate my site with AI</h3>
+                  <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-black uppercase tracking-widest">Instant</span>
+                </div>
+                <p className="text-white/80 font-medium mt-1">Answer a couple of things and we'll build a complete, on-brand site for your business in seconds.</p>
+              </div>
+              <span className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white text-indigo-700 font-black text-sm shrink-0 group-hover:gap-3 transition-all">Generate <Sparkles size={16} /></span>
+            </div>
+          </button>
+
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
             {/* Build from scratch */}
             <button onClick={startBlank} className="group text-left rounded-3xl border-2 border-dashed border-slate-700 hover:border-indigo-500 bg-slate-900 p-7 transition-all flex flex-col">
@@ -176,6 +208,45 @@ const WebsiteBuilder = () => {
             ))}
           </div>
         </div>
+
+        {/* Generate wizard */}
+        {genOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={() => setGenOpen(false)}>
+            <div className="w-full max-w-md rounded-3xl bg-slate-900 border border-slate-700 p-7" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-xl font-black flex items-center gap-2"><Wand2 size={20} className="text-indigo-400" /> Generate my site</h3>
+                <button onClick={() => setGenOpen(false)} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-800"><X size={18} /></button>
+              </div>
+              <div className="space-y-5">
+                <div>
+                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Business name</label>
+                  <input value={siteName} onChange={(e) => setSiteName(e.target.value)} placeholder="e.g. Vogue Studio" className="mt-2 w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-indigo-500" />
+                  {user?.category && <p className="text-xs text-slate-500 mt-1.5">Tailored for <span className="text-indigo-300 font-bold">{user.category}</span></p>}
+                </div>
+                <div>
+                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Vibe — accent</label>
+                  <div className="grid grid-cols-8 gap-2 mt-2">
+                    {GENERATOR_ACCENTS.map((c) => (
+                      <button key={c} onClick={() => setGenVibe((v) => ({ ...v, accent: c }))} className={`h-8 rounded-lg flex items-center justify-center ${genVibe.accent === c ? "ring-2 ring-white" : ""}`} style={{ background: c }}>{genVibe.accent === c && <Check size={13} className="text-white" />}</button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Mode</label>
+                  <div className="flex gap-2 mt-2">
+                    {["dark", "light"].map((m) => (
+                      <button key={m} onClick={() => setGenVibe((v) => ({ ...v, mode: m }))} className={`flex-1 capitalize py-2.5 rounded-xl text-xs font-black ${genVibe.mode === m ? "bg-indigo-600 text-white" : "bg-slate-800 text-slate-400"}`}>{m}</button>
+                    ))}
+                  </div>
+                </div>
+                <button onClick={runGenerate} className="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 font-black text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-all">
+                  <Sparkles size={16} /> Generate my site
+                </button>
+                <p className="text-center text-[11px] text-slate-500">You can edit every word, image and color after.</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
 

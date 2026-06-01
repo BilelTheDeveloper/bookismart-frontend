@@ -7,7 +7,7 @@ import {
   BarChart3, LogOut, ChevronLeft, ChevronRight, Wallet, Palette,
   Power, FileText, Star, Briefcase, Globe, Zap, Sparkles,
   ShieldCheck, Lock, MessageSquare, BadgeCheck, Clock,
-  AlertTriangle, RefreshCw, MonitorPlay, BookOpen, Building2,
+  AlertTriangle, RefreshCw, MonitorPlay, BookOpen, Building2, Gift, Megaphone,
 } from "lucide-react";
 
 /* ─── Access State Helpers ─── */
@@ -45,20 +45,24 @@ const NAV_SECTIONS = [
       { name: "Recruitment",  icon: Briefcase,      path: "/owner/dashboard/recruitment" },
       { name: "Staff",        icon: Users,          path: "/owner/dashboard/staff"       },
       { name: "Chat",         icon: MessageSquare,  path: "/owner/dashboard/chat"        },
+      { name: "No-Show Shield", icon: ShieldCheck,  path: "/owner/dashboard/no-show"     },
     ],
   },
   {
     label: "Finance",
     items: [
       { name: "Financials",   icon: Wallet,         path: "/owner/dashboard/finance"     },
+      { name: "Payments",     icon: CreditCard,     path: "/owner/dashboard/payments"    },
       { name: "Invoices",     icon: FileText,       path: "/owner/dashboard/invoices"    },
       { name: "Loyalty",      icon: Star,           path: "/owner/dashboard/loyalty"     },
+      { name: "Packages",     icon: Gift,           path: "/owner/dashboard/packages"    },
     ],
   },
   {
     label: "Growth",
     items: [
       { name: "Smart AI",     icon: Sparkles,       path: "/owner/dashboard/smart-ai",   badge: "AI"  },
+      { name: "Marketing",    icon: Megaphone,      path: "/owner/dashboard/marketing"   },
       { name: "Analytics",    icon: BarChart3,      path: "/owner/dashboard/stats"       },
       { name: "Website",      icon: Palette,        path: "/owner/dashboard/themes"      },
     ],
