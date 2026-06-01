@@ -52,7 +52,24 @@ import TattooTheme from "./themes/TattooArtists/theme1/TattooTheme";
 import RealEstateTheme from "./themes/RealEstate/theme1/RealEstateTheme";
 import InteriorDesignTheme from "./themes/InteriorDesign/theme1/InteriorDesignTheme";
 
+// ─── Organization (multi-team, category-adaptive) ──────────────────────────
+import OrganizationTheme from "./themes/Organization/theme1/OrganizationTheme";
+
 export const THEME_REGISTRY = [
+
+  // ── ORGANIZATION TEMPLATES (only shown to organization accounts) ─────────
+  {
+    id: "ORG_THEME_01",
+    name: "Enterprise Prestige",
+    category: "Organization",
+    forOrganization: true,
+    tags: ["Multi-Team", "Adaptive", "Premium"],
+    description: "A premium, category-adaptive website built for organizations — booking hero, services, a full team showcase, stats & locations. Adapts its accent to your industry.",
+    component: OrganizationTheme,
+    previewImage: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop",
+    cardBg: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop",
+    demoPath: "/p/demo-ORG_THEME_01"
+  },
 
   // ── BEAUTY & BARBERS ────────────────────────────────────────────────────
   {
@@ -435,14 +452,27 @@ export const THEME_REGISTRY = [
 ];
 
 /**
- * Filter themes by business category
+ * Filter themes by business category (individual accounts).
+ * Excludes organization-only templates.
  */
 export const getThemesByCategory = (category) => {
   if (!category) return [];
   const normalizedCategory = category.toLowerCase().trim();
   return THEME_REGISTRY.filter(
-    (theme) => theme.category.toLowerCase().trim() === normalizedCategory
+    (theme) => !theme.forOrganization && theme.category.toLowerCase().trim() === normalizedCategory
   );
+};
+
+/**
+ * Organization templates — shown to accountType === 'organization'.
+ * These are category-adaptive (a single template themes itself per industry),
+ * so the same entries serve every category. We tag each with the org's actual
+ * category for display so the preview/accent matches their industry.
+ */
+export const getOrganizationThemes = (category) => {
+  return THEME_REGISTRY
+    .filter((theme) => theme.forOrganization)
+    .map((theme) => ({ ...theme, category: category || theme.category }));
 };
 
 /**

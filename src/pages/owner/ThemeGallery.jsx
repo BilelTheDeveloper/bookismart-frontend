@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { CheckCircle2, Eye, Palette, Sparkles, Layout, ArrowRight } from "lucide-react";
 import API from "../../api/config";
 import { useAuth } from "../../context/AuthContext";
-import { THEME_REGISTRY, getThemesByCategory } from "./ThemeRegistry";
+import { THEME_REGISTRY, getThemesByCategory, getOrganizationThemes } from "./ThemeRegistry";
 
 const ThemeGallery = () => {
   const navigate = useNavigate();
@@ -13,7 +13,11 @@ const ThemeGallery = () => {
     ? authUser.category
     : "Beauty & Barbers";
 
-  const filteredThemes = getThemesByCategory(safeCategory);
+  // Organization accounts get the dedicated multi-team organization templates.
+  const isOrg = authUser?.accountType === "organization";
+  const filteredThemes = isOrg
+    ? getOrganizationThemes(safeCategory)
+    : getThemesByCategory(safeCategory);
 
   const [activeThemeId, setActiveThemeId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -85,11 +89,20 @@ const ThemeGallery = () => {
         { day: "Saturday", open: "09:00", close: "22:00", isClosed: false },
         { day: "Sunday", isClosed: true }
       ],
-      contact: { 
-        phone: "+216 71 000 000", 
+      contact: {
+        phone: "+216 71 000 000",
         address: "Tunis, Tunisia",
         socials: { instagram: "@bookiify_demo", facebook: "bookiify.tn" }
-      }
+      },
+      // Organization-template extras (ignored by solo templates):
+      organization: { name: theme.name, branchCount: 3, teamSize: 12 },
+      teamSection: { show: true, title: "Meet Our Team", subtitle: "The certified experts behind every appointment." },
+      team: [
+        { name: "Sarah Mansour",   role: "Lead Specialist", specialties: ["Senior", "5+ yrs"], photo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=800&auto=format&fit=crop" },
+        { name: "Karim Ben Salah", role: "Senior Expert",   specialties: ["Certified"],        photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=800&auto=format&fit=crop" },
+        { name: "Leïla Trabelsi",  role: "Specialist",      specialties: ["Premium"],          photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=800&auto=format&fit=crop" },
+        { name: "Yassine Gharbi",  role: "Consultant",      specialties: ["Advisory"],         photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop" },
+      ],
     };
 
     sessionStorage.setItem("preview_mode_data", JSON.stringify(demoData));
@@ -120,11 +133,25 @@ const ThemeGallery = () => {
             Designs optimized for your specific industry and brand aesthetic.
           </p>
         </div>
-        <div className="bg-slate-50 dark:bg-slate-800 px-5 py-3 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => navigate("/owner/site-builder")}
+            className="group flex items-center gap-2.5 rounded-2xl px-5 py-3.5 font-black text-white text-sm shadow-lg shadow-indigo-300/40 dark:shadow-indigo-900/40 transition-all hover:scale-[1.02] active:scale-95"
+            style={{ background: "linear-gradient(135deg,#4f46e5,#7c3aed)" }}
+          >
+            <Sparkles size={16} />
+            <span className="text-left leading-tight">
+              <span className="block">Website Builder</span>
+              <span className="block text-[9px] font-bold uppercase tracking-widest text-indigo-200">Build from scratch — drag & drop</span>
+            </span>
+            <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+          </button>
+          <div className="bg-slate-50 dark:bg-slate-800 px-5 py-3 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center gap-3">
             <Layout size={18} className="text-indigo-600 dark:text-indigo-400" />
             <span className="text-sm font-black text-slate-600 dark:text-slate-300 uppercase tracking-tighter">
-              {filteredThemes.length} Designs Ready
+              {filteredThemes.length} Ready
             </span>
+          </div>
         </div>
       </div>
 

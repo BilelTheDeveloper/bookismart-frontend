@@ -45,6 +45,7 @@ import SmartAssistant from "./pages/owner/SmartAssistant";
 import Recruitment from "./pages/owner/Recruitment";
 import Staff from "./pages/owner/Staff";
 import Branches from "./pages/owner/Branches";
+import WebsiteBuilder from "./pages/owner/builder/WebsiteBuilder";
 import Chat from "./pages/owner/Chat";
 import Tutorial from "./pages/owner/Tutorial";
 import WorkerWorkMode from "./pages/workmode/WorkerWorkMode";
@@ -228,7 +229,17 @@ function App() {
             <Route path="dashboard/smart-ai"    element={<SmartAssistant />} />
             <Route path="dashboard/queue"       element={<QueueManager />} />
           </Route>
-          
+
+          {/* --- 4b. Website Builder (full-screen, standalone) --- */}
+          <Route
+            path="/owner/site-builder"
+            element={
+              <AdminGuard allowedRoles={["owner"]}>
+                <WebsiteBuilder />
+              </AdminGuard>
+            }
+          />
+
           {/* --- 5. Customer Registration (public, no auth) --- */}
           <Route path="/customer/login"              element={<CustomerLogin />} />
           <Route path="/customer/register/:token"    element={<CustomerRegisterLayout />} />

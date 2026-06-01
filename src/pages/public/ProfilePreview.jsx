@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getThemeById } from "../owner/ThemeRegistry";
+import { SectionRenderer } from "../owner/builder/sections";
 import {
   Sparkles, Globe, Loader2, MapPin, Navigation,
   Play, Pause, Volume2, VolumeX,
@@ -545,9 +546,11 @@ const ProfilePreview = () => {
     );
   }
 
-  const themeConfig = getThemeById(data.templateId) || getThemeById("BB_THEME_01");
+  // Dynamic section-builder site renders from `sections`; otherwise a fixed template.
+  const useBuilder = data.useBuilder && Array.isArray(data.sections) && data.sections.length > 0;
+  const themeConfig = useBuilder ? null : (getThemeById(data.templateId) || getThemeById("BB_THEME_01"));
 
-  if (!themeConfig) {
+  if (!useBuilder && !themeConfig) {
     return (
       <div className="h-screen bg-slate-900 flex items-center justify-center text-white">
         <div className="p-8 bg-red-500/20 border border-red-500 rounded-2xl text-center">
@@ -558,7 +561,8 @@ const ProfilePreview = () => {
     );
   }
 
-  const SelectedTheme = themeConfig.component;
+  const SelectedTheme = themeConfig?.component;
+  const builderOwnerId = data.ownerId?._id || data.ownerId;
 
   const loc = data.setupConfig?.localization || {};
   const addressParts = [loc.address, loc.city, loc.country].filter(Boolean);
@@ -569,7 +573,9 @@ const ProfilePreview = () => {
     <div className="flex flex-col min-h-screen bg-black">
 
       <main className="flex-grow">
-        <SelectedTheme data={data} />
+        {useBuilder
+          ? <SectionRenderer sections={data.sections} theme={data.builderTheme || { accent: "#6366f1", mode: "dark" }} ownerId={builderOwnerId} />
+          : <SelectedTheme data={data} />}
       </main>
 
       {data.presentationReel?.show && data.presentationReel?.videoUrl && (

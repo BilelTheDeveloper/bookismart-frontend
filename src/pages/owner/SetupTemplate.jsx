@@ -55,6 +55,8 @@ const TemplateSetupForm = () => {
     hero: { title: "", slogan: "", backgroundImage: "" },
     about: { show: true, title: "Our Story", text: "", image: "" },
     services: [{ title: "", description: "", price: "", duration: 30, bufferTime: 0, active: true }],
+    teamSection: { show: true, title: "Meet Our Team", subtitle: "The certified experts behind every appointment." },
+    team: [],
     gallery: { show: true, images: ["", "", "", ""] },
     beforeAfterGallery: [],
     presentationReel: { show: false, videoUrl: '', title: 'Notre savoir-faire en vidéo', subtitle: '' },
@@ -527,6 +529,80 @@ const TemplateSetupForm = () => {
             ))}
           </div>
         </section>
+
+        {/* 03b: TEAM — organization templates only */}
+        {themeConfig?.forOrganization && (
+          <section className="space-y-8">
+            <div className="flex flex-wrap gap-4 justify-between items-center">
+              <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 flex items-center gap-4">
+                <span className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">03+</span>
+                Our Team
+              </h2>
+              <button
+                onClick={() => setMerchantData(p => ({ ...p, team: [...(p.team || []), { name: "", role: "", photo: "", bio: "", specialties: [] }] }))}
+                className="bg-slate-900 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 flex items-center gap-2"
+              >
+                <Plus size={16} /> Add Member
+              </button>
+            </div>
+
+            {/* Section heading config */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                value={merchantData.teamSection?.title || ""}
+                onChange={(e) => setMerchantData(p => ({ ...p, teamSection: { ...p.teamSection, title: e.target.value } }))}
+                className="bg-white rounded-2xl p-4 font-bold text-sm border border-slate-100 shadow-sm outline-none"
+                placeholder="Section title (e.g. Meet Our Team)"
+              />
+              <input
+                value={merchantData.teamSection?.subtitle || ""}
+                onChange={(e) => setMerchantData(p => ({ ...p, teamSection: { ...p.teamSection, subtitle: e.target.value } }))}
+                className="bg-white rounded-2xl p-4 font-bold text-sm border border-slate-100 shadow-sm outline-none"
+                placeholder="Section subtitle"
+              />
+            </div>
+
+            {(merchantData.team || []).length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-[2.5rem] border-2 border-dashed border-slate-200">
+                <p className="font-black text-slate-500">No team members yet</p>
+                <p className="text-sm text-slate-400 mt-1">Add your practitioners so clients can see who they'll book with.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {(merchantData.team || []).map((m, idx) => {
+                  const upd = (k, v) => setMerchantData(p => {
+                    const t = [...p.team]; t[idx] = { ...t[idx], [k]: v }; return { ...p, team: t };
+                  });
+                  return (
+                    <div key={idx} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative">
+                      <button onClick={() => setMerchantData(p => ({ ...p, team: p.team.filter((_, i) => i !== idx) }))} className="absolute top-6 right-6 text-slate-300 hover:text-red-500 transition-colors">
+                        <Trash2 size={18} />
+                      </button>
+                      <div className="space-y-4">
+                        <div className="flex gap-3 items-center">
+                          {m.photo ? (
+                            <img src={m.photo} alt="" className="w-14 h-14 rounded-2xl object-cover ring-2 ring-slate-100" />
+                          ) : (
+                            <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-lg">
+                              {(m.name || "?").charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          <div className="flex-1 space-y-2">
+                            <input value={m.name} onChange={(e) => upd("name", e.target.value)} className="w-full bg-slate-50 rounded-xl p-3 font-bold text-sm border-none outline-none" placeholder="Full name" />
+                            <input value={m.role} onChange={(e) => upd("role", e.target.value)} className="w-full bg-indigo-50 text-indigo-700 rounded-xl p-3 font-bold text-sm border-none outline-none" placeholder="Role (e.g. Senior Stylist)" />
+                          </div>
+                        </div>
+                        <input value={m.photo} onChange={(e) => upd("photo", e.target.value)} className="w-full bg-slate-50 rounded-xl p-3 text-xs border-none outline-none" placeholder="Photo URL (https://...)" />
+                        <input value={(m.specialties || []).join(", ")} onChange={(e) => upd("specialties", e.target.value.split(",").map(s => s.trim()).filter(Boolean))} className="w-full bg-slate-50 rounded-xl p-3 text-xs border-none outline-none" placeholder="Specialties (comma separated)" />
+                        <textarea value={m.bio} onChange={(e) => upd("bio", e.target.value)} className="w-full bg-slate-50 rounded-xl p-3 text-xs h-16 border-none outline-none resize-none" placeholder="Short bio..." />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        )}
 
         {/* 04: CONTACT & SOCIALS */}
         <section className="bg-white rounded-[3rem] p-12 shadow-sm border border-slate-100 space-y-10">
