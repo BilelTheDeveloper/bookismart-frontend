@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import {
   TrendingUp, TrendingDown, DollarSign, BarChart2, Plus, X, Download,
   Filter, ChevronDown, ArrowUpRight, ArrowDownLeft, Trash2, Edit2,
@@ -7,22 +8,22 @@ import {
 import API from "../../api/config";
 
 const INCOME_CATS = [
-  { value: "booking_revenue", label: "Booking Revenue" },
-  { value: "online_payment",  label: "Online Payment" },
-  { value: "tip",             label: "Tip / Gratuity" },
-  { value: "other_income",    label: "Other Income" },
+  { value: "booking_revenue", labelKey: "finance.cat_booking_revenue" },
+  { value: "online_payment",  labelKey: "finance.cat_online_payment" },
+  { value: "tip",             labelKey: "finance.cat_tip" },
+  { value: "other_income",    labelKey: "finance.cat_other_income" },
 ];
 const EXPENSE_CATS = [
-  { value: "rent",            label: "Rent / Lease" },
-  { value: "salaries",        label: "Salaries & Staff" },
-  { value: "tools_equipment", label: "Tools & Equipment" },
-  { value: "marketing",       label: "Marketing & Ads" },
-  { value: "utilities",       label: "Utilities & Bills" },
-  { value: "maintenance",     label: "Maintenance" },
-  { value: "supplies",        label: "Supplies & Products" },
-  { value: "insurance",       label: "Insurance" },
-  { value: "taxes",           label: "Taxes & Fees" },
-  { value: "other_expense",   label: "Other Expense" },
+  { value: "rent",            labelKey: "finance.cat_rent" },
+  { value: "salaries",        labelKey: "finance.cat_salaries" },
+  { value: "tools_equipment", labelKey: "finance.cat_tools_equipment" },
+  { value: "marketing",       labelKey: "finance.cat_marketing" },
+  { value: "utilities",       labelKey: "finance.cat_utilities" },
+  { value: "maintenance",     labelKey: "finance.cat_maintenance" },
+  { value: "supplies",        labelKey: "finance.cat_supplies" },
+  { value: "insurance",       labelKey: "finance.cat_insurance" },
+  { value: "taxes",           labelKey: "finance.cat_taxes" },
+  { value: "other_expense",   labelKey: "finance.cat_other_expense" },
 ];
 
 const fmt = (n) => (n ?? 0).toLocaleString("en", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
@@ -36,6 +37,7 @@ const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov
 
 // ── Mini SVG bar chart ────────────────────────────────────────────────────────
 function PLChart({ data }) {
+  const { t } = useTranslation();
   if (!data || !data.length) return null;
   const H = 160, W_BAR = 28, GAP = 14;
   const totalW = data.length * (W_BAR * 2 + GAP + 8);
@@ -73,13 +75,13 @@ function PLChart({ data }) {
       </svg>
       <div className="flex items-center gap-6 mt-3">
         <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
-          <div className="w-3 h-3 bg-indigo-500 rounded-sm" /> Income
+          <div className="w-3 h-3 bg-indigo-500 rounded-sm" /> {t("finance.chartIncome")}
         </div>
         <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
-          <div className="w-3 h-3 bg-rose-500 rounded-sm opacity-70" /> Expenses
+          <div className="w-3 h-3 bg-rose-500 rounded-sm opacity-70" /> {t("finance.chartExpenses")}
         </div>
         <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
-          <div className="w-3 h-3 rounded-full bg-emerald-500" /> Profitable month
+          <div className="w-3 h-3 rounded-full bg-emerald-500" /> {t("finance.profitableMonth")}
         </div>
       </div>
     </div>
@@ -88,6 +90,7 @@ function PLChart({ data }) {
 
 // ── Add/Edit Transaction Modal ────────────────────────────────────────────────
 function TransactionModal({ onClose, onSave, editing }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     type: editing?.type || "income",
     amount: editing?.amount || "",
@@ -106,16 +109,16 @@ function TransactionModal({ onClose, onSave, editing }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.amount || isNaN(parseFloat(form.amount)) || parseFloat(form.amount) <= 0) {
-      setError("Enter a valid amount greater than 0."); return;
+      setError(t("finance.errAmount")); return;
     }
-    if (!form.category) { setError("Select a category."); return; }
-    if (!form.description.trim()) { setError("Description is required."); return; }
+    if (!form.category) { setError(t("finance.errCategory")); return; }
+    if (!form.description.trim()) { setError(t("finance.errDescription")); return; }
     setError(""); setSaving(true);
     try {
       await onSave(form);
       onClose();
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to save. Try again.");
+      setError(err?.response?.data?.message || t("finance.errSave"));
     } finally {
       setSaving(false);
     }
@@ -128,58 +131,58 @@ function TransactionModal({ onClose, onSave, editing }) {
           <X size={22} />
         </button>
         <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-6">
-          {editing ? "Edit Transaction" : "Add Transaction"}
+          {editing ? t("finance.editTransaction") : t("finance.addTransactionTitle")}
         </h2>
 
         {/* Type Tabs */}
         <div className="flex gap-2 mb-6 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl">
-          {["income", "expense"].map(t => (
-            <button key={t} onClick={() => set("type", t)}
-              className={`flex-1 py-2.5 rounded-xl font-black text-sm capitalize transition-all ${
-                form.type === t
-                  ? t === "income" ? "bg-indigo-600 text-white shadow-md" : "bg-rose-500 text-white shadow-md"
+          {["income", "expense"].map(tp => (
+            <button key={tp} onClick={() => set("type", tp)}
+              className={`flex-1 py-2.5 rounded-xl font-black text-sm transition-all ${
+                form.type === tp
+                  ? tp === "income" ? "bg-indigo-600 text-white shadow-md" : "bg-rose-500 text-white shadow-md"
                   : "text-slate-500 hover:text-slate-800"
               }`}
-            >{t}</button>
+            >{tp === "income" ? t("finance.typeIncome") : t("finance.typeExpense")}</button>
           ))}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Amount (TND)</label>
+              <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("finance.amountTnd")}</label>
               <input type="number" step="0.001" min="0.001" value={form.amount} onChange={e => set("amount", e.target.value)}
                 className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
                 placeholder="0.000" required />
             </div>
             <div>
-              <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Date</label>
+              <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("finance.date")}</label>
               <input type="date" value={form.date} onChange={e => set("date", e.target.value)}
                 className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all" />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Category</label>
+            <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("finance.category")}</label>
             <select value={form.category} onChange={e => set("category", e.target.value)}
               className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all appearance-none bg-white dark:bg-slate-800" required>
-              <option value="">Select category...</option>
-              {cats.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+              <option value="">{t("finance.selectCategory")}</option>
+              {cats.map(c => <option key={c.value} value={c.value}>{t(c.labelKey)}</option>)}
             </select>
           </div>
 
           <div>
-            <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Description</label>
+            <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("finance.description")}</label>
             <input type="text" value={form.description} onChange={e => set("description", e.target.value)}
               className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
-              placeholder="e.g. Monthly rent payment" maxLength={300} required />
+              placeholder={t("finance.descPlaceholder")} maxLength={300} required />
           </div>
 
           <div>
-            <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Notes (optional)</label>
+            <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("finance.notesOptional")}</label>
             <textarea value={form.notes} onChange={e => set("notes", e.target.value)}
               className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all resize-none"
-              placeholder="Additional details..." rows={2} maxLength={1000} />
+              placeholder={t("finance.notesPlaceholder")} rows={2} maxLength={1000} />
           </div>
 
           {error && (
@@ -194,7 +197,7 @@ function TransactionModal({ onClose, onSave, editing }) {
                 ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200"
                 : "bg-rose-500 hover:bg-rose-600 text-white shadow-rose-200"
             } disabled:opacity-60`}>
-            {saving ? "Saving..." : editing ? "Update Transaction" : `Add ${form.type === "income" ? "Income" : "Expense"}`}
+            {saving ? t("finance.saving") : editing ? t("finance.updateTransaction") : (form.type === "income" ? t("finance.addIncome") : t("finance.addExpense"))}
           </button>
         </form>
       </div>
@@ -204,6 +207,7 @@ function TransactionModal({ onClose, onSave, editing }) {
 
 // ── Main Finance Page ─────────────────────────────────────────────────────────
 const Finance = () => {
+  const { t } = useTranslation();
   const [pl, setPL] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [total, setTotal] = useState(0);
@@ -251,10 +255,10 @@ const Finance = () => {
   const handleSave = async (form) => {
     if (editing) {
       await API.put(`/merchant/finance/transactions/${editing._id}`, form);
-      showToast("Transaction updated.");
+      showToast(t("finance.updated"));
     } else {
       await API.post("/merchant/finance/transactions", form);
-      showToast("Transaction added.");
+      showToast(t("finance.added"));
     }
     setEditing(null);
     loadTransactions();
@@ -265,10 +269,10 @@ const Finance = () => {
     setDeleting(id);
     try {
       await API.delete(`/merchant/finance/transactions/${id}`);
-      showToast("Transaction deleted.");
+      showToast(t("finance.deleted"));
       loadTransactions();
       loadPL();
-    } catch { showToast("Failed to delete.", "error"); } finally { setDeleting(null); }
+    } catch { showToast(t("finance.deleteFail"), "error"); } finally { setDeleting(null); }
   };
 
   const handleExport = async () => {
@@ -278,12 +282,12 @@ const Finance = () => {
       const a = document.createElement("a");
       a.href = url; a.download = `bookiify-finance-${year}.csv`; a.click();
       URL.revokeObjectURL(url);
-      showToast("Export downloaded.");
-    } catch { showToast("Export failed.", "error"); }
+      showToast(t("finance.exportDone"));
+    } catch { showToast(t("finance.exportFail"), "error"); }
   };
 
   const allCats = [...INCOME_CATS, ...EXPENSE_CATS];
-  const getCatLabel = (val) => allCats.find(c => c.value === val)?.label || val;
+  const getCatLabel = (val) => { const c = allCats.find(x => x.value === val); return c ? t(c.labelKey) : val; };
 
   const currentYear = new Date().getFullYear();
   const years = [currentYear, currentYear - 1, currentYear - 2];
@@ -303,16 +307,16 @@ const Finance = () => {
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">Finance Hub</h1>
-          <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">Track income, expenses & profit/loss in real time.</p>
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">{t("finance.title")}</h1>
+          <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">{t("finance.subtitle")}</p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={handleExport} className="flex items-center gap-2 px-4 py-2.5 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all">
-            <Download size={16} /> Export CSV
+            <Download size={16} /> {t("finance.exportCsv")}
           </button>
           <button onClick={() => { setEditing(null); setShowModal(true); }}
             className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-700 transition-all shadow-md shadow-indigo-200">
-            <Plus size={16} /> Add Transaction
+            <Plus size={16} /> {t("finance.addTransaction")}
           </button>
         </div>
       </div>
@@ -321,26 +325,26 @@ const Finance = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
         {[
           {
-            label: "Total Income", value: fmt(pl?.totalIncome), suffix: "TND",
+            label: t("finance.kpiIncome"), value: fmt(pl?.totalIncome), suffix: t("finance.tnd"),
             icon: <ArrowUpRight size={20} />, color: "text-indigo-600", bg: "bg-indigo-50",
-            sub: `${pl?.transactionCount ?? "—"} entries`
+            sub: t("finance.entries", { n: pl?.transactionCount ?? "—" })
           },
           {
-            label: "Total Expenses", value: fmt(pl?.totalExpense), suffix: "TND",
+            label: t("finance.kpiExpenses"), value: fmt(pl?.totalExpense), suffix: t("finance.tnd"),
             icon: <ArrowDownLeft size={20} />, color: "text-rose-500", bg: "bg-rose-50",
-            sub: "This year"
+            sub: t("finance.thisYear")
           },
           {
-            label: "Net Profit", value: fmt(pl?.netProfit), suffix: "TND",
+            label: t("finance.kpiNetProfit"), value: fmt(pl?.netProfit), suffix: t("finance.tnd"),
             icon: <TrendingUp size={20} />,
             color: (pl?.netProfit ?? 0) >= 0 ? "text-emerald-600" : "text-rose-500",
             bg: (pl?.netProfit ?? 0) >= 0 ? "bg-emerald-50" : "bg-rose-50",
-            sub: "Income − Expenses"
+            sub: t("finance.incomeMinusExpenses")
           },
           {
-            label: "Tax Estimate (19%)", value: fmt(pl?.taxEstimate), suffix: "TND",
+            label: t("finance.kpiTax"), value: fmt(pl?.taxEstimate), suffix: t("finance.tnd"),
             icon: <Percent size={20} />, color: "text-amber-600", bg: "bg-amber-50",
-            sub: "TVA estimate"
+            sub: t("finance.tvaEstimate")
           },
         ].map((card, i) => (
           <div key={i} className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-100 dark:border-slate-800 shadow-sm">
@@ -359,9 +363,9 @@ const Finance = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-              <BarChart2 size={22} className="text-indigo-500" /> Monthly P&L — {year}
+              <BarChart2 size={22} className="text-indigo-500" /> {t("finance.monthlyPL", { year })}
             </h3>
-            <p className="text-slate-400 text-sm font-medium mt-1">Income vs. expenses by month</p>
+            <p className="text-slate-400 text-sm font-medium mt-1">{t("finance.incomeVsExpenses")}</p>
           </div>
           <div className="flex items-center gap-2">
             {years.map(y => (
@@ -376,12 +380,12 @@ const Finance = () => {
           </div>
         </div>
         {plLoading ? (
-          <div className="h-40 flex items-center justify-center text-slate-400 font-bold">Loading chart...</div>
+          <div className="h-40 flex items-center justify-center text-slate-400 font-bold">{t("finance.loadingChart")}</div>
         ) : pl?.monthlyData?.every(m => m.income === 0 && m.expense === 0) ? (
           <div className="h-40 flex flex-col items-center justify-center text-slate-400">
             <BarChart2 size={40} className="mb-3 opacity-30" />
-            <p className="font-bold">No transactions yet for {year}</p>
-            <p className="text-sm mt-1">Add your first income or expense to see the chart.</p>
+            <p className="font-bold">{t("finance.noTxYear", { year })}</p>
+            <p className="text-sm mt-1">{t("finance.noTxYearSub")}</p>
           </div>
         ) : (
           <PLChart data={pl?.monthlyData} />
@@ -391,15 +395,15 @@ const Finance = () => {
       {/* ── Transactions Table ── */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
         <div className="p-6 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between gap-4 flex-wrap">
-          <h3 className="text-xl font-black text-slate-900 dark:text-white">All Transactions</h3>
+          <h3 className="text-xl font-black text-slate-900 dark:text-white">{t("finance.allTransactions")}</h3>
           <div className="flex items-center gap-3 flex-wrap">
             {/* Type filter */}
             <div className="relative">
               <select value={filterType} onChange={e => { setFilterType(e.target.value); setPage(1); }}
                 className="appearance-none border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl px-4 py-2 pr-8 text-sm font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                <option value="">All types</option>
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
+                <option value="">{t("finance.allTypes")}</option>
+                <option value="income">{t("finance.typeIncome")}</option>
+                <option value="expense">{t("finance.typeExpense")}</option>
               </select>
               <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
@@ -407,9 +411,9 @@ const Finance = () => {
             <div className="relative">
               <select value={filterCat} onChange={e => { setFilterCat(e.target.value); setPage(1); }}
                 className="appearance-none border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl px-4 py-2 pr-8 text-sm font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                <option value="">All categories</option>
+                <option value="">{t("finance.allCategories")}</option>
                 {[...INCOME_CATS, ...EXPENSE_CATS].map(c => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
+                  <option key={c.value} value={c.value}>{t(c.labelKey)}</option>
                 ))}
               </select>
               <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
@@ -418,12 +422,12 @@ const Finance = () => {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center h-40 text-slate-400 font-bold">Loading transactions...</div>
+          <div className="flex items-center justify-center h-40 text-slate-400 font-bold">{t("finance.loadingTx")}</div>
         ) : transactions.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-40 text-slate-400">
             <Receipt size={36} className="mb-3 opacity-30" />
-            <p className="font-bold">No transactions found</p>
-            <p className="text-sm mt-1">Use the button above to add your first entry.</p>
+            <p className="font-bold">{t("finance.noTxFound")}</p>
+            <p className="text-sm mt-1">{t("finance.noTxFoundSub")}</p>
           </div>
         ) : (
           <>
@@ -431,7 +435,7 @@ const Finance = () => {
               <table className="w-full text-left">
                 <thead>
                   <tr className="bg-slate-50/70 dark:bg-slate-800/50">
-                    {["Date","Type","Category","Description","Amount","Actions"].map(h => (
+                    {[t("finance.thDate"),t("finance.thType"),t("finance.thCategory"),t("finance.thDescription"),t("finance.thAmount"),t("finance.thActions")].map(h => (
                       <th key={h} className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{h}</th>
                     ))}
                   </tr>
@@ -445,7 +449,7 @@ const Finance = () => {
                       <td className="px-6 py-4">
                         <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
                           txn.type === "income" ? "bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400" : "bg-rose-50 dark:bg-rose-500/15 text-rose-500 dark:text-rose-400"
-                        }`}>{txn.type}</span>
+                        }`}>{txn.type === "income" ? t("finance.typeIncome") : t("finance.typeExpense")}</span>
                       </td>
                       <td className="px-6 py-4 text-sm font-bold text-slate-600">{getCatLabel(txn.category)}</td>
                       <td className="px-6 py-4 text-sm font-bold text-slate-900 dark:text-white max-w-[200px] truncate">{txn.description}</td>
@@ -473,16 +477,16 @@ const Finance = () => {
             {total > 30 && (
               <div className="px-6 py-4 border-t border-slate-50 dark:border-slate-800 flex items-center justify-between">
                 <p className="text-sm font-bold text-slate-400">
-                  Showing {(page - 1) * 30 + 1}–{Math.min(page * 30, total)} of {total}
+                  {t("finance.showing", { from: (page - 1) * 30 + 1, to: Math.min(page * 30, total), total })}
                 </p>
                 <div className="flex gap-2">
                   <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
                     className="px-4 py-2 text-sm font-bold border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl disabled:opacity-40 hover:bg-slate-50 transition-all">
-                    Prev
+                    {t("finance.prev")}
                   </button>
                   <button onClick={() => setPage(p => p + 1)} disabled={page * 30 >= total}
                     className="px-4 py-2 text-sm font-bold border border-slate-200 dark:border-slate-700 dark:bg-slate-800 rounded-xl disabled:opacity-40 hover:bg-slate-50 transition-all">
-                    Next
+                    {t("finance.next")}
                   </button>
                 </div>
               </div>
@@ -494,7 +498,7 @@ const Finance = () => {
       {/* ── Category Breakdown ── */}
       {pl?.categoryBreakdown && Object.keys(pl.categoryBreakdown).length > 0 && (
         <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-8">
-          <h3 className="text-xl font-black text-slate-900 dark:text-white mb-6">Category Breakdown</h3>
+          <h3 className="text-xl font-black text-slate-900 dark:text-white mb-6">{t("finance.categoryBreakdown")}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {Object.entries(pl.categoryBreakdown)
               .sort(([,a],[,b]) => b - a)
@@ -506,7 +510,7 @@ const Finance = () => {
                     <div>
                       <p className="text-sm font-black text-slate-900 dark:text-white">{getCatLabel(cat)}</p>
                       <span className={`text-[10px] font-black uppercase ${isIncome ? "text-indigo-500" : "text-rose-500"}`}>
-                        {isIncome ? "income" : "expense"}
+                        {isIncome ? t("finance.incomeLabel") : t("finance.expenseLabel")}
                       </span>
                     </div>
                     <p className={`font-black text-base ${isIncome ? "text-emerald-600" : "text-rose-500"}`}>

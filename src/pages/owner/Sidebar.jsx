@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/AuthContext";
 import API from "../../api/config";
 import {
@@ -28,50 +29,50 @@ export const getTrialDaysLeft = (trialEndsAt) => {
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 };
 
-/* ─── Nav Config ─── */
+/* ─── Nav Config (labels via i18n: sidebar.*) ─── */
 const NAV_SECTIONS = [
   {
-    label: "Main",
+    key: "main", labelKey: "sidebar.secMain",
     items: [
-      { name: "Overview",   icon: LayoutDashboard, path: "/owner/dashboard"          },
-      { name: "Tutorial",   icon: BookOpen,        path: "/owner/dashboard/tutorial", badge: "NEW" },
+      { key: "overview", labelKey: "sidebar.overview", icon: LayoutDashboard, path: "/owner/dashboard" },
+      { key: "tutorial", labelKey: "sidebar.tutorial", icon: BookOpen, path: "/owner/dashboard/tutorial", badgeKey: "sidebar.badgeNew" },
     ],
   },
   {
-    label: "Management",
+    key: "management", labelKey: "sidebar.secManagement",
     items: [
-      { name: "Appointments", icon: CalendarCheck,  path: "/owner/dashboard/bookings"    },
-      { name: "Queue Screen", icon: MonitorPlay,    path: "/owner/dashboard/queue"       },
-      { name: "Recruitment",  icon: Briefcase,      path: "/owner/dashboard/recruitment" },
-      { name: "Staff",        icon: Users,          path: "/owner/dashboard/staff"       },
-      { name: "Chat",         icon: MessageSquare,  path: "/owner/dashboard/chat"        },
-      { name: "No-Show Shield", icon: ShieldCheck,  path: "/owner/dashboard/no-show"     },
+      { key: "appointments", labelKey: "sidebar.appointments", icon: CalendarCheck, path: "/owner/dashboard/bookings" },
+      { key: "queue", labelKey: "sidebar.queue", icon: MonitorPlay, path: "/owner/dashboard/queue" },
+      { key: "recruitment", labelKey: "sidebar.recruitment", icon: Briefcase, path: "/owner/dashboard/recruitment" },
+      { key: "staff", labelKey: "sidebar.staff", icon: Users, path: "/owner/dashboard/staff" },
+      { key: "chat", labelKey: "sidebar.chat", icon: MessageSquare, path: "/owner/dashboard/chat" },
+      { key: "noShow", labelKey: "sidebar.noShow", icon: ShieldCheck, path: "/owner/dashboard/no-show" },
     ],
   },
   {
-    label: "Finance",
+    key: "finance", labelKey: "sidebar.secFinance",
     items: [
-      { name: "Financials",   icon: Wallet,         path: "/owner/dashboard/finance"     },
-      { name: "Payments",     icon: CreditCard,     path: "/owner/dashboard/payments"    },
-      { name: "Invoices",     icon: FileText,       path: "/owner/dashboard/invoices"    },
-      { name: "Loyalty",      icon: Star,           path: "/owner/dashboard/loyalty"     },
-      { name: "Packages",     icon: Gift,           path: "/owner/dashboard/packages"    },
+      { key: "financials", labelKey: "sidebar.financials", icon: Wallet, path: "/owner/dashboard/finance" },
+      { key: "payments", labelKey: "sidebar.payments", icon: CreditCard, path: "/owner/dashboard/payments" },
+      { key: "invoices", labelKey: "sidebar.invoices", icon: FileText, path: "/owner/dashboard/invoices" },
+      { key: "loyalty", labelKey: "sidebar.loyalty", icon: Star, path: "/owner/dashboard/loyalty" },
+      { key: "packages", labelKey: "sidebar.packages", icon: Gift, path: "/owner/dashboard/packages" },
     ],
   },
   {
-    label: "Growth",
+    key: "growth", labelKey: "sidebar.secGrowth",
     items: [
-      { name: "Smart AI",     icon: Sparkles,       path: "/owner/dashboard/smart-ai",   badge: "AI"  },
-      { name: "Marketing",    icon: Megaphone,      path: "/owner/dashboard/marketing"   },
-      { name: "Analytics",    icon: BarChart3,      path: "/owner/dashboard/stats"       },
-      { name: "Website",      icon: Palette,        path: "/owner/dashboard/themes"      },
+      { key: "smartAi", labelKey: "sidebar.smartAi", icon: Sparkles, path: "/owner/dashboard/smart-ai", badgeKey: "sidebar.badgeAi" },
+      { key: "marketing", labelKey: "sidebar.marketing", icon: Megaphone, path: "/owner/dashboard/marketing" },
+      { key: "analytics", labelKey: "sidebar.analytics", icon: BarChart3, path: "/owner/dashboard/stats" },
+      { key: "website", labelKey: "sidebar.website", icon: Palette, path: "/owner/dashboard/themes" },
     ],
   },
   {
-    label: "Account",
+    key: "account", labelKey: "sidebar.secAccount",
     items: [
-      { name: "Subscription", icon: CreditCard,     path: "/owner/dashboard/billing"     },
-      { name: "Settings",     icon: Settings,       path: "/owner/dashboard/settings"    },
+      { key: "subscription", labelKey: "sidebar.subscription", icon: CreditCard, path: "/owner/dashboard/billing" },
+      { key: "settings", labelKey: "sidebar.settings", icon: Settings, path: "/owner/dashboard/settings" },
     ],
   },
 ];
@@ -88,18 +89,19 @@ function Tooltip({ label }) {
 
 /* ─── State CTA Block ─── */
 function StateCTA({ accessState, isRejected, daysLeft, isCollapsed }) {
+  const { t } = useTranslation();
   const collapsedButton = (() => {
     if (accessState === "unverified") return (
       <Link to="/owner/dashboard/kyc"
         className="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center hover:bg-amber-500 hover:text-white hover:border-transparent transition-all"
-        title={isRejected ? "Resubmit documents" : "Get verified"}
+        title={isRejected ? t("sidebar.tipResubmit") : t("sidebar.tipGetVerified")}
       >
         {isRejected ? <RefreshCw size={17} className="animate-pulse" /> : <ShieldCheck size={17} className="animate-pulse" />}
       </Link>
     );
 
     if (accessState === "review") return (
-      <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center relative" title="Under review">
+      <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center relative" title={t("sidebar.tipUnderReview")}>
         <div className="w-3.5 h-3.5 rounded-full bg-blue-400 animate-pulse" />
         <div className="absolute inset-0 rounded-xl bg-blue-400/10 animate-ping" style={{ animationDuration: "2s" }} />
       </div>
@@ -108,7 +110,7 @@ function StateCTA({ accessState, isRejected, daysLeft, isCollapsed }) {
     if (accessState === "trial") return (
       <Link to="/owner/dashboard/work-mode"
         className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center hover:bg-emerald-500 hover:text-white hover:border-transparent transition-all"
-        title="Set Work Mode"
+        title={t("sidebar.tipWorkMode")}
       >
         <Power size={17} />
       </Link>
@@ -117,7 +119,7 @@ function StateCTA({ accessState, isRejected, daysLeft, isCollapsed }) {
     if (accessState === "expired") return (
       <Link to="/owner/dashboard/billing"
         className="w-11 h-11 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center hover:bg-rose-600 hover:text-white hover:border-transparent transition-all"
-        title="Upgrade now"
+        title={t("sidebar.tipUpgrade")}
       >
         <CreditCard size={17} />
       </Link>
@@ -130,10 +132,10 @@ function StateCTA({ accessState, isRejected, daysLeft, isCollapsed }) {
         <div className="relative group">
           {collapsedButton}
           <div className="absolute left-full ml-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-            {accessState === "unverified" && <Tooltip label={isRejected ? "Resubmit Documents" : "Get Verified"} />}
-            {accessState === "review"     && <Tooltip label="Under Review" />}
-            {accessState === "trial"      && <Tooltip label="Work Mode" />}
-            {accessState === "expired"    && <Tooltip label="Upgrade Now" />}
+            {accessState === "unverified" && <Tooltip label={isRejected ? t("sidebar.tipResubmit") : t("sidebar.tipGetVerified")} />}
+            {accessState === "review"     && <Tooltip label={t("sidebar.tipUnderReview")} />}
+            {accessState === "trial"      && <Tooltip label={t("sidebar.tipWorkMode")} />}
+            {accessState === "expired"    && <Tooltip label={t("sidebar.tipUpgrade")} />}
           </div>
         </div>
       </div>
@@ -158,10 +160,10 @@ function StateCTA({ accessState, isRejected, daysLeft, isCollapsed }) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-white font-black text-xs leading-none">
-              {isRejected ? "RESUBMIT DOCS" : "GET VERIFIED"}
+              {isRejected ? t("sidebar.resubmitDocs") : t("sidebar.getVerified")}
             </p>
             <p className="text-amber-200 text-[10px] font-bold mt-0.5">
-              {isRejected ? "Docs rejected — fix & resubmit" : "Identity verification required"}
+              {isRejected ? t("sidebar.docsRejectedFix") : t("sidebar.identityRequired")}
             </p>
           </div>
           <ChevronRight size={14} className="text-amber-200 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
@@ -181,8 +183,8 @@ function StateCTA({ accessState, isRejected, daysLeft, isCollapsed }) {
             <div className="absolute inset-0 rounded-xl bg-blue-400/8 animate-ping" style={{ animationDuration: "2.5s" }} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-blue-300 font-black text-xs leading-none">UNDER REVIEW</p>
-            <p className="text-blue-400/60 text-[10px] font-bold mt-0.5">Our team is reviewing — 24h</p>
+            <p className="text-blue-300 font-black text-xs leading-none">{t("sidebar.underReview")}</p>
+            <p className="text-blue-400/60 text-[10px] font-bold mt-0.5">{t("sidebar.reviewing24h")}</p>
           </div>
           <div className="flex-shrink-0 flex flex-col items-center gap-0.5">
             <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "0ms" }} />
@@ -205,8 +207,8 @@ function StateCTA({ accessState, isRejected, daysLeft, isCollapsed }) {
               <Power size={15} className="text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white font-black text-xs leading-none">SET WORK MODE</p>
-              <p className="text-indigo-200 text-[10px] font-bold mt-0.5">All features unlocked</p>
+              <p className="text-white font-black text-xs leading-none">{t("sidebar.setWorkMode")}</p>
+              <p className="text-indigo-200 text-[10px] font-bold mt-0.5">{t("sidebar.allUnlocked")}</p>
             </div>
             <Zap size={13} className="text-indigo-200 flex-shrink-0" />
           </Link>
@@ -219,8 +221,8 @@ function StateCTA({ accessState, isRejected, daysLeft, isCollapsed }) {
             }`}>
               <Clock size={11} className="flex-shrink-0" />
               {daysLeft <= 7
-                ? <span>Trial ends in <strong>{daysLeft}d</strong> — upgrade now</span>
-                : <span><strong>{daysLeft}</strong> days of free trial left</span>}
+                ? <span>{t("sidebar.trialEndsInD", { days: daysLeft })}</span>
+                : <span>{t("sidebar.trialDaysLeft", { days: daysLeft })}</span>}
             </div>
           )}
         </>
@@ -239,16 +241,16 @@ function StateCTA({ accessState, isRejected, daysLeft, isCollapsed }) {
               <CreditCard size={15} className="text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white font-black text-xs leading-none">UPGRADE NOW</p>
-              <p className="text-rose-200 text-[10px] font-bold mt-0.5">Free trial has expired</p>
+              <p className="text-white font-black text-xs leading-none">{t("sidebar.upgradeNow")}</p>
+              <p className="text-rose-200 text-[10px] font-bold mt-0.5">{t("sidebar.trialExpired")}</p>
             </div>
             <span className="flex-shrink-0 text-[8px] font-black text-rose-200 bg-rose-900/50 border border-rose-500/30 rounded-full px-1.5 py-0.5 uppercase tracking-wider">
-              EXPIRED
+              {t("sidebar.expired")}
             </span>
           </Link>
           <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-rose-500/8 border border-rose-500/15 text-[10px] font-bold text-rose-400/80">
             <AlertTriangle size={11} className="flex-shrink-0" />
-            <span>All features locked until you upgrade</span>
+            <span>{t("sidebar.allLocked")}</span>
           </div>
         </>
       )}
@@ -259,6 +261,7 @@ function StateCTA({ accessState, isRejected, daysLeft, isCollapsed }) {
 
 /* ─── Main Sidebar ─── */
 const Sidebar = ({ isCollapsed, setIsCollapsed, onMobileClose }) => {
+  const { t }      = useTranslation();
   const location   = useLocation();
   const navigate   = useNavigate();
   const { user }   = useAuth();
@@ -272,8 +275,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, onMobileClose }) => {
   // Organization accounts get a "Branches" item in the Management section.
   const isOrg = user?.accountType === "organization";
   const navSections = NAV_SECTIONS.map((section) =>
-    section.label === "Management" && isOrg
-      ? { ...section, items: [{ name: "Branches", icon: Building2, path: "/owner/dashboard/branches" }, ...section.items] }
+    section.key === "management" && isOrg
+      ? { ...section, items: [{ key: "branches", labelKey: "sidebar.branches", icon: Building2, path: "/owner/dashboard/branches" }, ...section.items] }
       : section
   );
 
@@ -296,18 +299,18 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, onMobileClose }) => {
   };
 
   const lockTooltip = (name) => {
-    if (accessState === "expired")  return `${name} — upgrade to unlock`;
-    if (accessState === "review")   return `${name} — available after review`;
-    return `${name} — verify first`;
+    if (accessState === "expired")  return t("sidebar.lockUpgrade", { name });
+    if (accessState === "review")   return t("sidebar.lockReview", { name });
+    return t("sidebar.lockVerify", { name });
   };
 
   /* User card status */
   const statusDot = {
-    trial:      { color: "bg-emerald-400", label: "Verified Business" },
-    review:     { color: "bg-blue-400 animate-pulse", label: "Under Review" },
-    unverified: { color: "bg-amber-400",  label: isRejected ? "Docs Rejected" : "Verification Pending" },
-    expired:    { color: "bg-rose-500",   label: "Trial Expired" },
-  }[accessState] || { color: "bg-slate-500", label: "Unknown" };
+    trial:      { color: "bg-emerald-400", label: t("sidebar.stVerified") },
+    review:     { color: "bg-blue-400 animate-pulse", label: t("sidebar.stReview") },
+    unverified: { color: "bg-amber-400",  label: isRejected ? t("sidebar.stRejected") : t("sidebar.stPending") },
+    expired:    { color: "bg-rose-500",   label: t("sidebar.stExpired") },
+  }[accessState] || { color: "bg-slate-500", label: t("sidebar.stUnknown") };
 
   return (
     <aside
@@ -335,7 +338,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, onMobileClose }) => {
         {!isCollapsed && (
           <div className="overflow-hidden">
             <p className="text-white font-black text-lg tracking-tighter leading-none">BOOKIIFY</p>
-            <p className="text-indigo-400 text-[9px] font-bold uppercase tracking-[0.2em] mt-0.5">Business Suite</p>
+            <p className="text-indigo-400 text-[9px] font-bold uppercase tracking-[0.2em] mt-0.5">{t("sidebar.businessSuite")}</p>
           </div>
         )}
       </div>
@@ -351,9 +354,9 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, onMobileClose }) => {
       {/* Nav */}
       <nav className="flex-1 px-2 overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: "none" }}>
         {navSections.map((section, si) => (
-          <div key={section.label} className={si > 0 ? "mt-4" : ""}>
+          <div key={section.key} className={si > 0 ? "mt-4" : ""}>
             {!isCollapsed && (
-              <p className="px-3 text-[9px] font-black text-slate-600 uppercase tracking-[0.22em] mb-1.5">{section.label}</p>
+              <p className="px-3 text-[9px] font-black text-slate-600 uppercase tracking-[0.22em] mb-1.5">{t(section.labelKey)}</p>
             )}
             {isCollapsed && si > 0 && <div className="h-px bg-slate-800/60 mx-2 mb-3" />}
 
@@ -362,13 +365,14 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, onMobileClose }) => {
                 const Icon    = item.icon;
                 const active  = isActive(item.path);
                 const allowed = isAllowed(item.path);
+                const label   = t(item.labelKey);
 
                 if (!allowed) {
                   return (
                     <div
-                      key={item.name}
+                      key={item.key}
                       className="relative"
-                      onMouseEnter={() => setHoveredItem(item.name)}
+                      onMouseEnter={() => setHoveredItem(item.key)}
                       onMouseLeave={() => setHoveredItem(null)}
                     >
                       <div
@@ -377,11 +381,11 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, onMobileClose }) => {
                         }`}
                       >
                         <Lock size={14} className="text-slate-600 flex-shrink-0" />
-                        {!isCollapsed && <span className="text-sm text-slate-600 whitespace-nowrap">{item.name}</span>}
+                        {!isCollapsed && <span className="text-sm text-slate-600 whitespace-nowrap">{label}</span>}
                       </div>
-                      {hoveredItem === item.name && (
+                      {hoveredItem === item.key && (
                         <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 z-50 pointer-events-none">
-                          <Tooltip label={lockTooltip(item.name)} />
+                          <Tooltip label={lockTooltip(label)} />
                         </div>
                       )}
                     </div>
@@ -390,9 +394,9 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, onMobileClose }) => {
 
                 return (
                   <div
-                    key={item.name}
+                    key={item.key}
                     className="relative"
-                    onMouseEnter={() => isCollapsed && setHoveredItem(item.name)}
+                    onMouseEnter={() => isCollapsed && setHoveredItem(item.key)}
                     onMouseLeave={() => setHoveredItem(null)}
                   >
                     <Link
@@ -413,14 +417,14 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, onMobileClose }) => {
                         <Icon size={19} />
                         {active && isCollapsed && <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-indigo-500 rounded-full border border-[#0D1117]" />}
                       </div>
-                      {!isCollapsed && <span className="text-sm whitespace-nowrap leading-none">{item.name}</span>}
-                      {!isCollapsed && item.badge && (
-                        <span className="ml-auto bg-indigo-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">{item.badge}</span>
+                      {!isCollapsed && <span className="text-sm whitespace-nowrap leading-none">{label}</span>}
+                      {!isCollapsed && item.badgeKey && (
+                        <span className="ml-auto bg-indigo-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">{t(item.badgeKey)}</span>
                       )}
                     </Link>
-                    {isCollapsed && hoveredItem === item.name && (
+                    {isCollapsed && hoveredItem === item.key && (
                       <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 z-50 pointer-events-none">
-                        <Tooltip label={item.name} />
+                        <Tooltip label={label} />
                       </div>
                     )}
                   </div>
@@ -469,7 +473,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, onMobileClose }) => {
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-rose-400 font-semibold text-sm hover:bg-rose-500/10 hover:text-rose-300 transition-all group"
             >
               <LogOut size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-              <span>Sign Out</span>
+              <span>{t("sidebar.signOut")}</span>
             </button>
           </div>
         ) : (
@@ -488,7 +492,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, onMobileClose }) => {
                 <LogOut size={17} />
               </button>
               <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                <Tooltip label="Sign Out" />
+                <Tooltip label={t("sidebar.signOut")} />
               </div>
             </div>
           </div>

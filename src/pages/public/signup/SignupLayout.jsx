@@ -9,8 +9,6 @@ import { registerUser } from "../../../services/authService";
 import { useAuth } from "../../../context/AuthContext";
 import { toast } from "react-hot-toast";
 import { ShieldCheck } from "lucide-react";
-import ThemeToggle from "../../../components/ThemeToggle";
-import LanguageSwitcher from "../../../components/LanguageSwitcher";
 
 const SignupLayout = () => {
   const navigate = useNavigate();
@@ -107,12 +105,6 @@ const SignupLayout = () => {
 
       {/* RIGHT PANEL */}
       <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 md:p-16 lg:p-24 bg-slate-50 dark:bg-slate-900 relative">
-
-        {/* Theme + language controls */}
-        <div className="absolute top-5 end-5 flex items-center gap-2">
-          <LanguageSwitcher />
-          <ThemeToggle />
-        </div>
 
         <div className="w-full max-w-md">
 

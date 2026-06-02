@@ -131,7 +131,8 @@ const LayoutManager = ({ children }) => {
   const location = useLocation();
   
   const isSignupPage    = location.pathname === "/signup";
-  const isAuthPage      = ["/login", "/forgot-password", "/reset-password", "/onboarding-status"].includes(location.pathname);
+  const isAuthPage      = ["/login", "/forgot-password", "/reset-password"].includes(location.pathname);
+  const isOnboardingStatus = location.pathname === "/onboarding-status";
   const isAdminPage     = location.pathname.startsWith("/admin");
   const isOwnerPage     = location.pathname.startsWith("/owner");
   const isProfilePreview = location.pathname.startsWith("/p/");
@@ -141,16 +142,23 @@ const LayoutManager = ({ children }) => {
   const isCustomerPage  = location.pathname.startsWith("/customer");
   const isStaffPage     = location.pathname.startsWith("/staff");
 
-  // 🛡️ Hide Chrome for high-immersion pages
-  const hideChrome = isSignupPage || isAuthPage || isAdminPage || isOwnerPage || isProfilePreview || isBookingPage || isReviewPage || isDisplayPage || isCustomerPage || isStaffPage;
+  // Sign-in & sign-up: show the Navbar (branding + language switch) but NOT the marketing Footer.
+  const authChrome = isSignupPage || isAuthPage;
+
+  // 🛡️ Fully chrome-less, high-immersion pages
+  const hideAll = isOnboardingStatus || isAdminPage || isOwnerPage || isProfilePreview ||
+    isBookingPage || isReviewPage || isDisplayPage || isCustomerPage || isStaffPage;
+
+  const showNavbar = !hideAll;                 // public marketing + auth/signup
+  const showFooter = !hideAll && !authChrome;  // marketing pages only
 
   return (
     <>
-      {!hideChrome && <Navbar />}
-      <main className={!hideChrome ? "min-h-screen" : ""}>
+      {showNavbar && <Navbar />}
+      <main className={showFooter ? "min-h-screen" : ""}>
         {children}
       </main>
-      {!hideChrome && <Footer />}
+      {showFooter && <Footer />}
     </>
   );
 };

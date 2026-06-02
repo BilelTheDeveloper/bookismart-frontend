@@ -2,16 +2,22 @@ import React, { useState, useEffect, useMemo } from "react";
 import {
   CreditCard, Zap, CheckCircle2, Clock, ArrowUpRight,
   ShieldCheck, Loader2, RefreshCw, CalendarDays, AlertTriangle,
-  TrendingUp, Crown, Sparkles, X, ExternalLink,
+  Star, Users, Building2, Crown, Sparkles, X,
 } from "lucide-react";
 import API from "../../api/config";
 
-/* ─── Plan display config ─── */
+/* ─── Plan display config (matches server/config/plans.js) ─── */
 const PLAN_CONFIG = {
-  free_trial: { label: "Free Trial", color: "text-amber-400", icon: <Zap className="text-amber-400 fill-amber-400" size={26} /> },
-  basic:      { label: "Basic",      color: "text-emerald-400", icon: <TrendingUp className="text-emerald-400" size={26} /> },
-  premium:    { label: "Premium",    color: "text-indigo-400",  icon: <Crown className="text-indigo-400" size={26} /> },
-  pro:        { label: "Pro",        color: "text-violet-400",  icon: <Sparkles className="text-violet-400" size={26} /> },
+  free_trial:   { label: "Free Trial",   color: "text-amber-400",   icon: <Zap className="text-amber-400 fill-amber-400" size={26} /> },
+  solo_starter: { label: "Solo Starter", color: "text-emerald-400", icon: <Star className="text-emerald-400" size={26} /> },
+  solo_pro:     { label: "Solo Pro",     color: "text-indigo-400",  icon: <Zap className="text-indigo-400" size={26} /> },
+  team:         { label: "Team",         color: "text-sky-400",     icon: <Users className="text-sky-400" size={26} /> },
+  business:     { label: "Business",     color: "text-violet-400",  icon: <Building2 className="text-violet-400" size={26} /> },
+  enterprise:   { label: "Enterprise",   color: "text-fuchsia-400", icon: <Crown className="text-fuchsia-400" size={26} /> },
+  // legacy ids (pre-relaunch)
+  basic:        { label: "Solo Starter", color: "text-emerald-400", icon: <Star className="text-emerald-400" size={26} /> },
+  premium:      { label: "Solo Pro",     color: "text-indigo-400",  icon: <Zap className="text-indigo-400" size={26} /> },
+  pro:          { label: "Team",         color: "text-sky-400",     icon: <Users className="text-sky-400" size={26} /> },
 };
 
 const STATUS_STYLES = {
@@ -34,63 +40,65 @@ const TXN_STATUS_STYLES = {
   Pending:   "bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400",
 };
 
-/* ─── Days remaining from a date ─── */
+/* ─── Upgrade catalog (audience-aware), TND/month ─── */
+const UPGRADE_PLANS = {
+  individual: [
+    {
+      id: "solo_starter", name: "Solo Starter", price: "19", color: "from-emerald-500 to-teal-600", border: "border-emerald-500/40",
+      features: ["Booking + public page", "CRM & reminders", "Basic website", "Loyalty & invoices", "Up to 200 bookings/mo"],
+    },
+    {
+      id: "solo_pro", name: "Solo Pro", price: "39", color: "from-indigo-500 to-violet-600", border: "border-indigo-500/40", badge: "Most Popular",
+      features: ["Everything in Starter", "Website builder + AI", "Packages & gift cards", "Marketing campaigns", "Unlimited bookings"],
+    },
+  ],
+  organization: [
+    {
+      id: "team", name: "Team", price: "59", color: "from-sky-500 to-cyan-600", border: "border-sky-500/40",
+      features: ["Up to 5 staff", "Team scheduling", "Finance dashboard", "Payments & deposits", "Chat / work mode"],
+    },
+    {
+      id: "business", name: "Business", price: "99", color: "from-indigo-500 to-violet-600", border: "border-indigo-500/40", badge: "Most Popular",
+      features: ["Everything in Team", "Multi-branch", "Up to 20 staff", "Recruitment", "Marketing automation"],
+    },
+    {
+      id: "enterprise", name: "Enterprise", price: "149–199", custom: true, color: "from-fuchsia-500 to-purple-700", border: "border-fuchsia-500/40",
+      features: ["Unlimited staff", "Unlimited branches", "Advanced permissions", "Premium support", "Custom setup"],
+    },
+  ],
+};
+
 const daysUntil = (dateStr) => {
   if (!dateStr) return null;
   const diff = new Date(dateStr) - new Date();
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 };
 
-/* ─── Format date nicely ─── */
 const fmtDate = (dateStr) => {
   if (!dateStr) return "—";
   return new Date(dateStr).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 };
 
-/* ─── Plan picker config ─── */
-const PLANS = [
-  {
-    id: "basic",
-    name: "Basic",
-    price: 29,
-    icon: <TrendingUp size={22} className="text-emerald-400" />,
-    color: "from-emerald-500 to-teal-600",
-    border: "border-emerald-500/40",
-    features: ["Up to 3 staff members", "Unlimited bookings", "Basic analytics", "Email notifications"],
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    price: 79,
-    icon: <Crown size={22} className="text-indigo-400" />,
-    color: "from-indigo-500 to-violet-600",
-    border: "border-indigo-500/40",
-    badge: "Most Popular",
-    features: ["Up to 10 staff members", "Advanced analytics", "Priority support", "Custom domain", "Loyalty programs"],
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    price: 149,
-    icon: <Sparkles size={22} className="text-violet-400" />,
-    color: "from-violet-500 to-purple-700",
-    border: "border-violet-500/40",
-    features: ["Unlimited staff members", "Full analytics suite", "Dedicated support", "White-label option", "API access", "All integrations"],
-  },
-];
-
-function PlanPickerModal({ onClose }) {
+function PlanPickerModal({ audience, onClose }) {
   const [checkingOut, setCheckingOut] = useState(null);
+  const [note, setNote] = useState("");
+  const plans = UPGRADE_PLANS[audience] || UPGRADE_PLANS.individual;
+  const cols = plans.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3";
 
-  const handleCheckout = async (planId) => {
-    setCheckingOut(planId);
+  const handleCheckout = async (plan) => {
+    setCheckingOut(plan.id);
+    setNote("");
     try {
-      const { data } = await API.post("/payments/checkout", { plan: planId });
+      const { data } = await API.post("/payments/checkout", { plan: plan.id });
       if (data?.checkoutUrl) {
         window.location.href = data.checkoutUrl;
+      } else if (data?.contactSales) {
+        setNote("Thanks! Our team will reach out about your Enterprise plan.");
+      } else {
+        setNote(data?.message || "Subscription checkout is coming online shortly.");
       }
-    } catch {
-      alert("Checkout failed. Please try again.");
+    } catch (err) {
+      setNote(err?.response?.data?.message || "Checkout failed. Please try again.");
     } finally {
       setCheckingOut(null);
     }
@@ -99,40 +107,29 @@ function PlanPickerModal({ onClose }) {
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-[#0d1117] rounded-[2rem] w-full max-w-3xl border border-slate-800 shadow-2xl overflow-hidden">
-        {/* Modal header */}
         <div className="flex items-center justify-between px-8 py-6 border-b border-slate-800">
           <div>
             <h3 className="text-2xl font-black text-white">Choose Your Plan</h3>
-            <p className="text-slate-400 text-sm mt-1">Billed monthly · Cancel anytime</p>
+            <p className="text-slate-400 text-sm mt-1">Billed monthly in TND · 30 days free · Cancel anytime</p>
           </div>
           <button onClick={onClose} className="p-2 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-all">
             <X size={20} />
           </button>
         </div>
 
-        {/* Plans grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-8">
-          {PLANS.map((plan) => (
-            <div
-              key={plan.id}
-              className={`relative bg-slate-900 border ${plan.border} rounded-2xl p-6 flex flex-col`}
-            >
+        <div className={`grid grid-cols-1 ${cols} gap-4 p-8`}>
+          {plans.map((plan) => (
+            <div key={plan.id} className={`relative bg-slate-900 border ${plan.border} rounded-2xl p-6 flex flex-col`}>
               {plan.badge && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full whitespace-nowrap">
                   {plan.badge}
                 </span>
               )}
-              <div className="flex items-center gap-3 mb-4">
-                <div className={`p-2.5 rounded-xl bg-gradient-to-br ${plan.color} bg-opacity-10`}>
-                  {plan.icon}
-                </div>
-                <div>
-                  <p className="text-white font-black">{plan.name}</p>
-                  <p className="text-slate-400 text-xs">/month</p>
-                </div>
-              </div>
-
-              <p className="text-3xl font-black text-white mb-5">${plan.price}</p>
+              <p className="text-white font-black text-lg">{plan.name}</p>
+              <p className="mt-3 mb-5">
+                <span className="text-3xl font-black text-white">{plan.price}</span>
+                <span className="text-slate-400 text-sm font-bold"> TND{plan.custom ? "" : "/mo"}</span>
+              </p>
 
               <ul className="space-y-2 mb-6 flex-1">
                 {plan.features.map((f) => (
@@ -143,12 +140,14 @@ function PlanPickerModal({ onClose }) {
               </ul>
 
               <button
-                onClick={() => handleCheckout(plan.id)}
+                onClick={() => handleCheckout(plan)}
                 disabled={!!checkingOut}
                 className={`w-full py-3 rounded-xl font-black text-sm transition-all flex items-center justify-center gap-2 bg-gradient-to-r ${plan.color} text-white hover:opacity-90 disabled:opacity-50`}
               >
                 {checkingOut === plan.id ? (
                   <><Loader2 size={14} className="animate-spin" /> Processing…</>
+                ) : plan.custom ? (
+                  <>Contact Sales <ArrowUpRight size={15} /></>
                 ) : (
                   <>Get {plan.name} <ArrowUpRight size={15} /></>
                 )}
@@ -156,63 +155,61 @@ function PlanPickerModal({ onClose }) {
             </div>
           ))}
         </div>
+
+        {note && (
+          <p className="px-8 pb-6 -mt-3 text-center text-sm font-bold text-indigo-300">{note}</p>
+        )}
       </div>
     </div>
   );
 }
 
 const Billing = () => {
-  const [billing, setBilling]         = useState(null);
-  const [loading, setLoading]         = useState(true);
-  const [showPlans, setShowPlans]     = useState(false);
-  const [portalLoading, setPortalLoading] = useState(false);
+  const [billing, setBilling] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showPlans, setShowPlans] = useState(false);
 
   const fetchBilling = () => {
     setLoading(true);
     API.get("/merchant/settings/billing")
-      .then((res) => { if (res.data?.success) setBilling(res.data.data); })
+      .then((res) => { if (res.data?.success) setBilling(res.data); })
       .catch(() => {})
       .finally(() => setLoading(false));
   };
 
   useEffect(() => { fetchBilling(); }, []);
 
-  const openPortal = async () => {
-    setPortalLoading(true);
-    try {
-      const { data } = await API.post("/payments/portal");
-      if (data?.portalUrl) window.location.href = data.portalUrl;
-    } catch {
-      alert("Could not open billing portal. Please try again.");
-    } finally {
-      setPortalLoading(false);
-    }
-  };
+  const data = billing?.data || {};
+  const ent = billing?.entitlements || {};
+  const sub = data.subscription || {};
 
-  const sub = billing?.subscription || {};
-  const plan = PLAN_CONFIG[sub.plan] || PLAN_CONFIG.free_trial;
+  const planKey = ent.planId || sub.plan || "free_trial";
+  const plan = PLAN_CONFIG[planKey] || PLAN_CONFIG.free_trial;
   const statusLabel = STATUS_LABEL[sub.status] || "Unknown";
   const statusStyle = STATUS_STYLES[sub.status] || STATUS_STYLES.trialing;
-  const daysLeft = daysUntil(sub.trialEndsAt);
-  const currency = billing?.currency || "TND";
-  const transactions = billing?.transactionHistory || [];
-  const isPaid = sub.plan && sub.plan !== "free_trial";
+  const daysLeft = ent.trial?.daysLeft ?? daysUntil(sub.trialEndsAt);
+  const totalTrialDays = ent.trial?.totalDays || 30;
+  const currency = data.currency || "TND";
+  const transactions = data.transactionHistory || [];
+  const audience = ent.audience || "individual";
+  const onTrial = ent.trial?.active ?? (planKey === "free_trial");
+  const isPaid = !onTrial && planKey !== "free_trial";
 
   const trialBarPct = useMemo(() => {
     if (!sub.trialEndsAt) return 0;
-    const total = 90 * 24 * 60 * 60 * 1000;
+    const total = totalTrialDays * 24 * 60 * 60 * 1000;
     const remaining = new Date(sub.trialEndsAt) - new Date();
     return Math.max(0, Math.min(100, Math.round((remaining / total) * 100)));
-  }, [sub.trialEndsAt]);
+  }, [sub.trialEndsAt, totalTrialDays]);
 
   const trialBarColor =
     daysLeft === null ? "bg-slate-400" :
-    daysLeft > 30     ? "bg-emerald-500" :
-    daysLeft > 7      ? "bg-amber-500"   : "bg-rose-500";
+    daysLeft > 14     ? "bg-emerald-500" :
+    daysLeft > 5      ? "bg-amber-500"   : "bg-rose-500";
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {showPlans && <PlanPickerModal onClose={() => setShowPlans(false)} />}
+      {showPlans && <PlanPickerModal audience={audience} onClose={() => setShowPlans(false)} />}
 
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -247,6 +244,11 @@ const Billing = () => {
                     {plan.label} {plan.icon}
                   </h2>
                 )}
+                {onTrial && (
+                  <p className="text-slate-400 text-sm font-medium mt-2">
+                    Full access to every feature during your {totalTrialDays}-day trial.
+                  </p>
+                )}
               </div>
               {!loading && sub.nextBillingDate && (
                 <div className="text-right">
@@ -275,7 +277,7 @@ const Billing = () => {
                 {loading ? (
                   <div className="w-12 h-5 bg-white/10 rounded animate-pulse mt-1" />
                 ) : (
-                  <p className={`font-black mt-1 ${daysLeft <= 7 ? "text-rose-400" : daysLeft <= 30 ? "text-amber-400" : "text-emerald-400"}`}>
+                  <p className={`font-black mt-1 ${daysLeft <= 5 ? "text-rose-400" : daysLeft <= 14 ? "text-amber-400" : "text-emerald-400"}`}>
                     {daysLeft !== null ? `${daysLeft}d` : "—"}
                   </p>
                 )}
@@ -283,22 +285,22 @@ const Billing = () => {
             </div>
 
             {/* Trial progress bar */}
-            {sub.plan === "free_trial" && !loading && daysLeft !== null && (
+            {onTrial && !loading && daysLeft !== null && (
               <div className="mt-6 space-y-2">
                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
                   <span className="text-slate-400">Trial Progress</span>
-                  <span className={daysLeft <= 7 ? "text-rose-400" : daysLeft <= 30 ? "text-amber-400" : "text-emerald-400"}>
+                  <span className={daysLeft <= 5 ? "text-rose-400" : daysLeft <= 14 ? "text-amber-400" : "text-emerald-400"}>
                     {trialBarPct}% remaining
                   </span>
                 </div>
                 <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
                   <div className={`h-full ${trialBarColor} rounded-full transition-all duration-700`} style={{ width: `${trialBarPct}%` }} />
                 </div>
-                {daysLeft <= 14 && (
+                {daysLeft <= 10 && (
                   <div className="flex items-center gap-2 mt-1">
                     <AlertTriangle size={12} className="text-amber-400" />
                     <p className="text-amber-300 text-[10px] font-bold">
-                      {daysLeft <= 7 ? "Trial expiring soon — upgrade to keep access." : "Less than 2 weeks left on your trial."}
+                      {daysLeft <= 5 ? "Trial expiring soon — pick a plan to keep access." : "Less than 10 days left on your trial."}
                     </p>
                   </div>
                 )}
@@ -311,84 +313,58 @@ const Billing = () => {
           <div className="absolute bottom-0 left-0 w-40 h-40 bg-blue-500/10 rounded-full blur-2xl -ml-10 -mb-10 pointer-events-none" />
         </div>
 
-        {/* Upgrade / Manage CTA */}
+        {/* Upgrade CTA */}
         <div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-[2.5rem] p-8 text-white flex flex-col justify-between shadow-xl shadow-indigo-200">
           <div>
             <div className="p-3 bg-white/10 rounded-2xl w-fit mb-4"><Crown size={24} /></div>
-            {isPaid ? (
-              <>
-                <h3 className="text-2xl font-black leading-tight">Manage Your<br />Subscription</h3>
-                <p className="mt-3 text-indigo-100 text-sm font-medium">Update payment method, download invoices, or cancel your plan from the Stripe billing portal.</p>
-              </>
-            ) : (
-              <>
-                <h3 className="text-2xl font-black leading-tight">Switch to Pro &<br />Scale Faster</h3>
-                <ul className="mt-4 space-y-2 text-sm text-indigo-100 font-medium">
-                  {["Unlimited staff members", "Advanced analytics", "Priority support", "Custom domain"].map((f) => (
-                    <li key={f} className="flex items-center gap-2">
-                      <CheckCircle2 size={13} className="text-indigo-300 shrink-0" /> {f}
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
+            <h3 className="text-2xl font-black leading-tight">
+              {isPaid ? <>Manage Your<br />Subscription</> : <>Pick the Plan<br />That Fits You</>}
+            </h3>
+            <ul className="mt-4 space-y-2 text-sm text-indigo-100 font-medium">
+              {(audience === "organization"
+                ? ["From 59 TND/month", "Team scheduling & finance", "Multi-branch & recruitment"]
+                : ["From 19 TND/month", "Website builder + AI", "Packages, gift cards, marketing"]
+              ).map((f) => (
+                <li key={f} className="flex items-center gap-2">
+                  <CheckCircle2 size={13} className="text-indigo-300 shrink-0" /> {f}
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {isPaid ? (
-            <button
-              onClick={openPortal}
-              disabled={portalLoading}
-              className="w-full py-4 bg-white text-indigo-600 font-black rounded-2xl hover:bg-indigo-50 transition-all flex items-center justify-center gap-2 group mt-6 disabled:opacity-60"
-            >
-              {portalLoading ? <><Loader2 size={16} className="animate-spin" /> Opening…</> : <><ExternalLink size={16} /> Billing Portal</>}
-            </button>
-          ) : (
-            <button
-              onClick={() => setShowPlans(true)}
-              className="w-full py-4 bg-white text-indigo-600 font-black rounded-2xl hover:bg-indigo-50 transition-all flex items-center justify-center gap-2 group mt-6"
-            >
-              Upgrade Now
-              <ArrowUpRight size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </button>
-          )}
+          <button
+            onClick={() => setShowPlans(true)}
+            className="w-full py-4 bg-white text-indigo-600 font-black rounded-2xl hover:bg-indigo-50 transition-all flex items-center justify-center gap-2 group mt-6"
+          >
+            {isPaid ? "Change Plan" : "View Plans"}
+            <ArrowUpRight size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </button>
         </div>
       </div>
 
       {/* Middle: payment method + security note */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-              <CreditCard className="text-indigo-600" /> Payment Method
-            </h3>
-            {isPaid && (
-              <button
-                onClick={openPortal}
-                disabled={portalLoading}
-                className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-700 px-3 py-1.5 rounded-xl border border-indigo-200 hover:bg-indigo-50 transition-all disabled:opacity-50"
-              >
-                {portalLoading ? <Loader2 size={12} className="animate-spin" /> : <ExternalLink size={12} />}
-                Manage
-              </button>
-            )}
-          </div>
+          <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2 mb-6">
+            <CreditCard className="text-indigo-600" /> Payment Method
+          </h3>
           <div className="flex items-center gap-4 p-5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-dashed border-slate-200 dark:border-slate-700">
-            <div className="w-12 h-8 bg-slate-200 dark:bg-slate-700 rounded-lg flex items-center justify-center text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase">Card</div>
+            <div className="w-12 h-8 bg-slate-200 dark:bg-slate-700 rounded-lg flex items-center justify-center text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase">D17</div>
             <div>
               {isPaid ? (
                 <>
                   <p className="text-sm font-black text-slate-700 dark:text-slate-200">Payment method on file</p>
-                  <p className="text-xs text-slate-400 font-medium mt-0.5">Managed securely via Stripe. Click "Manage" to update.</p>
+                  <p className="text-xs text-slate-400 font-medium mt-0.5">Managed securely via your Tunisian payment partner (Flouci / Konnect).</p>
                 </>
               ) : (
                 <>
                   <p className="text-sm font-black text-slate-600 dark:text-slate-300 italic">No payment method added yet</p>
-                  <p className="text-xs text-slate-400 font-medium mt-0.5">Your trial is currently free of charge.</p>
+                  <p className="text-xs text-slate-400 font-medium mt-0.5">Your {totalTrialDays}-day trial is free of charge.</p>
                 </>
               )}
             </div>
           </div>
-          <p className="text-[10px] text-slate-400 font-bold mt-4 uppercase tracking-widest">Payments processed securely via Stripe.</p>
+          <p className="text-[10px] text-slate-400 font-bold mt-4 uppercase tracking-widest">Payments processed securely via Flouci / Konnect.</p>
         </div>
 
         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-6">

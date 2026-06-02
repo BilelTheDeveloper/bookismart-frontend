@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Sidebar, { getAccessState, getTrialDaysLeft } from "./Sidebar";
 import { Menu } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
@@ -31,21 +32,21 @@ const NOTIF_META = {
 };
 
 const FILTER_TABS = [
-  { key: "all",         label: "All"         },
-  { key: "booking",     label: "Bookings"    },
-  { key: "payment",     label: "Payments"    },
-  { key: "staff",       label: "Staff"       },
-  { key: "system",      label: "System"      },
+  { key: "all",         labelKey: "dashboardLayout.fAll"      },
+  { key: "booking",     labelKey: "dashboardLayout.fBookings" },
+  { key: "payment",     labelKey: "dashboardLayout.fPayments" },
+  { key: "staff",       labelKey: "dashboardLayout.fStaff"    },
+  { key: "system",      labelKey: "dashboardLayout.fSystem"   },
 ];
 
-function timeAgo(dateStr) {
+function timeAgo(dateStr, t) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const m = Math.floor(diff / 60000);
-  if (m < 1)  return "just now";
-  if (m < 60) return `${m}m ago`;
+  if (m < 1)  return t("dashboardLayout.justNow");
+  if (m < 60) return t("dashboardLayout.minutesAgo", { m });
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  return `${Math.floor(h / 24)}d ago`;
+  if (h < 24) return t("dashboardLayout.hoursAgo", { h });
+  return t("dashboardLayout.daysAgo", { d: Math.floor(h / 24) });
 }
 
 /* ── Quick action button (confirm / cancel booking from notification) ── */
@@ -64,6 +65,7 @@ function QuickActionBtn({ label, color, loading, onClick, icon: Icon }) {
 
 /* ── Single notification item ── */
 function NotifItem({ notif, onMarkRead, onDelete, onQuickAction }) {
+  const { t } = useTranslation();
   const meta = NOTIF_META[notif.type] || NOTIF_META.default;
   const Icon = meta.icon;
   const [actionLoading, setActionLoading] = useState(null);
@@ -113,7 +115,7 @@ function NotifItem({ notif, onMarkRead, onDelete, onQuickAction }) {
           <div className="flex gap-1.5 mt-2">
             {notif.meta.bookingStatus === "pending" && (
               <QuickActionBtn
-                label="Confirm"
+                label={t("dashboardLayout.confirm")}
                 icon={CheckCircle2}
                 color="bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500 hover:text-white"
                 loading={actionLoading === "confirmed"}
@@ -121,7 +123,7 @@ function NotifItem({ notif, onMarkRead, onDelete, onQuickAction }) {
               />
             )}
             <QuickActionBtn
-              label="Cancel"
+              label={t("dashboardLayout.cancel")}
               icon={XCircle}
               color="bg-rose-500/15 text-rose-400 hover:bg-rose-500 hover:text-white"
               loading={actionLoading === "cancelled"}
@@ -130,7 +132,7 @@ function NotifItem({ notif, onMarkRead, onDelete, onQuickAction }) {
           </div>
         )}
 
-        <p className="text-[10px] text-slate-600 font-bold mt-1.5">{timeAgo(notif.createdAt)}</p>
+        <p className="text-[10px] text-slate-600 font-bold mt-1.5">{timeAgo(notif.createdAt, t)}</p>
       </div>
     </div>
   );
@@ -138,6 +140,7 @@ function NotifItem({ notif, onMarkRead, onDelete, onQuickAction }) {
 
 /* ── Full Notification Dropdown ── */
 function NotificationDropdown({ onClose }) {
+  const { t } = useTranslation();
   const { notifications, unreadCount, loading, markRead, markAllRead, deleteNotif, clearAll } = useNotifications();
   const [activeTab, setActiveTab] = useState("all");
 
@@ -158,7 +161,7 @@ function NotificationDropdown({ onClose }) {
       <div className="flex items-center justify-between px-4 py-3.5 border-b border-slate-800">
         <div className="flex items-center gap-2">
           <Bell size={14} className="text-slate-400" />
-          <span className="font-black text-white text-sm">Notifications</span>
+          <span className="font-black text-white text-sm">{t("dashboardLayout.notifications")}</span>
           {unreadCount > 0 && (
             <span className="bg-rose-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
               {unreadCount > 99 ? "99+" : unreadCount}
@@ -168,12 +171,12 @@ function NotificationDropdown({ onClose }) {
         <div className="flex items-center gap-0.5">
           {unreadCount > 0 && (
             <button onClick={markAllRead} className="flex items-center gap-1 text-[10px] font-bold text-indigo-400 hover:text-indigo-300 px-2 py-1.5 rounded-lg hover:bg-indigo-500/10 transition-all">
-              <CheckCheck size={11} /> All read
+              <CheckCheck size={11} /> {t("dashboardLayout.allRead")}
             </button>
           )}
           {notifications.length > 0 && (
             <button onClick={clearAll} className="text-[10px] font-bold text-slate-600 hover:text-rose-400 px-2 py-1.5 rounded-lg hover:bg-rose-500/10 transition-all">
-              Clear
+              {t("dashboardLayout.clear")}
             </button>
           )}
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-600 hover:text-white transition-all ml-1">
@@ -194,7 +197,7 @@ function NotificationDropdown({ onClose }) {
                 : "text-slate-500 hover:text-slate-300 hover:bg-slate-800"
             }`}
           >
-            {tab.label}
+            {t(tab.labelKey)}
           </button>
         ))}
       </div>
@@ -217,7 +220,9 @@ function NotificationDropdown({ onClose }) {
           <div className="py-14 text-center">
             <Bell size={28} className="text-slate-800 mx-auto mb-3" />
             <p className="text-sm font-black text-slate-600">
-              {activeTab === "all" ? "All caught up" : `No ${activeTab} notifications`}
+              {activeTab === "all"
+                ? t("dashboardLayout.allCaughtUp")
+                : t("dashboardLayout.noTypeNotifs", { type: t(FILTER_TABS.find(tb => tb.key === activeTab)?.labelKey || "dashboardLayout.fAll") })}
             </p>
           </div>
         ) : (
@@ -236,58 +241,32 @@ function NotificationDropdown({ onClose }) {
   );
 }
 
-/* ══ FAQ DATA ══════════════════════════════════════════════════════════════ */
-const LANGS = [
-  { code: "FR", flag: "🇫🇷", label: "Français" },
-  { code: "EN", flag: "🇬🇧", label: "English"  },
-  { code: "AR", flag: "🇹🇳", label: "عربية"    },
-];
-
-const FAQ = [
-  {
-    category: "Getting Started", color: "indigo",
+/* ══ FAQ CONFIG (text resolved via i18n: dashboardLayout.faq*) ════════════════ */
+const FAQ_CONFIG = [
+  { titleKey: "dashboardLayout.faqGettingStarted", color: "indigo",
     items: [
-      { q: "How do I verify my identity (KYC)?",
-        a: "Click 'GET VERIFIED' in the sidebar. Upload a clear photo of your ID card (front and back), then complete the 5-second biometric scan. Our team reviews your dossier within 24 hours and notifies you by email." },
-      { q: "How do I set up my online booking page?",
-        a: "Go to Website in the sidebar, choose a theme, add your services with prices and durations, set your opening hours, and publish. You'll get a unique link to share with customers on WhatsApp, Instagram, or your website." },
-      { q: "What is Work Mode?",
-        a: "Work Mode is a simplified daily interface. Track today's queue, mark appointments as done, manage walk-ins, and let staff log in via a secure invite link — all optimized for phone use at your business." },
-    ]
-  },
-  {
-    category: "Bookings", color: "emerald",
+      { qKey: "dashboardLayout.faqGs1Q", aKey: "dashboardLayout.faqGs1A" },
+      { qKey: "dashboardLayout.faqGs2Q", aKey: "dashboardLayout.faqGs2A" },
+      { qKey: "dashboardLayout.faqGs3Q", aKey: "dashboardLayout.faqGs3A" },
+    ] },
+  { titleKey: "dashboardLayout.faqBookings", color: "emerald",
     items: [
-      { q: "How do customers book with me?",
-        a: "Share your Bookiify link. Customers choose a service, pick an available time slot, and confirm. You get an instant notification and the booking appears in Appointments." },
-      { q: "How do I confirm or cancel a booking?",
-        a: "In Appointments, click any booking to open its details. Use the action buttons to Confirm, Reschedule, or Cancel. The customer automatically receives an email notification." },
-      { q: "Can I block time off / set my schedule?",
-        a: "Yes. In your settings you can define working days and hours, add breaks, and block specific dates for holidays or personal time." },
-    ]
-  },
-  {
-    category: "Finance", color: "amber",
+      { qKey: "dashboardLayout.faqBk1Q", aKey: "dashboardLayout.faqBk1A" },
+      { qKey: "dashboardLayout.faqBk2Q", aKey: "dashboardLayout.faqBk2A" },
+      { qKey: "dashboardLayout.faqBk3Q", aKey: "dashboardLayout.faqBk3A" },
+    ] },
+  { titleKey: "dashboardLayout.faqFinance", color: "amber",
     items: [
-      { q: "How do I track my revenue?",
-        a: "The Finance page shows earnings by day, week, or month. Filter by service type or staff member. All transactions are logged automatically when a booking is completed." },
-      { q: "How do I send an invoice?",
-        a: "In Invoices, click 'New Invoice', select the customer and services, then hit Send. The invoice is emailed as a PDF with your business branding and a payment reference." },
-      { q: "How does the loyalty program work?",
-        a: "Customers earn points per visit or total spend. In Loyalty settings, define your point-to-reward rules. Customers can redeem points for free services or discounts on their next booking." },
-    ]
-  },
-  {
-    category: "Security", color: "rose",
+      { qKey: "dashboardLayout.faqFi1Q", aKey: "dashboardLayout.faqFi1A" },
+      { qKey: "dashboardLayout.faqFi2Q", aKey: "dashboardLayout.faqFi2A" },
+      { qKey: "dashboardLayout.faqFi3Q", aKey: "dashboardLayout.faqFi3A" },
+    ] },
+  { titleKey: "dashboardLayout.faqSecurity", color: "rose",
     items: [
-      { q: "How do I enable two-factor authentication?",
-        a: "Settings → Security → Enable Two-Factor Auth. Scan the QR code with Google Authenticator or Authy. From then on, every login requires your 6-digit app code after your password." },
-      { q: "How do I change my password?",
-        a: "Settings → Security → Change Password. Enter your current password then choose a new strong password (min 8 characters, must include uppercase, a number, and a special character)." },
-      { q: "What is device fingerprinting?",
-        a: "Bookiify ties your session to the device you logged in from. If someone steals your token and tries to use it from a different device, the session is rejected automatically." },
-    ]
-  },
+      { qKey: "dashboardLayout.faqSe1Q", aKey: "dashboardLayout.faqSe1A" },
+      { qKey: "dashboardLayout.faqSe2Q", aKey: "dashboardLayout.faqSe2A" },
+      { qKey: "dashboardLayout.faqSe3Q", aKey: "dashboardLayout.faqSe3A" },
+    ] },
 ];
 
 const COLOR_MAP = {
@@ -299,8 +278,14 @@ const COLOR_MAP = {
 
 /* ── Help Panel ── */
 function HelpPanel({ onClose }) {
+  const { t } = useTranslation();
   const [openIdx, setOpenIdx]           = useState(null);
   const [activeCategory, setActiveCategory] = useState(0);
+  const FAQ = FAQ_CONFIG.map((c) => ({
+    category: t(c.titleKey),
+    color: c.color,
+    items: c.items.map((it) => ({ q: t(it.qKey), a: t(it.aKey) })),
+  }));
   const cat = FAQ[activeCategory];
 
   return (
@@ -315,8 +300,8 @@ function HelpPanel({ onClose }) {
               <HelpCircle size={20} className="text-indigo-600" />
             </div>
             <div>
-              <h2 className="font-black text-slate-900 dark:text-white text-base">Help Center</h2>
-              <p className="text-[11px] text-slate-500 font-bold">Frequently asked questions</p>
+              <h2 className="font-black text-slate-900 dark:text-white text-base">{t("dashboardLayout.helpCenter")}</h2>
+              <p className="text-[11px] text-slate-500 font-bold">{t("dashboardLayout.helpSubtitle")}</p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
@@ -362,9 +347,9 @@ function HelpPanel({ onClose }) {
         {/* Footer */}
         <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 text-center">
           <p className="text-xs text-slate-400 font-bold">
-            Still need help?{" "}
+            {t("dashboardLayout.stillNeedHelp")}{" "}
             <a href="mailto:support@bookiify.com" className="text-indigo-600 font-black hover:underline">
-              Contact Support
+              {t("dashboardLayout.contactSupport")}
             </a>
           </p>
         </div>
@@ -375,6 +360,7 @@ function HelpPanel({ onClose }) {
 
 /* ── Access State Banner ── */
 function AccessBanner({ user }) {
+  const { t } = useTranslation();
   const accessState = getAccessState(user);
   const daysLeft    = getTrialDaysLeft(user?.trialEndsAt);
   const isRejected  = user?.accountStatus === "on_boarding" && user?.kycStatus === "rejected";
@@ -383,9 +369,9 @@ function AccessBanner({ user }) {
     return (
       <div className="flex flex-wrap items-center gap-2 px-4 py-3 border-b bg-amber-50 border-amber-200 text-amber-800 text-xs font-bold sm:flex-nowrap sm:gap-3 sm:px-8 sm:text-sm">
         <ShieldCheck size={16} className="text-amber-600 flex-shrink-0" />
-        <span className="flex-1">{isRejected ? "Your KYC was rejected. Please resubmit with the correct documents." : "Your account is not yet verified."}</span>
+        <span className="flex-1">{isRejected ? t("dashboardLayout.bKycRejected") : t("dashboardLayout.bNotVerified")}</span>
         <Link to="/owner/dashboard/kyc" className="underline hover:no-underline font-black whitespace-nowrap">
-          {isRejected ? "Resubmit →" : "Complete KYC →"}
+          {isRejected ? t("dashboardLayout.bResubmit") : t("dashboardLayout.bCompleteKyc")}
         </Link>
       </div>
     );
@@ -395,7 +381,7 @@ function AccessBanner({ user }) {
     return (
       <div className="flex items-center gap-2 px-4 py-3 border-b bg-blue-50 border-blue-200 text-blue-800 text-xs font-bold sm:gap-3 sm:px-8 sm:text-sm">
         <CheckCircle2 size={16} className="text-blue-500 flex-shrink-0" />
-        <span>Your identity documents are under review. We&apos;ll notify you within 24 hours.</span>
+        <span>{t("dashboardLayout.bUnderReview")}</span>
       </div>
     );
   }
@@ -404,8 +390,8 @@ function AccessBanner({ user }) {
     return (
       <div className="flex flex-wrap items-center gap-2 px-4 py-3 border-b bg-rose-50 border-rose-200 text-rose-800 text-xs font-bold sm:flex-nowrap sm:gap-3 sm:px-8 sm:text-sm">
         <XCircle size={16} className="text-rose-500 flex-shrink-0" />
-        <span className="flex-1">Your free trial has expired. Upgrade your plan to continue.</span>
-        <Link to="/owner/dashboard/billing" className="underline hover:no-underline font-black whitespace-nowrap">Upgrade Now →</Link>
+        <span className="flex-1">{t("dashboardLayout.bTrialExpired")}</span>
+        <Link to="/owner/dashboard/billing" className="underline hover:no-underline font-black whitespace-nowrap">{t("dashboardLayout.bUpgradeNow")}</Link>
       </div>
     );
   }
@@ -417,11 +403,11 @@ function AccessBanner({ user }) {
         <Loader2 size={16} className={`flex-shrink-0 ${urgent ? "text-rose-500" : "text-amber-600"}`} />
         <span>
           {urgent
-            ? `Your free trial expires in ${daysLeft} day${daysLeft !== 1 ? "s" : ""}. Upgrade now to avoid interruption.`
-            : `Your free trial expires in ${daysLeft} days.`}
+            ? t("dashboardLayout.bTrialUrgent", { days: daysLeft })
+            : t("dashboardLayout.bTrialDays", { days: daysLeft })}
         </span>
         <Link to="/owner/dashboard/billing" className="ml-1 underline hover:no-underline font-black whitespace-nowrap">
-          Upgrade Plan →
+          {t("dashboardLayout.bUpgradePlan")}
         </Link>
       </div>
     );
@@ -434,6 +420,7 @@ function AccessBanner({ user }) {
    DASHBOARD LAYOUT
    ══════════════════════════════════════════════════════════════════════════════ */
 const DashboardLayout = () => {
+  const { t }     = useTranslation();
   const navigate  = useNavigate();
   const location  = useLocation();
   const { user, logoutUser } = useAuth();
@@ -541,7 +528,7 @@ const DashboardLayout = () => {
             className="relative flex-1 max-w-xs sm:max-w-sm lg:max-w-sm flex items-center gap-2 sm:gap-3 pl-3 sm:pl-4 pr-2 sm:pr-3 py-2 sm:py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border-2 border-transparent hover:border-indigo-200 rounded-2xl text-sm transition-all group text-left"
           >
             <Search className="h-4 w-4 text-slate-400 flex-shrink-0" />
-            <span className="text-slate-400 dark:text-slate-500 font-medium flex-1 truncate text-xs sm:text-sm">Search…</span>
+            <span className="text-slate-400 dark:text-slate-500 font-medium flex-1 truncate text-xs sm:text-sm">{t("dashboardLayout.search")}</span>
             <kbd className="hidden sm:flex items-center gap-0.5 px-2 py-1 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 text-[10px] font-black rounded-lg shadow-sm flex-shrink-0">
               <Command size={10} /> K
             </kbd>
@@ -585,8 +572,8 @@ const DashboardLayout = () => {
                 className="flex items-center gap-3 cursor-pointer group select-none"
               >
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm font-black text-slate-900 leading-tight">{displayUser.fullName}</p>
-                  <p className="text-[11px] font-bold text-indigo-600 uppercase tracking-tighter">{displayUser.role} Account</p>
+                  <p className="text-sm font-black text-slate-900 dark:text-white leading-tight">{displayUser.fullName}</p>
+                  <p className="text-[11px] font-bold text-indigo-600 uppercase tracking-tighter">{t("dashboardLayout.roleAccount", { role: displayUser.role })}</p>
                 </div>
 
                 <div className="relative">
@@ -613,37 +600,37 @@ const DashboardLayout = () => {
               {/* Profile dropdown */}
               {isProfileOpen && (
                 <div className="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-black/40 py-2 z-50">
-                  <div className="px-4 py-2 border-b border-slate-50 mb-1">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Account Status</p>
+                  <div className="px-4 py-2 border-b border-slate-50 dark:border-slate-800 mb-1">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("dashboardLayout.accountStatus")}</p>
                     <p className="text-xs font-bold text-emerald-600 flex items-center gap-1 mt-1">
                       <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse inline-block" />
-                      Active & Online
+                      {t("dashboardLayout.activeOnline")}
                     </p>
                   </div>
 
                   <Link
                     to="/owner/profile"
-                    className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-indigo-600 transition-colors"
                     onClick={() => setIsProfileOpen(false)}
                   >
-                    <Globe size={16} /> Online Web Profile
+                    <Globe size={16} /> {t("dashboardLayout.onlineProfile")}
                   </Link>
 
                   <Link
                     to="/owner/dashboard/settings"
-                    className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-indigo-600 transition-colors"
                     onClick={() => setIsProfileOpen(false)}
                   >
-                    <SettingsIcon size={16} /> Settings
+                    <SettingsIcon size={16} /> {t("dashboardLayout.settings")}
                   </Link>
 
-                  <div className="h-[1px] bg-slate-100 my-1 mx-2" />
+                  <div className="h-[1px] bg-slate-100 dark:bg-slate-800 my-1 mx-2" />
 
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-rose-500 hover:bg-rose-50 transition-colors"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
                   >
-                    <LogOut size={16} /> Logout Account
+                    <LogOut size={16} /> {t("dashboardLayout.logout")}
                   </button>
                 </div>
               )}
@@ -675,12 +662,12 @@ const DashboardLayout = () => {
       <button
         onClick={() => setIsHelpOpen(p => !p)}
         className="fixed bottom-7 right-7 z-50 w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-2xl shadow-indigo-400/30 flex items-center justify-center transition-all hover:scale-110 active:scale-95 group"
-        title="Help & FAQ"
+        title={t("dashboardLayout.helpTooltip")}
       >
         {isHelpOpen ? <X size={22} /> : <HelpCircle size={22} />}
         {!isHelpOpen && (
           <span className="absolute bottom-16 right-0 bg-slate-900 dark:bg-slate-700 text-white text-[10px] font-black px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg">
-            Help & FAQ
+            {t("dashboardLayout.helpTooltip")}
           </span>
         )}
         {!isHelpOpen && (

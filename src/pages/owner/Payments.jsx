@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import {
   CreditCard, Wallet, Loader2, ShieldCheck, Percent, Coins,
   CheckCircle2, XCircle, Clock, DollarSign, Check,
@@ -14,6 +15,7 @@ const STATUS_STYLE = {
 };
 
 const Payments = () => {
+  const { t } = useTranslation();
   const [providers, setProviders] = useState({ enabled: false, flouci: false, konnect: false, default: "flouci" });
   const [policy, setPolicy] = useState({ depositEnabled: false, depositType: "fixed", depositValue: 0, provider: "flouci" });
   const [payments, setPayments] = useState([]);
@@ -29,15 +31,15 @@ const Payments = () => {
       setPolicy(s.data.policy || {});
       setPayments(l.data.payments || []);
       setTotalPaid(l.data.totalPaid || 0);
-    } catch { toast.error("Could not load payments."); }
+    } catch { toast.error(t("payments.loadError")); }
     finally { setLoading(false); }
-  }, []);
+  }, [t]);
   useEffect(() => { load(); }, [load]);
 
   const savePolicy = async () => {
     setSaving(true);
-    try { await API.put("/payments/deposit-policy", policy); toast.success("Deposit policy saved"); }
-    catch (e) { toast.error(e.response?.data?.message || "Save failed"); }
+    try { await API.put("/payments/deposit-policy", policy); toast.success(t("payments.policySaved")); }
+    catch (e) { toast.error(e.response?.data?.message || t("payments.saveFailed")); }
     finally { setSaving(false); }
   };
 
@@ -46,29 +48,29 @@ const Payments = () => {
   return (
     <div className="space-y-7">
       <div>
-        <h1 className="flex items-center gap-2.5 text-2xl font-black text-slate-900 dark:text-white"><CreditCard className="text-indigo-600 dark:text-indigo-400" /> Payments & Deposits</h1>
-        <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">Take deposits at booking to stop no-shows — paid via Tunisian gateways.</p>
+        <h1 className="flex items-center gap-2.5 text-2xl font-black text-slate-900 dark:text-white"><CreditCard className="text-indigo-600 dark:text-indigo-400" /> {t("payments.title")}</h1>
+        <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">{t("payments.subtitle")}</p>
       </div>
 
       {/* KPI */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-5 shadow-sm">
           <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3"><DollarSign size={18} /></div>
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Collected</p>
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("payments.collected")}</p>
           <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{loading ? "—" : `${totalPaid.toFixed(0)} TND`}</p>
         </div>
         <ProviderCard name="Flouci" on={providers.flouci} />
         <ProviderCard name="Konnect" on={providers.konnect} />
         <div className={`rounded-3xl border p-5 shadow-sm ${providers.enabled ? "border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10" : "border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10"}`}>
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${providers.enabled ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400" : "bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400"}`}><ShieldCheck size={18} /></div>
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Payments</p>
-          <p className="text-sm font-black text-slate-900 dark:text-white mt-1">{providers.enabled ? "Enabled" : "Not enabled"}</p>
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("payments.payments")}</p>
+          <p className="text-sm font-black text-slate-900 dark:text-white mt-1">{providers.enabled ? t("payments.enabled") : t("payments.notEnabled")}</p>
         </div>
       </div>
 
       {!providers.enabled && (
         <div className="rounded-3xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-5 text-sm font-medium text-amber-800 dark:text-amber-300">
-          Add your gateway keys to the server <code className="font-black">.env</code> (<code>PAYMENTS_ENABLED</code>, <code>FLOUCI_APP_TOKEN/SECRET</code> or <code>KONNECT_API_KEY/WALLET_ID</code>) to start collecting deposits. You can configure your policy below in the meantime.
+          {t("payments.envNote")}
         </div>
       )}
 
@@ -76,8 +78,8 @@ const Payments = () => {
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2"><ShieldCheck size={18} className="text-indigo-500" /> Deposit policy</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Require a deposit to confirm a booking.</p>
+            <h3 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2"><ShieldCheck size={18} className="text-indigo-500" /> {t("payments.depositPolicy")}</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{t("payments.depositPolicySub")}</p>
           </div>
           <button onClick={() => upd("depositEnabled", !policy.depositEnabled)} className={`relative w-14 h-8 rounded-full transition-all ${policy.depositEnabled ? "bg-indigo-600" : "bg-slate-300 dark:bg-slate-700"}`}>
             <span className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all ${policy.depositEnabled ? "left-7" : "left-1"}`} />
@@ -87,19 +89,19 @@ const Payments = () => {
         {policy.depositEnabled && (
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Type</label>
+              <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">{t("payments.type")}</label>
               <div className="flex gap-2 mt-2">
-                {[["fixed", "Fixed", Coins], ["percent", "Percent", Percent]].map(([id, label, Icon]) => (
+                {[["fixed", t("payments.fixed"), Coins], ["percent", t("payments.percent"), Percent]].map(([id, label, Icon]) => (
                   <button key={id} onClick={() => upd("depositType", id)} className={`flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-black ${policy.depositType === id ? "bg-indigo-600 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"}`}><Icon size={13} /> {label}</button>
                 ))}
               </div>
             </div>
             <div>
-              <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">{policy.depositType === "percent" ? "Percent of price" : "Amount (TND)"}</label>
+              <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">{policy.depositType === "percent" ? t("payments.percentOfPrice") : t("payments.amountTnd")}</label>
               <input type="number" min="0" value={policy.depositValue} onChange={(e) => upd("depositValue", e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-sm font-bold text-slate-900 dark:text-white outline-none focus:border-indigo-500" placeholder={policy.depositType === "percent" ? "30" : "10"} />
             </div>
             <div>
-              <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Gateway</label>
+              <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">{t("payments.gateway")}</label>
               <div className="flex gap-2 mt-2">
                 {["flouci", "konnect"].map((p) => (
                   <button key={p} onClick={() => upd("provider", p)} className={`flex-1 capitalize py-2.5 rounded-xl text-xs font-black ${policy.provider === p ? "bg-indigo-600 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"}`}>{p}</button>
@@ -110,22 +112,22 @@ const Payments = () => {
         )}
 
         <button onClick={savePolicy} disabled={saving} className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-6 py-3 font-black text-white hover:bg-indigo-500 transition-all disabled:opacity-60">
-          {saving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />} Save policy
+          {saving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />} {t("payments.savePolicy")}
         </button>
       </div>
 
       {/* History */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
         <div className="px-6 py-5 border-b border-slate-50 dark:border-slate-800">
-          <h3 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2"><Clock size={18} className="text-indigo-500" /> Payment history</h3>
+          <h3 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2"><Clock size={18} className="text-indigo-500" /> {t("payments.paymentHistory")}</h3>
         </div>
         {loading ? (
           <div className="flex justify-center py-12"><Loader2 className="animate-spin text-indigo-500" size={24} /></div>
         ) : payments.length === 0 ? (
           <div className="py-14 text-center">
             <Wallet size={32} className="mx-auto mb-3 text-slate-300 dark:text-slate-600" />
-            <p className="font-black text-slate-700 dark:text-slate-200">No payments yet</p>
-            <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">Deposits and payments will appear here.</p>
+            <p className="font-black text-slate-700 dark:text-slate-200">{t("payments.noPayments")}</p>
+            <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">{t("payments.noPaymentsSub")}</p>
           </div>
         ) : (
           <div className="divide-y divide-slate-50 dark:divide-slate-800">
@@ -133,10 +135,10 @@ const Payments = () => {
               <div key={p._id} className="flex items-center gap-4 px-6 py-4">
                 <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0"><CreditCard size={17} /></div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-black text-slate-900 dark:text-white truncate">{p.customerName || "Customer"} · {p.amount} TND</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate capitalize">{p.kind} · {p.provider} · {new Date(p.createdAt).toLocaleDateString("en-GB")}</p>
+                  <p className="font-black text-slate-900 dark:text-white truncate">{p.customerName || t("payments.customer")} · {p.amount} TND</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{t(`payments.kind${p.kind ? p.kind.charAt(0).toUpperCase() + p.kind.slice(1) : "Deposit"}`, p.kind)} · {p.provider} · {new Date(p.createdAt).toLocaleDateString("en-GB")}</p>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase shrink-0 ${STATUS_STYLE[p.status] || STATUS_STYLE.pending}`}>{p.status}</span>
+                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase shrink-0 ${STATUS_STYLE[p.status] || STATUS_STYLE.pending}`}>{t(`payments.st${p.status ? p.status.charAt(0).toUpperCase() + p.status.slice(1) : "Pending"}`, p.status)}</span>
               </div>
             ))}
           </div>
@@ -146,12 +148,15 @@ const Payments = () => {
   );
 };
 
-const ProviderCard = ({ name, on }) => (
+const ProviderCard = ({ name, on }) => {
+  const { t } = useTranslation();
+  return (
   <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-5 shadow-sm">
     <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 flex items-center justify-center mb-3"><Wallet size={18} /></div>
     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{name}</p>
-    <p className="text-sm font-black mt-1 flex items-center gap-1.5">{on ? <><CheckCircle2 size={15} className="text-emerald-500" /> <span className="text-slate-900 dark:text-white">Connected</span></> : <><XCircle size={15} className="text-slate-400" /> <span className="text-slate-400">Not set</span></>}</p>
+    <p className="text-sm font-black mt-1 flex items-center gap-1.5">{on ? <><CheckCircle2 size={15} className="text-emerald-500" /> <span className="text-slate-900 dark:text-white">{t("payments.connected")}</span></> : <><XCircle size={15} className="text-slate-400" /> <span className="text-slate-400">{t("payments.notSet")}</span></>}</p>
   </div>
-);
+  );
+};
 
 export default Payments;

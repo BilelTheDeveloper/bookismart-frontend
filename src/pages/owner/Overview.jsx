@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import API from "../../api/config";
@@ -11,14 +12,15 @@ import {
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
 /* ─── Thin progress bar for trial countdown ─── */
-const TrialBar = ({ daysLeft, total = 90 }) => {
+const TrialBar = ({ daysLeft, total = 30 }) => {
+  const { t } = useTranslation();
   const pct = Math.max(0, Math.min(100, Math.round((daysLeft / total) * 100)));
-  const color = daysLeft > 30 ? 'bg-emerald-400' : daysLeft > 7 ? 'bg-amber-400' : 'bg-rose-400';
+  const color = daysLeft > 14 ? 'bg-emerald-400' : daysLeft > 5 ? 'bg-amber-400' : 'bg-rose-400';
   return (
     <div className="mt-2 space-y-1">
       <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-        <span>Trial usage</span>
-        <span>{daysLeft}d left</span>
+        <span>{t("overview.trialUsage")}</span>
+        <span>{t("overview.daysLeftShort", { days: daysLeft })}</span>
       </div>
       <div className="h-1.5 w-full bg-slate-200/60 dark:bg-slate-700 rounded-full overflow-hidden">
         <div className={`h-full ${color} rounded-full transition-all duration-700`} style={{ width: `${pct}%` }} />
@@ -29,6 +31,7 @@ const TrialBar = ({ daysLeft, total = 90 }) => {
 
 /* ─── Website status card (top banner) ─── */
 const WebsiteStatusBanner = ({ website, loading }) => {
+  const { t } = useTranslation();
   if (loading) {
     return <div className="h-24 bg-slate-100 dark:bg-slate-800 rounded-[2rem] animate-pulse" />;
   }
@@ -40,14 +43,14 @@ const WebsiteStatusBanner = ({ website, loading }) => {
           <Globe size={20} className="text-slate-400" />
         </div>
         <div className="flex-1">
-          <p className="font-black text-slate-800 dark:text-white">No Website Yet</p>
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Create your public booking page to start receiving clients online</p>
+          <p className="font-black text-slate-800 dark:text-white">{t("overview.noWebsite")}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{t("overview.noWebsiteSub")}</p>
         </div>
         <Link
           to="/owner/dashboard/themes"
           className="shrink-0 px-4 py-2.5 bg-indigo-600 text-white text-xs font-black rounded-xl hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg shadow-indigo-100 dark:shadow-indigo-900/40"
         >
-          <Palette size={14} /> Build Site
+          <Palette size={14} /> {t("overview.buildSite")}
         </Link>
       </div>
     );
@@ -59,12 +62,12 @@ const WebsiteStatusBanner = ({ website, loading }) => {
   const isRejected = website.verificationStatus === 'rejected';
 
   const cfg = isLive
-    ? { bg: 'bg-emerald-950', border: 'border-emerald-900', dot: 'bg-emerald-400 animate-pulse', label: 'Website Live', sub: `bookiify.vercel.app/p/${website.slug}`, iconBg: 'bg-emerald-900', iconColor: 'text-emerald-400', icon: <CheckCircle2 size={20} /> }
+    ? { bg: 'bg-emerald-950', border: 'border-emerald-900', dot: 'bg-emerald-400 animate-pulse', label: t("overview.websiteLive"), sub: `bookiify.vercel.app/p/${website.slug}`, iconBg: 'bg-emerald-900', iconColor: 'text-emerald-400', icon: <CheckCircle2 size={20} /> }
     : isApprovedOffline
-    ? { bg: 'bg-indigo-950', border: 'border-indigo-900', dot: 'bg-indigo-400', label: 'Approved — Not Published', sub: 'Your site passed review. Publish it to go live.', iconBg: 'bg-indigo-900', iconColor: 'text-indigo-400', icon: <Globe size={20} /> }
+    ? { bg: 'bg-indigo-950', border: 'border-indigo-900', dot: 'bg-indigo-400', label: t("overview.approvedOffline"), sub: t("overview.approvedOfflineSub"), iconBg: 'bg-indigo-900', iconColor: 'text-indigo-400', icon: <Globe size={20} /> }
     : isPending
-    ? { bg: 'bg-amber-950', border: 'border-amber-900', dot: 'bg-amber-400 animate-pulse', label: 'Under Admin Review', sub: 'Your website is being reviewed. You\'ll be notified when approved.', iconBg: 'bg-amber-900', iconColor: 'text-amber-400', icon: <Timer size={20} /> }
-    : { bg: 'bg-rose-950', border: 'border-rose-900', dot: 'bg-rose-400', label: 'Website Rejected', sub: website.rejectionReason || 'Please review feedback and resubmit.', iconBg: 'bg-rose-900', iconColor: 'text-rose-400', icon: <XCircle size={20} /> };
+    ? { bg: 'bg-amber-950', border: 'border-amber-900', dot: 'bg-amber-400 animate-pulse', label: t("overview.underReview"), sub: t("overview.underReviewSub"), iconBg: 'bg-amber-900', iconColor: 'text-amber-400', icon: <Timer size={20} /> }
+    : { bg: 'bg-rose-950', border: 'border-rose-900', dot: 'bg-rose-400', label: t("overview.rejected"), sub: website.rejectionReason || t("overview.rejectedSub"), iconBg: 'bg-rose-900', iconColor: 'text-rose-400', icon: <XCircle size={20} /> };
 
   return (
     <div className={`flex items-center gap-4 ${cfg.bg} rounded-[2rem] p-5 border ${cfg.border}`}>
@@ -86,14 +89,14 @@ const WebsiteStatusBanner = ({ website, loading }) => {
             rel="noopener noreferrer"
             className="px-3 py-2 bg-emerald-500 text-white text-[10px] font-black rounded-xl hover:bg-emerald-400 transition-all flex items-center gap-1.5"
           >
-            <ExternalLink size={12} /> Visit
+            <ExternalLink size={12} /> {t("overview.visit")}
           </a>
         )}
         <Link
           to="/owner/theme/customize-site"
           className="px-3 py-2 bg-white/10 text-white text-[10px] font-black rounded-xl hover:bg-white/20 transition-all"
         >
-          Edit Site
+          {t("overview.editSite")}
         </Link>
       </div>
     </div>
@@ -101,7 +104,12 @@ const WebsiteStatusBanner = ({ website, loading }) => {
 };
 
 /* ─── Status pill ─── */
+const STATUS_LABEL_KEYS = {
+  pending: 'overview.stPending', confirmed: 'overview.stConfirmed', completed: 'overview.stCompleted',
+  cancelled: 'overview.stCancelled', 'no-show': 'overview.stNoShow',
+};
 const StatusPill = ({ status }) => {
+  const { t } = useTranslation();
   const cfg = {
     pending:   'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400',
     confirmed: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400',
@@ -111,7 +119,7 @@ const StatusPill = ({ status }) => {
   };
   return (
     <span className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${cfg[status] || 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
-      {status}
+      {STATUS_LABEL_KEYS[status] ? t(STATUS_LABEL_KEYS[status]) : status}
     </span>
   );
 };
@@ -130,13 +138,15 @@ const SkeletonRow = () => (
 
 /* ═══════════════════════════════════════════ */
 const Overview = () => {
+  const { t, i18n } = useTranslation();
   const { user: authUser } = useAuth();
   const subscription = authUser?.paymentInfo?.subscription || {};
   const trialEndsAt = subscription.trialEndsAt
     ? new Date(subscription.trialEndsAt)
-    : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
+    : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
   const trialDaysLeft = Math.max(0, Math.ceil((trialEndsAt - Date.now()) / 86_400_000));
-  const planLabel = { free_trial: 'Free Trial', basic: 'Basic', premium: 'Premium', pro: 'Pro' }[subscription.plan || 'free_trial'] || 'Free Trial';
+  const PLAN_LABELS = { free_trial: t('overview.planFreeTrial'), solo_starter: 'Solo Starter', solo_pro: 'Solo Pro', team: 'Team', business: 'Business', enterprise: 'Enterprise', basic: 'Solo Starter', premium: 'Solo Pro', pro: 'Team' };
+  const planLabel = PLAN_LABELS[subscription.plan || 'free_trial'] || t('overview.planFreeTrial');
 
   const [loading, setLoading] = useState(true);
   const [websiteLoading, setWebsiteLoading] = useState(true);
@@ -148,10 +158,12 @@ const Overview = () => {
   const [actionLoading, setActionLoading] = useState(null);
 
   const today = todayStr();
-  const todayLabel = new Date().toLocaleDateString('en-US', {
+  const locale = { fr: 'fr-FR', ar: 'ar-TN', en: 'en-US' }[i18n.language?.slice(0, 2)] || 'en-US';
+  const todayLabel = new Date().toLocaleDateString(locale, {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
-  const greeting = new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening';
+  const hours = new Date().getHours();
+  const greetKey = hours < 12 ? 'overview.greetMorning' : hours < 18 ? 'overview.greetAfternoon' : 'overview.greetEvening';
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -214,36 +226,36 @@ const Overview = () => {
 
   const kpis = [
     {
-      label: "Today's Apts",
+      label: t("overview.todayApts"),
       value: loading ? null : todayBookings.length,
       icon: <CalendarCheck size={18} />,
       color: 'text-indigo-600 dark:text-indigo-400',
       bg: 'bg-indigo-50 dark:bg-indigo-500/15',
-      sub: new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+      sub: new Date().toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' }),
     },
     {
-      label: 'Pending Action',
+      label: t("overview.pendingAction"),
       value: loading ? null : pendingTotal,
       icon: <AlertCircle size={18} />,
       color: pendingTotal > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400',
       bg: pendingTotal > 0 ? 'bg-amber-50 dark:bg-amber-500/15' : 'bg-slate-50 dark:bg-slate-800',
-      sub: 'Need confirmation',
+      sub: t("overview.needConfirmation"),
     },
     {
-      label: 'Total Bookings',
+      label: t("overview.totalBookings"),
       value: loading ? null : (summary?.totalBookings ?? 0),
       icon: <Users size={18} />,
       color: 'text-violet-600 dark:text-violet-400',
       bg: 'bg-violet-50 dark:bg-violet-500/15',
-      sub: 'All time',
+      sub: t("overview.allTime"),
     },
     {
-      label: 'Revenue',
+      label: t("overview.revenue"),
       value: loading ? null : `${(summary?.totalRevenue ?? 0).toFixed(2)} TND`,
       icon: <DollarSign size={18} />,
       color: 'text-emerald-600 dark:text-emerald-400',
       bg: 'bg-emerald-50 dark:bg-emerald-500/15',
-      sub: 'From consultations',
+      sub: t("overview.fromConsultations"),
     },
   ];
 
@@ -254,7 +266,7 @@ const Overview = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-            Good {greeting}, {authUser?.fullName?.split(' ')[0] || 'Owner'}
+            {t(greetKey)}, {authUser?.fullName?.split(' ')[0] || 'Owner'}
           </h2>
           <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mt-0.5">{todayLabel}</p>
         </div>
@@ -263,7 +275,7 @@ const Overview = () => {
           disabled={loading}
           className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all disabled:opacity-60 self-start sm:self-auto"
         >
-          <RefreshCw size={15} className={loading ? 'animate-spin' : ''} /> Refresh
+          <RefreshCw size={15} className={loading ? 'animate-spin' : ''} /> {t("overview.refresh")}
         </button>
       </div>
 
@@ -283,10 +295,10 @@ const Overview = () => {
         }`}>
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Subscription</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("overview.subscription")}</p>
               <p className="text-lg font-black text-slate-900 dark:text-white mt-0.5">{planLabel}</p>
               <p className={`text-xs font-medium mt-0.5 ${trialDaysLeft <= 7 ? 'text-rose-600 dark:text-rose-400' : trialDaysLeft <= 30 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500 dark:text-slate-400'}`}>
-                {trialDaysLeft > 0 ? `${trialDaysLeft} days remaining` : 'Trial expired'}
+                {trialDaysLeft > 0 ? t("overview.daysRemaining", { days: trialDaysLeft }) : t("overview.trialExpired")}
               </p>
             </div>
             <div className={`p-2.5 rounded-xl ${trialDaysLeft <= 7 ? 'bg-rose-100 dark:bg-rose-500/20' : trialDaysLeft <= 30 ? 'bg-amber-100 dark:bg-amber-500/20' : 'bg-indigo-50 dark:bg-indigo-500/15'}`}>
@@ -304,7 +316,7 @@ const Overview = () => {
               }`}
             >
               <Zap size={12} />
-              {trialDaysLeft <= 30 ? 'Upgrade Now' : 'View Plans'}
+              {trialDaysLeft <= 30 ? t("overview.upgradeNow") : t("overview.viewPlans")}
             </Link>
           </div>
         </div>
@@ -346,11 +358,11 @@ const Overview = () => {
           {/* text */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
-              <p className="text-sm font-black text-white">Smart {authUser?.businessName || authUser?.fullName?.split(' ')[0] || 'AI'}</p>
+              <p className="text-sm font-black text-white">{t("overview.smartName", { name: authUser?.businessName || authUser?.fullName?.split(' ')[0] || 'AI' })}</p>
               <span className="bg-indigo-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">AI</span>
             </div>
             <p className="text-xs text-slate-400 font-medium">
-              Business intelligence — busiest days, top clients, success rate &amp; more
+              {t("overview.aiSub")}
             </p>
           </div>
           {/* stats pills */}
@@ -358,12 +370,12 @@ const Overview = () => {
             {summary && (
               <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-xl px-3 py-2">
                 <Target size={11} className="text-emerald-400" />
-                <span className="text-[11px] font-black text-white">{summary.bookingsCompleted} done</span>
+                <span className="text-[11px] font-black text-white">{t("overview.doneCount", { n: summary.bookingsCompleted })}</span>
               </div>
             )}
             <div className="flex items-center gap-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl px-3 py-2">
               <Sparkles size={11} className="text-indigo-400" />
-              <span className="text-[11px] font-black text-indigo-300">12 insights</span>
+              <span className="text-[11px] font-black text-indigo-300">{t("overview.insightsCount", { n: 12 })}</span>
             </div>
           </div>
           {/* arrow */}
@@ -378,7 +390,7 @@ const Overview = () => {
         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col overflow-hidden">
           <div className="px-7 py-5 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between">
             <div>
-              <h3 className="text-base font-black text-slate-900 dark:text-white">Today's Schedule</h3>
+              <h3 className="text-base font-black text-slate-900 dark:text-white">{t("overview.todaySchedule")}</h3>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
                 {today}
               </p>
@@ -386,7 +398,7 @@ const Overview = () => {
             <span className={`text-xs font-black px-3 py-1 rounded-full ${
               todayBookings.length > 0 ? 'bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
             }`}>
-              {loading ? '—' : todayBookings.length} apts
+              {loading ? '—' : t("overview.aptsCount", { n: todayBookings.length })}
             </span>
           </div>
 
@@ -402,8 +414,8 @@ const Overview = () => {
                 <div className="w-14 h-14 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center mb-3">
                   <CalendarCheck size={24} className="text-slate-300 dark:text-slate-600" />
                 </div>
-                <p className="text-sm font-bold text-slate-400">No appointments today</p>
-                <p className="text-xs text-slate-400 mt-1">Check tomorrow's bookings below</p>
+                <p className="text-sm font-bold text-slate-400">{t("overview.noAptsToday")}</p>
+                <p className="text-xs text-slate-400 mt-1">{t("overview.checkTomorrow")}</p>
               </div>
             ) : (
               todayBookings
@@ -413,7 +425,7 @@ const Overview = () => {
                   <div key={b._id} className="px-6 py-3.5 flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors border-b border-slate-50 dark:border-slate-800 last:border-0">
                     <div className="w-16 text-center shrink-0">
                       <p className="text-sm font-black text-indigo-600 dark:text-indigo-400">{b.timeSlot}</p>
-                      <p className="text-[9px] text-slate-400 font-bold uppercase">{b.service?.duration}min</p>
+                      <p className="text-[9px] text-slate-400 font-bold uppercase">{b.service?.duration}{t("common.minShort", "min")}</p>
                     </div>
                     <div className="w-px h-8 bg-slate-100 dark:bg-slate-700 shrink-0" />
                     <div className="flex-1 min-w-0">
@@ -431,7 +443,7 @@ const Overview = () => {
               to="/owner/dashboard/bookings"
               className="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1 transition-colors"
             >
-              All appointments <ArrowRight size={14} />
+              {t("overview.allAppointments")} <ArrowRight size={14} />
             </Link>
           </div>
         </div>
@@ -440,14 +452,14 @@ const Overview = () => {
         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col overflow-hidden">
           <div className="px-7 py-5 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between">
             <div>
-              <h3 className="text-base font-black text-slate-900 dark:text-white">Pending Confirmations</h3>
+              <h3 className="text-base font-black text-slate-900 dark:text-white">{t("overview.pendingConfirmations")}</h3>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
-                Action required
+                {t("overview.actionRequired")}
               </p>
             </div>
             {pendingTotal > 0 && (
               <span className="text-xs font-black px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400">
-                {pendingTotal} waiting
+                {t("overview.waitingCount", { n: pendingTotal })}
               </span>
             )}
           </div>
@@ -464,8 +476,8 @@ const Overview = () => {
                 <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-500/15 rounded-2xl flex items-center justify-center mb-3">
                   <CheckCircle2 size={24} className="text-emerald-400" />
                 </div>
-                <p className="text-sm font-bold text-slate-400">All caught up!</p>
-                <p className="text-xs text-slate-400 mt-1">No bookings awaiting confirmation</p>
+                <p className="text-sm font-bold text-slate-400">{t("overview.allCaughtUp")}</p>
+                <p className="text-xs text-slate-400 mt-1">{t("overview.noPending")}</p>
               </div>
             ) : (
               pendingBookings.map((b) => (
@@ -482,14 +494,14 @@ const Overview = () => {
                       disabled={actionLoading === b._id}
                       className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-black rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-all disabled:opacity-50 uppercase tracking-wider"
                     >
-                      {actionLoading === b._id ? '···' : 'Confirm'}
+                      {actionLoading === b._id ? '···' : t("overview.confirm")}
                     </button>
                     <button
                       onClick={() => handleQuickStatus(b._id, 'cancelled')}
                       disabled={actionLoading === b._id}
                       className="px-3 py-1.5 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 text-rose-600 dark:text-rose-400 text-[10px] font-black rounded-xl hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-all disabled:opacity-50 uppercase tracking-wider"
                     >
-                      Cancel
+                      {t("overview.cancel")}
                     </button>
                   </div>
                 </div>
@@ -502,7 +514,7 @@ const Overview = () => {
               to="/owner/dashboard/bookings"
               className="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1 transition-colors"
             >
-              Manage all bookings <ArrowRight size={14} />
+              {t("overview.manageAll")} <ArrowRight size={14} />
             </Link>
           </div>
         </div>
@@ -510,13 +522,13 @@ const Overview = () => {
 
       {/* ── Quick Navigation ── */}
       <div>
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Quick Access</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">{t("overview.quickAccess")}</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { label: 'Appointments', sub: 'Manage bookings', to: '/owner/dashboard/bookings', icon: <CalendarCheck size={18} />, color: 'text-indigo-600 dark:text-indigo-400', ring: 'hover:ring-indigo-200 dark:hover:ring-indigo-500/30', bg: 'bg-indigo-50 dark:bg-indigo-500/15' },
-            { label: 'Customers', sub: 'View history', to: '/owner/dashboard/customers', icon: <Users size={18} />, color: 'text-violet-600 dark:text-violet-400', ring: 'hover:ring-violet-200 dark:hover:ring-violet-500/30', bg: 'bg-violet-50 dark:bg-violet-500/15' },
-            { label: 'Analytics', sub: 'Performance', to: '/owner/dashboard/stats', icon: <BarChart3 size={18} />, color: 'text-emerald-600 dark:text-emerald-400', ring: 'hover:ring-emerald-200 dark:hover:ring-emerald-500/30', bg: 'bg-emerald-50 dark:bg-emerald-500/15' },
-            { label: 'Loyalty', sub: 'Rewards program', to: '/owner/dashboard/loyalty', icon: <Star size={18} />, color: 'text-amber-600 dark:text-amber-400', ring: 'hover:ring-amber-200 dark:hover:ring-amber-500/30', bg: 'bg-amber-50 dark:bg-amber-500/15' },
+            { label: t("overview.qaAppointments"), sub: t("overview.qaAppointmentsSub"), to: '/owner/dashboard/bookings', icon: <CalendarCheck size={18} />, color: 'text-indigo-600 dark:text-indigo-400', ring: 'hover:ring-indigo-200 dark:hover:ring-indigo-500/30', bg: 'bg-indigo-50 dark:bg-indigo-500/15' },
+            { label: t("overview.qaCustomers"), sub: t("overview.qaCustomersSub"), to: '/owner/dashboard/customers', icon: <Users size={18} />, color: 'text-violet-600 dark:text-violet-400', ring: 'hover:ring-violet-200 dark:hover:ring-violet-500/30', bg: 'bg-violet-50 dark:bg-violet-500/15' },
+            { label: t("overview.qaAnalytics"), sub: t("overview.qaAnalyticsSub"), to: '/owner/dashboard/stats', icon: <BarChart3 size={18} />, color: 'text-emerald-600 dark:text-emerald-400', ring: 'hover:ring-emerald-200 dark:hover:ring-emerald-500/30', bg: 'bg-emerald-50 dark:bg-emerald-500/15' },
+            { label: t("overview.qaLoyalty"), sub: t("overview.qaLoyaltySub"), to: '/owner/dashboard/loyalty', icon: <Star size={18} />, color: 'text-amber-600 dark:text-amber-400', ring: 'hover:ring-amber-200 dark:hover:ring-amber-500/30', bg: 'bg-amber-50 dark:bg-amber-500/15' },
           ].map((item, i) => (
             <Link
               key={i}

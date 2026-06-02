@@ -5,20 +5,22 @@ import {
   CheckCircle2, Clock, XCircle, AlertCircle, ShieldCheck, Lock, Loader2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import API from "../../api/config";
 import AddCustomerModal from "./AddCustomerModal";
 
-/* ─── Status badge config ─── */
+/* ─── Status badge config (labels via i18n) ─── */
 const STATUS_CONFIG = {
-  invited:      { label: "Invited",      color: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400",       icon: Clock },
-  pending_kyc:  { label: "Verifying",    color: "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400",   icon: AlertCircle },
-  under_review: { label: "Under Review", color: "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-400", icon: Shield },
-  active:       { label: "Active",       color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400", icon: CheckCircle2 },
-  rejected:     { label: "Rejected",     color: "bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-400",       icon: XCircle },
+  invited:      { labelKey: "customers.stInvited",     color: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400",       icon: Clock },
+  pending_kyc:  { labelKey: "customers.stVerifying",   color: "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400",   icon: AlertCircle },
+  under_review: { labelKey: "customers.stUnderReview", color: "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-400", icon: Shield },
+  active:       { labelKey: "customers.stActive",      color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400", icon: CheckCircle2 },
+  rejected:     { labelKey: "customers.stRejected",    color: "bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-400",       icon: XCircle },
 };
 
 const Customers = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [tab, setTab]                     = useState("portal");   // portal | booking
   const [q, setQ]                         = useState("");
   const [portalClients, setPortalClients] = useState([]);
@@ -75,10 +77,10 @@ const Customers = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
         <div className="md:col-span-2 bg-indigo-600 rounded-[2.5rem] p-7 text-white flex items-center justify-between shadow-xl shadow-indigo-100 dark:shadow-indigo-900/40 relative overflow-hidden">
           <div className="relative z-10">
-            <p className="text-indigo-200 text-xs font-black uppercase tracking-widest mb-1">Portal Clients</p>
+            <p className="text-indigo-200 text-xs font-black uppercase tracking-widest mb-1">{t("customers.portalClients")}</p>
             <h3 className="text-5xl font-black italic">{portalClients.length}</h3>
             <div className="flex items-center gap-2 mt-3 text-xs font-bold bg-white/10 w-fit px-3 py-1.5 rounded-full">
-              <CheckCircle2 size={12} /> {activeCount} active
+              <CheckCircle2 size={12} /> {t("customers.activeCount", { n: activeCount })}
             </div>
           </div>
           <ShieldCheck size={80} className="text-white/10 absolute -right-4 -bottom-4" />
@@ -87,18 +89,18 @@ const Customers = () => {
         <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2.5rem] p-6 shadow-sm flex items-center gap-5">
           <div className="p-4 bg-amber-50 dark:bg-amber-500/15 text-amber-500 dark:text-amber-400 rounded-2xl"><Award size={28} /></div>
           <div>
-            <p className="text-slate-400 text-xs font-black uppercase tracking-widest">Pending Review</p>
+            <p className="text-slate-400 text-xs font-black uppercase tracking-widest">{t("customers.pendingReview")}</p>
             <h3 className="text-2xl font-black text-slate-900 dark:text-white">{pendingCount}</h3>
-            <p className="text-slate-500 dark:text-slate-400 text-[11px] font-bold mt-0.5">Awaiting admin</p>
+            <p className="text-slate-500 dark:text-slate-400 text-[11px] font-bold mt-0.5">{t("customers.awaitingAdmin")}</p>
           </div>
         </div>
 
         <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2.5rem] p-6 shadow-sm flex items-center gap-5">
           <div className="p-4 bg-emerald-50 dark:bg-emerald-500/15 text-emerald-500 dark:text-emerald-400 rounded-2xl"><Users size={28} /></div>
           <div>
-            <p className="text-slate-400 text-xs font-black uppercase tracking-widest">Booking History</p>
+            <p className="text-slate-400 text-xs font-black uppercase tracking-widest">{t("customers.bookingHistory")}</p>
             <h3 className="text-2xl font-black text-slate-900 dark:text-white">{totalBK}</h3>
-            <p className="text-slate-500 dark:text-slate-400 text-[11px] font-bold mt-0.5">{vipCount} VIP</p>
+            <p className="text-slate-500 dark:text-slate-400 text-[11px] font-bold mt-0.5">{t("customers.vipCount", { n: vipCount })}</p>
           </div>
         </div>
       </div>
@@ -107,7 +109,7 @@ const Customers = () => {
       <div className="flex flex-col md:flex-row items-center gap-4">
         {/* Tabs */}
         <div className="flex bg-slate-100 dark:bg-slate-800 rounded-2xl p-1 gap-1">
-          {[["portal", ShieldCheck, "Portal Clients"], ["booking", History, "Booking History"]].map(([id, Icon, label]) => (
+          {[["portal", ShieldCheck, t("customers.tabPortal")], ["booking", History, t("customers.tabBooking")]].map(([id, Icon, label]) => (
             <button
               key={id}
               onClick={() => setTab(id)}
@@ -125,7 +127,7 @@ const Customers = () => {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={17} />
           <input
             type="text"
-            placeholder="Search by name, phone or email…"
+            placeholder={t("customers.searchPlaceholder")}
             value={q}
             onChange={e => setQ(e.target.value)}
             className="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 dark:focus:ring-indigo-500/20 transition-all outline-none font-medium"
@@ -138,7 +140,7 @@ const Customers = () => {
             onClick={() => setShowModal(true)}
             className="flex items-center gap-2 px-7 py-3.5 bg-slate-900 dark:bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-black dark:hover:bg-indigo-500 transition-all shadow-lg shadow-slate-200 dark:shadow-indigo-900/40 whitespace-nowrap"
           >
-            <UserPlus size={17} /> Add Client
+            <UserPlus size={17} /> {t("customers.addClient")}
           </button>
         )}
       </div>
@@ -149,20 +151,20 @@ const Customers = () => {
           {loadingPortal ? (
             <div className="flex items-center justify-center py-20 gap-3">
               <Loader2 size={24} className="animate-spin text-indigo-500" />
-              <span className="text-slate-400 font-medium text-sm">Loading clients…</span>
+              <span className="text-slate-400 font-medium text-sm">{t("customers.loadingClients")}</span>
             </div>
           ) : filteredPortal.length === 0 ? (
             <div className="text-center py-20">
               <ShieldCheck size={48} className="mx-auto text-slate-200 dark:text-slate-700 mb-4" />
-              <p className="text-slate-400 font-bold">No portal clients yet</p>
-              <p className="text-slate-300 dark:text-slate-600 text-sm mt-1">Click "Add Client" to invite your first client.</p>
+              <p className="text-slate-400 font-bold">{t("customers.noPortalClients")}</p>
+              <p className="text-slate-300 dark:text-slate-600 text-sm mt-1">{t("customers.noPortalClientsSub")}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                   <tr>
-                    {["Client", "Status", "Access", "Joined", "Actions"].map(h => (
+                    {[t("customers.thClient"), t("customers.thStatus"), t("customers.thAccess"), t("customers.thJoined"), t("customers.thActions")].map(h => (
                       <th key={h} className="px-7 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{h}</th>
                     ))}
                   </tr>
@@ -191,7 +193,7 @@ const Customers = () => {
 
                         <td className="px-7 py-5">
                           <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter ${cfg.color}`}>
-                            <SIcon size={11} /> {cfg.label}
+                            <SIcon size={11} /> {t(cfg.labelKey)}
                           </span>
                         </td>
 
@@ -204,7 +206,7 @@ const Customers = () => {
                                 </span>
                               ))
                             ) : (
-                              <span className="text-slate-300 dark:text-slate-600 text-xs font-medium">Profile only</span>
+                              <span className="text-slate-300 dark:text-slate-600 text-xs font-medium">{t("customers.profileOnly")}</span>
                             )}
                             {c.allowedPages?.length > 2 && (
                               <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-black rounded-md">+{c.allowedPages.length - 2}</span>
@@ -223,7 +225,7 @@ const Customers = () => {
                                 onClick={() => navigate(`/owner/dashboard/customers/${c._id}/access`)}
                                 className="flex items-center gap-1.5 px-3 py-2 bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/25 rounded-xl text-xs font-black transition-all"
                               >
-                                <Lock size={12} /> Access
+                                <Lock size={12} /> {t("customers.access")}
                               </button>
                             )}
                             <button
@@ -250,19 +252,19 @@ const Customers = () => {
           {loadingBK ? (
             <div className="flex items-center justify-center py-20 gap-3">
               <Loader2 size={24} className="animate-spin text-indigo-500" />
-              <span className="text-slate-400 font-medium text-sm">Loading…</span>
+              <span className="text-slate-400 font-medium text-sm">{t("customers.loading")}</span>
             </div>
           ) : filteredBK.length === 0 ? (
             <div className="text-center py-20">
               <Users size={48} className="mx-auto text-slate-200 dark:text-slate-700 mb-4" />
-              <p className="text-slate-400 font-bold">No booking records found</p>
+              <p className="text-slate-400 font-bold">{t("customers.noBookingRecords")}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                   <tr>
-                    {["Customer", "Status", "Visits", "Total Spend", "Actions"].map(h => (
+                    {[t("customers.thCustomer"), t("customers.thStatus"), t("customers.thVisits"), t("customers.thTotalSpend"), t("customers.thActions")].map(h => (
                       <th key={h} className="px-7 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{h}</th>
                     ))}
                   </tr>
@@ -289,15 +291,15 @@ const Customers = () => {
                         <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
                           cus.status === "VIP" ? "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400" :
                           cus.status === "New" ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-400" : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                        }`}>{cus.status}</span>
+                        }`}>{cus.status === "VIP" ? t("customers.stVip") : cus.status === "New" ? t("customers.stNew") : cus.status}</span>
                       </td>
                       <td className="px-7 py-5 text-center">
                         <span className="font-black text-slate-900 dark:text-white">{cus.visits}</span>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">Last: {cus.lastVisit}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase">{t("customers.lastVisit", { date: cus.lastVisit })}</p>
                       </td>
                       <td className="px-7 py-5">
                         <span className="font-black text-indigo-600 dark:text-indigo-400">{Number(cus.spend || 0).toFixed(3)} TND</span>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">Lifetime</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase">{t("customers.lifetime")}</p>
                       </td>
                       <td className="px-7 py-5">
                         <div className="flex items-center gap-2">
@@ -318,11 +320,11 @@ const Customers = () => {
       {/* Footer CTA */}
       <div className="bg-slate-900 dark:bg-slate-950 dark:border dark:border-slate-800 rounded-[2rem] sm:rounded-[3rem] p-5 sm:p-8 md:p-10 text-white flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
         <div className="relative z-10">
-          <h3 className="text-2xl font-black italic">Need more customer insights?</h3>
-          <p className="text-slate-400 font-medium mt-1">Export your data to CSV or connect with automated marketing tools.</p>
+          <h3 className="text-2xl font-black italic">{t("customers.footerTitle")}</h3>
+          <p className="text-slate-400 font-medium mt-1">{t("customers.footerSub")}</p>
         </div>
         <button className="relative z-10 px-8 py-4 bg-white text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform flex items-center gap-2 text-sm uppercase tracking-widest">
-          Export Database <ChevronRight size={18} />
+          {t("customers.exportDatabase")} <ChevronRight size={18} />
         </button>
         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -mr-32 -mt-32" />
       </div>

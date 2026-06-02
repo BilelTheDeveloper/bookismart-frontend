@@ -7,53 +7,35 @@ import {
   ExternalLink, Check, Menu, ArrowRight,
   CalendarCheck, ChevronRight,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeToggle from "./ThemeToggle";
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   DEMO NOTIFICATIONS
+   DEMO NOTIFICATIONS — text resolved via i18n (navbar.n*)
    ───────────────────────────────────────────────────────────────────────────── */
 const DEMO_NOTIFICATIONS = [
-  { id: 1, icon: "📅", title: "New booking received",     body: "A client just booked an appointment for tomorrow at 3:00 PM",           time: "2m ago",  read: false },
-  { id: 2, icon: "⭐", title: "New 5-star review",         body: "A customer left you a glowing review — check it in your dashboard",     time: "1h ago",  read: false },
-  { id: 3, icon: "🔔", title: "Free trial ends in 7 days", body: "Upgrade your plan now to keep all features without interruption",       time: "3h ago",  read: true  },
+  { id: 1, icon: "📅", titleKey: "navbar.n1Title", bodyKey: "navbar.n1Body", time: "2m", read: false },
+  { id: 2, icon: "⭐", titleKey: "navbar.n2Title", bodyKey: "navbar.n2Body", time: "1h", read: false },
+  { id: 3, icon: "🔔", titleKey: "navbar.n3Title", bodyKey: "navbar.n3Body", time: "3h", read: true  },
 ];
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   NAV LINKS — hardcoded real text, no translation keys
+   NAV LINKS — labels/descriptions via i18n
    ───────────────────────────────────────────────────────────────────────────── */
 const NAV_LINKS = [
-  {
-    name: "Services",
-    href: "/services",
-    icon: LayoutGrid,
-    desc: "Barbers, doctors, coaches, gyms & every service category",
-  },
-  {
-    name: "How It Works",
-    href: "/how-it-works",
-    icon: Zap,
-    desc: "Set up your booking page in under 10 minutes — no code",
-  },
-  {
-    name: "Professionals",
-    href: "/professionals",
-    icon: Star,
-    desc: "Browse KYC-verified businesses across all Tunisian cities",
-  },
-  {
-    name: "Find Work",
-    href: "/find-work",
-    icon: Briefcase,
-    desc: "Apply to job openings at barbershops, clinics, studios & more",
-  },
+  { key: "services",      href: "/services",      icon: LayoutGrid, descKey: "navbar.descServices" },
+  { key: "howItWorks",    href: "/how-it-works",  icon: Zap,        descKey: "navbar.descHowItWorks" },
+  { key: "professionals", href: "/professionals", icon: Star,       descKey: "navbar.descProfessionals" },
+  { key: "findWork",      href: "/find-work",     icon: Briefcase,  descKey: "navbar.descFindWork" },
 ];
 
 /* ─────────────────────────────────────────────────────────────────────────────
    NOTIFICATION DROPDOWN
    ───────────────────────────────────────────────────────────────────────────── */
 function NotificationDropdown({ onClose }) {
+  const { t } = useTranslation();
   const [notifs, setNotifs] = useState(DEMO_NOTIFICATIONS);
   const unread = notifs.filter(n => !n.read).length;
   const markAll = () => setNotifs(p => p.map(n => ({ ...n, read: true })));
@@ -67,7 +49,7 @@ function NotificationDropdown({ onClose }) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-50">
           <div className="flex items-center gap-2.5">
             <Bell size={16} className="text-slate-600" />
-            <span className="font-black text-slate-900 text-sm">Notifications</span>
+            <span className="font-black text-slate-900 text-sm">{t("nav.notifications")}</span>
             {unread > 0 && (
               <span className="bg-rose-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full min-w-[20px] text-center leading-tight">
                 {unread}
@@ -78,7 +60,7 @@ function NotificationDropdown({ onClose }) {
             {unread > 0 && (
               <button onClick={markAll}
                 className="flex items-center gap-1 text-[11px] font-bold text-indigo-600 hover:text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-lg transition-colors">
-                <Check size={11} /> Mark all read
+                <Check size={11} /> {t("nav.markAllRead")}
               </button>
             )}
             <button onClick={onClose}
@@ -92,7 +74,7 @@ function NotificationDropdown({ onClose }) {
         <div className="overflow-y-auto max-h-[280px]" style={{ scrollbarWidth: "none" }}>
           {notifs.length === 0 ? (
             <div className="py-10 text-center text-slate-400 text-sm font-medium">
-              You're all caught up 🎉
+              {t("navbar.caughtUp")}
             </div>
           ) : notifs.map(n => (
             <div key={n.id}
@@ -103,10 +85,10 @@ function NotificationDropdown({ onClose }) {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
-                  <p className={`text-[13px] font-bold leading-tight ${!n.read ? "text-slate-900" : "text-slate-600"}`}>{n.title}</p>
+                  <p className={`text-[13px] font-bold leading-tight ${!n.read ? "text-slate-900" : "text-slate-600"}`}>{t(n.titleKey)}</p>
                   <span className="text-[10px] text-slate-400 whitespace-nowrap font-medium flex-shrink-0">{n.time}</span>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{n.body}</p>
+                <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{t(n.bodyKey)}</p>
               </div>
               {!n.read && <div className="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0 mt-1.5" />}
             </div>
@@ -117,7 +99,7 @@ function NotificationDropdown({ onClose }) {
         <div className="px-4 py-3 border-t border-slate-50 bg-slate-50/50">
           <Link to="/owner/dashboard" onClick={onClose}
             className="flex items-center justify-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-500 py-1 transition-colors">
-            View all in dashboard <ExternalLink size={11} />
+            {t("nav.viewAllDashboard")} <ExternalLink size={11} />
           </Link>
         </div>
       </div>
@@ -129,16 +111,17 @@ function NotificationDropdown({ onClose }) {
    PROFILE DROPDOWN
    ───────────────────────────────────────────────────────────────────────────── */
 function ProfileDropdown({ user, onLogout, onClose }) {
+  const { t } = useTranslation();
   const ownerLinks = [
-    { label: "Dashboard",    icon: LayoutDashboard, path: "/owner/dashboard",          desc: "Overview, KPIs & today's schedule" },
-    { label: "Appointments", icon: CalendarCheck,   path: "/owner/dashboard/bookings", desc: "Confirm, reschedule & manage bookings" },
-    { label: "Financials",   icon: Wallet,          path: "/owner/dashboard/finance",  desc: "Revenue tracking & wallet balance" },
-    { label: "Settings",     icon: Settings,        path: "/owner/dashboard/settings", desc: "Profile, password & notifications" },
-    { label: "Subscription", icon: CreditCard,      path: "/owner/dashboard/billing",  desc: "Your plan, trial & upgrade options" },
+    { label: t("nav.dashboard"),    icon: LayoutDashboard, path: "/owner/dashboard",          desc: t("navbar.descDashboard") },
+    { label: t("nav.appointments"), icon: CalendarCheck,   path: "/owner/dashboard/bookings", desc: t("navbar.descAppointments") },
+    { label: t("nav.financials"),   icon: Wallet,          path: "/owner/dashboard/finance",  desc: t("navbar.descFinancials") },
+    { label: t("nav.settings"),     icon: Settings,        path: "/owner/dashboard/settings", desc: t("navbar.descSettings") },
+    { label: t("nav.billing"),      icon: CreditCard,      path: "/owner/dashboard/billing",  desc: t("navbar.descSubscription") },
   ];
   const adminLinks = [
-    { label: "Admin Panel", icon: Shield, path: "/admin/dashboard",       desc: "Platform management & oversight" },
-    { label: "KYC Review",  icon: User,  path: "/admin/verify-identity",  desc: "Review & approve identity documents" },
+    { label: t("nav.adminPanel"), icon: Shield, path: "/admin/dashboard",       desc: t("navbar.descAdminPanel") },
+    { label: t("nav.kycReview"),  icon: User,  path: "/admin/verify-identity",  desc: t("navbar.descKyc") },
   ];
 
   const links = user?.role === "admin" ? adminLinks : ownerLinks;
@@ -168,7 +151,7 @@ function ProfileDropdown({ user, onLogout, onClose }) {
               <div className="flex items-center gap-1.5 mt-1.5">
                 <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
                 <span className="text-emerald-300 text-[10px] font-black uppercase tracking-wider">
-                  {user?.role === "admin" ? "Administrator" : "Business Owner"}
+                  {user?.role === "admin" ? t("nav.administrator") : t("nav.businessOwner")}
                 </span>
               </div>
             </div>
@@ -181,7 +164,7 @@ function ProfileDropdown({ user, onLogout, onClose }) {
             className="flex items-center justify-between w-full px-4 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm transition-all group">
             <div className="flex items-center gap-2">
               <LayoutDashboard size={15} />
-              Go to Dashboard
+              {t("nav.goToDashboard")}
             </div>
             <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </Link>
@@ -211,7 +194,7 @@ function ProfileDropdown({ user, onLogout, onClose }) {
         <div className="p-3 border-t border-slate-50 mt-1">
           <button onClick={() => { onClose(); onLogout(); }}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-rose-500 hover:bg-rose-50 transition-all">
-            <LogOut size={15} /> Sign Out
+            <LogOut size={15} /> {t("nav.signOut")}
           </button>
         </div>
       </div>
@@ -223,6 +206,7 @@ function ProfileDropdown({ user, onLogout, onClose }) {
    MAIN NAVBAR
    ───────────────────────────────────────────────────────────────────────────── */
 const Navbar = () => {
+  const { t } = useTranslation();
   const { user, isAuthenticated, logoutUser } = useAuth();
   const location = useLocation();
 
@@ -240,6 +224,15 @@ const Navbar = () => {
 
   const unreadCount = DEMO_NOTIFICATIONS.filter(n => !n.read).length;
   const initials    = user?.fullName?.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() || "U";
+
+  const whyItems = [
+    { icon: "🚀", label: t("navbar.whyTrial"),     sub: t("navbar.whyTrialSub") },
+    { icon: "📅", label: t("navbar.whyBooking"),   sub: t("navbar.whyBookingSub") },
+    { icon: "🤖", label: t("navbar.whyAi"),        sub: t("navbar.whyAiSub") },
+    { icon: "📊", label: t("navbar.whyAnalytics"), sub: t("navbar.whyAnalyticsSub") },
+    { icon: "🔒", label: t("navbar.whySecurity"),  sub: t("navbar.whySecuritySub") },
+    { icon: "👥", label: t("navbar.whyStaff"),     sub: t("navbar.whyStaffSub") },
+  ];
 
   /* Scroll detection */
   useEffect(() => {
@@ -290,9 +283,9 @@ const Navbar = () => {
         >
           <Sparkles size={13} className="flex-shrink-0 opacity-80" />
           <span className="leading-relaxed">
-            🇹🇳 Bookiify est désormais disponible en Tunisie — Gérez vos rendez-vous, votre équipe et vos finances dans une seule plateforme.{" "}
+            {t("navbar.announcement")}{" "}
             <Link to="/signup" className="underline font-black hover:no-underline whitespace-nowrap">
-              Essai gratuit 90 jours →
+              {t("navbar.announcementCta")}
             </Link>
           </span>
           <button
@@ -335,7 +328,7 @@ const Navbar = () => {
                   Book<span className="text-indigo-400">iify</span>
                 </span>
                 <p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400 mt-0.5 hidden sm:block">
-                  Professional Booking Suite
+                  {t("navbar.tagline")}
                 </p>
               </div>
             </Link>
@@ -345,6 +338,7 @@ const Navbar = () => {
               {NAV_LINKS.map(link => {
                 const Icon = link.icon;
                 const active = isActive(link.href);
+                const name = t(`nav.${link.key}`);
                 return (
                   <Link
                     key={link.href}
@@ -360,14 +354,14 @@ const Navbar = () => {
                     <Icon size={15} className={`flex-shrink-0 transition-all duration-200 ${
                       active ? "text-indigo-400" : "text-slate-400 group-hover:text-indigo-300"
                     }`} />
-                    <span className="whitespace-nowrap">{link.name}</span>
+                    <span className="whitespace-nowrap">{name}</span>
                     {active && (
                       <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-indigo-500 rounded-full" />
                     )}
                     {/* Hover tooltip */}
                     {activeHover === link.href && !active && (
                       <span className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 bg-slate-900 text-white text-[11px] font-semibold rounded-lg whitespace-nowrap pointer-events-none opacity-90 shadow-lg z-50">
-                        {link.desc}
+                        {t(link.descKey)}
                         <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 rotate-45" />
                       </span>
                     )}
@@ -385,6 +379,11 @@ const Navbar = () => {
                   {/* Theme toggle */}
                   <ThemeToggle className="hidden sm:inline-flex" />
 
+                  {/* Language switcher */}
+                  <div className="hidden md:block">
+                    <LanguageSwitcher />
+                  </div>
+
                   {/* Notification bell */}
                   <div className="relative" ref={notifRef}>
                     <button
@@ -392,7 +391,7 @@ const Navbar = () => {
                       className={`relative p-2.5 rounded-xl transition-all ${
                         notifOpen ? "bg-indigo-500/15 text-indigo-300" : "text-slate-300 hover:bg-white/10 hover:text-white"
                       }`}
-                      aria-label="Notifications"
+                      aria-label={t("nav.notifications")}
                     >
                       <Bell size={19} />
                       {unreadCount > 0 && (
@@ -441,7 +440,7 @@ const Navbar = () => {
                   {/* AI badge */}
                   <span className="hidden xl:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/30 bg-indigo-500/15 text-xs font-bold text-indigo-300 flex-shrink-0 whitespace-nowrap">
                     <Sparkles size={12} className="text-indigo-400" />
-                    AI-Powered Platform
+                    {t("navbar.aiPlatform")}
                   </span>
 
                   {/* Theme toggle */}
@@ -460,7 +459,7 @@ const Navbar = () => {
                     className="hidden sm:flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-200 hover:text-white hover:bg-white/10 rounded-xl transition-all"
                   >
                     <LogIn size={15} />
-                    Login
+                    {t("nav.login")}
                   </Link>
 
                   {/* Signup CTA */}
@@ -471,8 +470,8 @@ const Navbar = () => {
                   >
                     <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full hover:translate-x-full transition-transform duration-700 pointer-events-none" />
                     <UserPlus size={15} className="flex-shrink-0" />
-                    <span className="hidden sm:inline whitespace-nowrap">Start Free — 90 Days</span>
-                    <span className="sm:hidden">Join Free</span>
+                    <span className="hidden sm:inline whitespace-nowrap">{t("navbar.startFree")}</span>
+                    <span className="sm:hidden">{t("navbar.joinFree")}</span>
                   </Link>
                 </>
               )}
@@ -527,7 +526,7 @@ const Navbar = () => {
         <div className="flex-1 overflow-y-auto px-4 py-5 space-y-1" style={{ scrollbarWidth: "none" }}>
 
           {/* Nav links */}
-          <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400 px-3 mb-3">Explore</p>
+          <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400 px-3 mb-3">{t("navbar.explore")}</p>
           {NAV_LINKS.map(link => {
             const Icon = link.icon;
             const active = isActive(link.href);
@@ -546,8 +545,8 @@ const Navbar = () => {
                   <Icon size={18} />
                 </div>
                 <div>
-                  <p className="font-bold text-sm">{link.name}</p>
-                  <p className="text-[11px] text-slate-400 font-medium">{link.desc}</p>
+                  <p className="font-bold text-sm">{t(`nav.${link.key}`)}</p>
+                  <p className="text-[11px] text-slate-400 font-medium">{t(link.descKey)}</p>
                 </div>
                 {active && <ChevronRight size={14} className="ml-auto text-indigo-400" />}
               </Link>
@@ -574,7 +573,7 @@ const Navbar = () => {
                     <div className="flex items-center gap-1 mt-1">
                       <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
                       <span className="text-emerald-300 text-[10px] font-black uppercase">
-                        {user.role === "admin" ? "Administrator" : "Business Owner"}
+                        {user.role === "admin" ? t("nav.administrator") : t("nav.businessOwner")}
                       </span>
                     </div>
                   </div>
@@ -586,7 +585,7 @@ const Navbar = () => {
                 className="flex items-center justify-between w-full px-5 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm transition-all group"
               >
                 <div className="flex items-center gap-2">
-                  <LayoutDashboard size={17} /> Go to Dashboard
+                  <LayoutDashboard size={17} /> {t("nav.goToDashboard")}
                 </div>
                 <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
               </Link>
@@ -598,7 +597,7 @@ const Navbar = () => {
                 onClick={() => { setMobileOpen(false); logoutUser(); }}
                 className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl bg-rose-50 text-rose-500 font-bold text-sm hover:bg-rose-100 transition-colors"
               >
-                <LogOut size={16} /> Sign Out
+                <LogOut size={16} /> {t("nav.signOut")}
               </button>
             </div>
           ) : (
@@ -612,7 +611,7 @@ const Navbar = () => {
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-bold text-sm transition-colors"
               >
-                <LogIn size={18} /> Login to your account
+                <LogIn size={18} /> {t("navbar.loginAccount")}
               </Link>
               <Link
                 to="/signup"
@@ -620,20 +619,13 @@ const Navbar = () => {
                 className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl text-white font-black text-sm shadow-lg shadow-indigo-200 transition-all hover:scale-[1.01] active:scale-95"
                 style={{ background: "linear-gradient(135deg,#4f46e5,#7c3aed)" }}
               >
-                <UserPlus size={18} /> Create your free account
+                <UserPlus size={18} /> {t("navbar.createAccount")}
               </Link>
 
               {/* Why Bookiify */}
               <div className="pt-2">
-                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400 px-1 mb-3">Why Bookiify?</p>
-                {[
-                  { icon: "🚀", label: "90-day free trial",          sub: "No credit card required" },
-                  { icon: "📅", label: "Online booking in minutes",   sub: "Share your link & start accepting bookings" },
-                  { icon: "🤖", label: "AI-powered smart assistant",  sub: "24/7 business advisor built right in" },
-                  { icon: "📊", label: "Real-time analytics",         sub: "Revenue, bookings & performance tracking" },
-                  { icon: "🔒", label: "Enterprise-grade security",   sub: "Redis sessions + device fingerprinting" },
-                  { icon: "👥", label: "Staff & team management",     sub: "Role-based access for your entire team" },
-                ].map((f, i) => (
+                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400 px-1 mb-3">{t("navbar.whyBookiify")}</p>
+                {whyItems.map((f, i) => (
                   <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-colors">
                     <span className="text-xl flex-shrink-0">{f.icon}</span>
                     <div>
@@ -650,7 +642,7 @@ const Navbar = () => {
         {/* Drawer footer */}
         <div className="px-5 py-4 border-t border-white/10 bg-white/5">
           <p className="text-[10px] text-slate-400 font-medium text-center">
-            © {new Date().getFullYear()} Bookiify — Professional Booking Suite for Tunisia
+            © {new Date().getFullYear()} Bookiify — {t("navbar.footerTagline")}
           </p>
         </div>
       </div>

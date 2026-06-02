@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import {
   Megaphone, Send, Users, Mail, Check, Loader2, Sparkles,
   UserMinus, UserCheck, Clock, MessageCircle, CheckCircle2, XCircle,
@@ -7,12 +8,13 @@ import {
 import API from "../../api/config";
 
 const SEGMENTS = [
-  { id: "all",      label: "All customers",     icon: Users,      hint: "Everyone who has booked with you" },
-  { id: "inactive", label: "Win back (45+ days)", icon: UserMinus, hint: "Haven't booked in 45+ days" },
-  { id: "recent",   label: "Recent (30 days)",  icon: UserCheck,  hint: "Booked in the last 30 days" },
+  { id: "all",      labelKey: "marketing.segAll",      icon: Users,      hintKey: "marketing.segAllHint" },
+  { id: "inactive", labelKey: "marketing.segInactive", icon: UserMinus,  hintKey: "marketing.segInactiveHint" },
+  { id: "recent",   labelKey: "marketing.segRecent",   icon: UserCheck,  hintKey: "marketing.segRecentHint" },
 ];
 
 const Marketing = () => {
+  const { t } = useTranslation();
   const [segments, setSegments] = useState({ all: 0, inactive: 0, recent: 0 });
   const [channels, setChannels] = useState({ whatsapp: false, email: true, sms: false });
   const [campaigns, setCampaigns] = useState([]);
@@ -36,23 +38,23 @@ const Marketing = () => {
       setChannels(a.data.channels || {});
       setUseWa(!!a.data.channels?.whatsapp);
       setCampaigns(c.data.campaigns || []);
-    } catch { toast.error("Could not load marketing data."); }
+    } catch { toast.error(t("marketing.loadError")); }
     finally { setLoading(false); }
-  }, []);
+  }, [t]);
   useEffect(() => { load(); }, [load]);
 
   const send = async () => {
-    if (!message.trim()) { toast.error("Write a message first."); return; }
-    if (!useWa && !useEmail) { toast.error("Pick at least one channel."); return; }
+    if (!message.trim()) { toast.error(t("marketing.writeMessage")); return; }
+    if (!useWa && !useEmail) { toast.error(t("marketing.pickChannel")); return; }
     setSending(true);
     try {
       const { data } = await API.post("/merchant/marketing/broadcast", {
         segment, subject, message, channels: { whatsapp: useWa, email: useEmail },
       });
-      toast.success(`Sent to ${data.sent} customers${data.capped ? " (capped at 200)" : ""}`);
+      toast.success(t("marketing.sent", { n: data.sent }) + (data.capped ? t("marketing.capped") : ""));
       setMessage(""); setSubject("");
       load();
-    } catch (e) { toast.error(e.response?.data?.message || "Broadcast failed"); }
+    } catch (e) { toast.error(e.response?.data?.message || t("marketing.broadcastFail")); }
     finally { setSending(false); }
   };
 
@@ -61,21 +63,21 @@ const Marketing = () => {
   return (
     <div className="space-y-7">
       <div>
-        <h1 className="flex items-center gap-2.5 text-2xl font-black text-slate-900 dark:text-white"><Megaphone className="text-indigo-600 dark:text-indigo-400" /> Marketing & Broadcasts</h1>
-        <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">Reach your customers with promos and win-back messages via WhatsApp & email.</p>
+        <h1 className="flex items-center gap-2.5 text-2xl font-black text-slate-900 dark:text-white"><Megaphone className="text-indigo-600 dark:text-indigo-400" /> {t("marketing.title")}</h1>
+        <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">{t("marketing.subtitle")}</p>
       </div>
 
       {/* Channel status */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <ChannelCard label="WhatsApp" icon={MessageCircle} on={channels.whatsapp} onHint="Connected — messages will send via WhatsApp" offHint="Not connected. Add WhatsApp keys to enable." accent="emerald" />
-        <ChannelCard label="Email" icon={Mail} on={channels.email} onHint="Active — emails are ready to send" offHint="Email unavailable" accent="indigo" />
+        <ChannelCard label={t("marketing.chWhatsApp")} icon={MessageCircle} on={channels.whatsapp} onHint={t("marketing.waOn")} offHint={t("marketing.waOff")} accent="emerald" />
+        <ChannelCard label={t("marketing.chEmail")} icon={Mail} on={channels.email} onHint={t("marketing.emailOn")} offHint={t("marketing.emailOff")} accent="indigo" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Composer */}
         <div className="lg:col-span-3 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6 space-y-5">
           <div>
-            <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Audience</label>
+            <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">{t("marketing.audience")}</label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mt-2">
               {SEGMENTS.map((s) => {
                 const Icon = s.icon; const active = segment === s.id;
@@ -85,8 +87,8 @@ const Marketing = () => {
                       <Icon size={17} className={active ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400"} />
                       <span className={`text-lg font-black ${active ? "text-indigo-600 dark:text-indigo-400" : "text-slate-900 dark:text-white"}`}>{loading ? "—" : (segments[s.id] ?? 0)}</span>
                     </div>
-                    <p className={`text-xs font-black mt-2 ${active ? "text-indigo-700 dark:text-indigo-300" : "text-slate-700 dark:text-slate-200"}`}>{s.label}</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">{s.hint}</p>
+                    <p className={`text-xs font-black mt-2 ${active ? "text-indigo-700 dark:text-indigo-300" : "text-slate-700 dark:text-slate-200"}`}>{t(s.labelKey)}</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">{t(s.hintKey)}</p>
                   </button>
                 );
               })}
@@ -94,40 +96,40 @@ const Marketing = () => {
           </div>
 
           <div>
-            <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Email subject (optional)</label>
-            <input value={subject} onChange={(e) => setSubject(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-sm font-bold text-slate-900 dark:text-white outline-none focus:border-indigo-500" placeholder="e.g. A little gift for you 🎁" />
+            <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">{t("marketing.emailSubject")}</label>
+            <input value={subject} onChange={(e) => setSubject(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-sm font-bold text-slate-900 dark:text-white outline-none focus:border-indigo-500" placeholder={t("marketing.subjectPlaceholder")} />
           </div>
 
           <div>
             <div className="flex items-center justify-between">
-              <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Message</label>
-              <button onClick={() => setMessage((m) => m + "{name}")} className="text-[10px] font-black text-indigo-500 hover:text-indigo-400">+ insert {"{name}"}</button>
+              <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">{t("marketing.message")}</label>
+              <button onClick={() => setMessage((m) => m + "{name}")} className="text-[10px] font-black text-indigo-500 hover:text-indigo-400">{t("marketing.insertName")}</button>
             </div>
-            <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={5} className="mt-2 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-sm font-medium text-slate-900 dark:text-white outline-none focus:border-indigo-500 resize-none" placeholder={"Hi {name}! We miss you 💜 Enjoy 20% off your next visit this week. Book now!"} />
-            <p className="text-[11px] text-slate-400 mt-1.5">{"{name}"} becomes each customer's name. {message.length}/1000</p>
+            <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={5} className="mt-2 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-sm font-medium text-slate-900 dark:text-white outline-none focus:border-indigo-500 resize-none" placeholder={t("marketing.messagePlaceholder")} />
+            <p className="text-[11px] text-slate-400 mt-1.5">{t("marketing.nameHint")} {message.length}/1000</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <Toggle label="WhatsApp" icon={MessageCircle} on={useWa} disabled={!channels.whatsapp} onClick={() => setUseWa((v) => !v)} />
-            <Toggle label="Email" icon={Mail} on={useEmail} onClick={() => setUseEmail((v) => !v)} />
+            <Toggle label={t("marketing.chWhatsApp")} icon={MessageCircle} on={useWa} disabled={!channels.whatsapp} onClick={() => setUseWa((v) => !v)} />
+            <Toggle label={t("marketing.chEmail")} icon={Mail} on={useEmail} onClick={() => setUseEmail((v) => !v)} />
           </div>
 
           <button onClick={send} disabled={sending} className="w-full flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 py-4 font-black text-white hover:bg-indigo-500 transition-all disabled:opacity-60">
             {sending ? <Loader2 size={17} className="animate-spin" /> : <Send size={17} />}
-            Send to {segCount} customer{segCount === 1 ? "" : "s"}
+            {t("marketing.sendTo", { n: segCount })}
           </button>
           {!channels.whatsapp && useWa === false && (
-            <p className="text-[11px] text-amber-600 dark:text-amber-400 flex items-center gap-1.5"><Sparkles size={12} /> Tip: connect WhatsApp (env keys) to dramatically boost open rates in Tunisia.</p>
+            <p className="text-[11px] text-amber-600 dark:text-amber-400 flex items-center gap-1.5"><Sparkles size={12} /> {t("marketing.waTip")}</p>
           )}
         </div>
 
         {/* History */}
         <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
-          <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-4"><Clock size={14} /> Recent campaigns</h3>
+          <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-4"><Clock size={14} /> {t("marketing.recentCampaigns")}</h3>
           {loading ? (
             <div className="flex justify-center py-10"><Loader2 className="animate-spin text-indigo-500" size={22} /></div>
           ) : campaigns.length === 0 ? (
-            <p className="text-sm text-slate-400 py-8 text-center">No campaigns yet.</p>
+            <p className="text-sm text-slate-400 py-8 text-center">{t("marketing.noCampaigns")}</p>
           ) : (
             <div className="space-y-3">
               {campaigns.map((c) => (
