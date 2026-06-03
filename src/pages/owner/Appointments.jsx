@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import API from "../../api/config";
 import CompletionFlowModal from "../../components/CompletionFlowModal";
 import {
@@ -34,42 +35,36 @@ import {
 
 const STATUS_CONFIG = {
   pending: {
-    label: "Pending",
+    labelKey: "appointments.stPending",
     dot: "bg-amber-400",
     badge: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
     icon: <Clock size={11} />,
   },
   confirmed: {
-    label: "Confirmed",
+    labelKey: "appointments.stConfirmed",
     dot: "bg-emerald-400",
     badge: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
     icon: <CheckCircle2 size={11} />,
   },
   completed: {
-    label: "Completed",
+    labelKey: "appointments.stCompleted",
     dot: "bg-indigo-400",
     badge: "bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200",
     icon: <Check size={11} />,
   },
   cancelled: {
-    label: "Cancelled",
+    labelKey: "appointments.stCancelled",
     dot: "bg-rose-400",
     badge: "bg-rose-50 text-rose-700 ring-1 ring-rose-200",
     icon: <X size={11} />,
   },
   "no-show": {
-    label: "No Show",
+    labelKey: "appointments.stNoShow",
     dot: "bg-slate-400",
     badge: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 ring-1 ring-slate-200",
     icon: <Ban size={11} />,
   },
 };
-
-const MONTHS = [
-  "January","February","March","April","May","June",
-  "July","August","September","October","November","December",
-];
-const DAYS_SHORT = ["Su","Mo","Tu","We","Th","Fr","Sa"];
 
 const toDateString = (date) => {
   const y = date.getFullYear();
@@ -101,6 +96,9 @@ const formatTime = (time24) => {
    MINI CALENDAR (for reschedule modal)
    ───────────────────────────────────────────────────────────────────────────── */
 const MiniCalendar = ({ selectedDate, onSelect }) => {
+  const { t } = useTranslation();
+  const MONTHS = t("appointments.months", { returnObjects: true });
+  const DAYS_SHORT = t("appointments.daysShort", { returnObjects: true });
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const [viewYear, setViewYear] = useState(today.getFullYear());
@@ -170,6 +168,7 @@ const MiniCalendar = ({ selectedDate, onSelect }) => {
    RESCHEDULE MODAL
    ───────────────────────────────────────────────────────────────────────────── */
 const RescheduleModal = ({ booking, onClose, onSuccess }) => {
+  const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState(booking.dateString || toDateString(new Date()));
   const [selectedTime, setSelectedTime] = useState(null);
   const [slots, setSlots] = useState([]);
@@ -223,7 +222,7 @@ const RescheduleModal = ({ booking, onClose, onSuccess }) => {
         onSuccess(res.data.data);
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Reschedule failed. Please try again.");
+      setError(err.response?.data?.message || t("appointments.rescheduleFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -239,7 +238,7 @@ const RescheduleModal = ({ booking, onClose, onSuccess }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800">
           <div>
-            <h3 className="text-lg font-black text-slate-900 dark:text-white">Reschedule Appointment</h3>
+            <h3 className="text-lg font-black text-slate-900 dark:text-white">{t("appointments.rescheduleTitle")}</h3>
             <p className="text-sm text-slate-500 mt-0.5">
               {booking.customerName} · {booking.service?.title}
             </p>
@@ -254,35 +253,35 @@ const RescheduleModal = ({ booking, onClose, onSuccess }) => {
           <div className="flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
             <Clock size={14} className="text-amber-600 flex-shrink-0" />
             <span className="text-sm text-amber-700 font-medium">
-              Currently: {formatDisplayDate(booking.dateString)} at {formatTime(booking.timeSlot)}
+              {t("appointments.currently", { date: formatDisplayDate(booking.dateString), time: formatTime(booking.timeSlot) })}
             </span>
           </div>
 
           {/* Calendar */}
           <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Pick New Date</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">{t("appointments.pickNewDate")}</p>
             <MiniCalendar selectedDate={selectedDate} onSelect={setSelectedDate} />
           </div>
 
           {/* Time Slots */}
           <div>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
-              Available Times — {formatDisplayDate(selectedDate)}
+              {t("appointments.availableTimes", { date: formatDisplayDate(selectedDate) })}
             </p>
             {slotsLoading ? (
               <div className="flex items-center justify-center py-6">
                 <Loader2 className="animate-spin text-indigo-500 w-5 h-5" />
-                <span className="ml-2 text-slate-400 text-sm">Loading slots...</span>
+                <span className="ml-2 text-slate-400 text-sm">{t("appointments.loadingSlots")}</span>
               </div>
             ) : dayIsClosed ? (
               <div className="text-center py-5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
                 <Ban size={20} className="text-slate-300 mx-auto mb-1" />
-                <p className="text-slate-400 text-sm">Closed on this day</p>
+                <p className="text-slate-400 text-sm">{t("appointments.closedDay")}</p>
               </div>
             ) : slots.length === 0 ? (
               <div className="text-center py-5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
                 <AlertCircle size={20} className="text-slate-300 mx-auto mb-1" />
-                <p className="text-slate-400 text-sm">No slots available</p>
+                <p className="text-slate-400 text-sm">{t("appointments.noSlots")}</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 max-h-36 overflow-y-auto">
@@ -322,7 +321,7 @@ const RescheduleModal = ({ booking, onClose, onSuccess }) => {
             onClick={onClose}
             className="flex-1 py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-bold text-sm hover:bg-slate-200 transition-colors"
           >
-            Cancel
+            {t("appointments.cancel")}
           </button>
           <button
             onClick={handleReschedule}
@@ -330,9 +329,9 @@ const RescheduleModal = ({ booking, onClose, onSuccess }) => {
             className="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-black text-sm hover:bg-indigo-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-indigo-200"
           >
             {submitting ? (
-              <><Loader2 size={14} className="animate-spin" /> Saving...</>
+              <><Loader2 size={14} className="animate-spin" /> {t("appointments.saving")}</>
             ) : (
-              <><CalendarDays size={14} /> Confirm Reschedule</>
+              <><CalendarDays size={14} /> {t("appointments.confirmReschedule")}</>
             )}
           </button>
         </div>
@@ -345,6 +344,7 @@ const RescheduleModal = ({ booking, onClose, onSuccess }) => {
    BOOKING DETAIL DRAWER
    ───────────────────────────────────────────────────────────────────────────── */
 const BookingDrawer = ({ booking, onClose, onStatusChange, onReschedule, onComplete }) => {
+  const { t } = useTranslation();
   const [actionLoading, setActionLoading] = useState(null);
 
   const handleStatus = async (status) => {
@@ -386,7 +386,7 @@ const BookingDrawer = ({ booking, onClose, onStatusChange, onReschedule, onCompl
               <CalendarCheck size={18} className="text-indigo-600" />
             </div>
             <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Booking Detail</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("appointments.bookingDetail")}</p>
               <h3 className="font-black text-slate-900 dark:text-white text-base leading-tight">{booking.customerName}</h3>
             </div>
           </div>
@@ -401,13 +401,13 @@ const BookingDrawer = ({ booking, onClose, onStatusChange, onReschedule, onCompl
           <div className="flex items-center gap-2">
             <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black ${cfg.badge}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
-              {cfg.label}
+              {t(cfg.labelKey)}
             </span>
           </div>
 
           {/* Appointment Info */}
           <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-5 space-y-3">
-            <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Appointment</p>
+            <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">{t("appointments.appointment")}</p>
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <Sparkles size={15} className="text-indigo-500" />
@@ -421,7 +421,7 @@ const BookingDrawer = ({ booking, onClose, onStatusChange, onReschedule, onCompl
                 <Clock size={15} className="text-indigo-500" />
                 <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{formatTime(booking.timeSlot)}</span>
                 {booking.service?.duration && (
-                  <span className="text-xs text-slate-400 font-medium">· {booking.service.duration} min</span>
+                  <span className="text-xs text-slate-400 font-medium">· {t("appointments.minSuffix", { n: booking.service.duration })}</span>
                 )}
               </div>
               {booking.service?.price && (
@@ -435,7 +435,7 @@ const BookingDrawer = ({ booking, onClose, onStatusChange, onReschedule, onCompl
 
           {/* Customer Info */}
           <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 space-y-3">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Customer</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("appointments.customer")}</p>
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <User size={15} className="text-slate-400" />
@@ -459,7 +459,7 @@ const BookingDrawer = ({ booking, onClose, onStatusChange, onReschedule, onCompl
           {/* Notes */}
           {booking.notes && (
             <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5">
-              <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-2">Customer Note</p>
+              <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-2">{t("appointments.customerNote")}</p>
               <div className="flex gap-2">
                 <MessageSquare size={14} className="text-amber-400 flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-amber-800 font-medium leading-relaxed">{booking.notes}</p>
@@ -469,18 +469,18 @@ const BookingDrawer = ({ booking, onClose, onStatusChange, onReschedule, onCompl
 
           {/* Booking Meta */}
           <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-            <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-2">Booking ID</p>
+            <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-2">{t("appointments.bookingId")}</p>
             <p className="text-xs font-mono text-slate-400">{booking._id}</p>
           </div>
         </div>
 
         {/* Actions Footer */}
         <div className="p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Actions</p>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">{t("appointments.actions")}</p>
           <div className="flex flex-wrap gap-2">
             {booking.status !== 'confirmed' && booking.status !== 'completed' && booking.status !== 'no-show' && (
               <ActionButton
-                label={actionLoading === 'confirmed' ? "Saving..." : "Confirm"}
+                label={actionLoading === 'confirmed' ? t("appointments.saving") : t("appointments.confirm")}
                 icon={<CheckCircle2 size={13} />}
                 onClick={() => handleStatus('confirmed')}
                 color="bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white"
@@ -489,7 +489,7 @@ const BookingDrawer = ({ booking, onClose, onStatusChange, onReschedule, onCompl
             )}
             {booking.status !== 'completed' && booking.status !== 'cancelled' && booking.status !== 'no-show' && (
               <ActionButton
-                label="Complete"
+                label={t("appointments.complete")}
                 icon={<Check size={13} />}
                 onClick={() => onComplete(booking)}
                 color="bg-indigo-100 text-indigo-700 hover:bg-indigo-600 hover:text-white"
@@ -499,21 +499,21 @@ const BookingDrawer = ({ booking, onClose, onStatusChange, onReschedule, onCompl
             {booking.status !== 'cancelled' && booking.status !== 'completed' && booking.status !== 'no-show' && (
               <>
                 <ActionButton
-                  label="Reschedule"
+                  label={t("appointments.reschedule")}
                   icon={<RotateCcw size={13} />}
                   onClick={onReschedule}
                   color="bg-amber-100 text-amber-700 hover:bg-amber-500 hover:text-white"
                   disabled={!!actionLoading}
                 />
                 <ActionButton
-                  label={actionLoading === 'no-show' ? "Saving..." : "No-show"}
+                  label={actionLoading === 'no-show' ? t("appointments.saving") : t("appointments.noShow")}
                   icon={<Ban size={13} />}
                   onClick={() => handleStatus('no-show')}
                   color="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-600 hover:text-white"
                   disabled={!!actionLoading}
                 />
                 <ActionButton
-                  label={actionLoading === 'cancelled' ? "Saving..." : "Cancel"}
+                  label={actionLoading === 'cancelled' ? t("appointments.saving") : t("appointments.cancel")}
                   icon={<XCircle size={13} />}
                   onClick={() => handleStatus('cancelled')}
                   color="bg-rose-100 text-rose-700 hover:bg-rose-600 hover:text-white"
@@ -556,6 +556,7 @@ const StatCard = ({ label, value, color, active, onClick }) => (
    BOOKING ROW CARD
    ───────────────────────────────────────────────────────────────────────────── */
 const BookingCard = ({ booking, onClick }) => {
+  const { t } = useTranslation();
   const cfg = STATUS_CONFIG[booking.status] || STATUS_CONFIG.pending;
 
   return (
@@ -584,7 +585,7 @@ const BookingCard = ({ booking, onClick }) => {
             </h4>
             <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tight flex-shrink-0 ${cfg.badge}`}>
               {cfg.icon}
-              {cfg.label}
+              {t(cfg.labelKey)}
             </span>
           </div>
           <p className="text-xs text-slate-400 font-medium truncate">{booking.service?.title}</p>
@@ -610,6 +611,7 @@ const BookingCard = ({ booking, onClick }) => {
    MAIN APPOINTMENTS PAGE
    ───────────────────────────────────────────────────────────────────────────── */
 const Appointments = () => {
+  const { t } = useTranslation();
   // Data state
   const [bookings, setBookings] = useState([]);
   const [summary, setSummary] = useState(null);
@@ -655,7 +657,7 @@ const Appointments = () => {
         setPagination(res.data.pagination);
       }
     } catch (err) {
-      setError("Failed to load appointments. Please try again.");
+      setError(t("appointments.loadFailed"));
     } finally {
       setLoading(false);
     }
@@ -698,12 +700,12 @@ const Appointments = () => {
   };
 
   const TABS = [
-    { key: "all", label: "All", count: summary?.total },
-    { key: "pending", label: "Pending", count: summary?.pending },
-    { key: "confirmed", label: "Confirmed", count: summary?.confirmed },
-    { key: "completed", label: "Completed", count: summary?.completed },
-    { key: "cancelled", label: "Cancelled", count: summary?.cancelled },
-    { key: "no-show", label: "No-show", count: summary?.noShow },
+    { key: "all", label: t("appointments.tabAll"), count: summary?.total },
+    { key: "pending", label: t("appointments.tabPending"), count: summary?.pending },
+    { key: "confirmed", label: t("appointments.tabConfirmed"), count: summary?.confirmed },
+    { key: "completed", label: t("appointments.tabCompleted"), count: summary?.completed },
+    { key: "cancelled", label: t("appointments.tabCancelled"), count: summary?.cancelled },
+    { key: "no-show", label: t("appointments.tabNoShow"), count: summary?.noShow },
   ];
 
   return (
@@ -718,9 +720,9 @@ const Appointments = () => {
             <CalendarCheck size={26} />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Appointments</h1>
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{t("appointments.title")}</h1>
             <p className="text-slate-500 font-semibold text-sm">
-              {summary?.total ?? "—"} total bookings
+              {t("appointments.totalBookings", { n: summary?.total ?? "—" })}
             </p>
           </div>
         </div>
@@ -738,7 +740,7 @@ const Appointments = () => {
               onClick={() => { setDateFilter(""); setCurrentPage(1); }}
               className="px-3 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-500 hover:bg-slate-200 transition-colors text-xs font-bold flex items-center gap-1.5"
             >
-              <X size={12} /> Clear
+              <X size={12} /> {t("appointments.clear")}
             </button>
           )}
           {/* Refresh */}
@@ -757,35 +759,35 @@ const Appointments = () => {
           ══════════════════════════════════════════════ */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <StatCard
-          label="Pending"
+          label={t("appointments.tabPending")}
           value={summary?.pending}
           color="bg-amber-400"
           active={activeStatus === "pending"}
           onClick={() => handleStatusChange("pending")}
         />
         <StatCard
-          label="Confirmed"
+          label={t("appointments.tabConfirmed")}
           value={summary?.confirmed}
           color="bg-emerald-400"
           active={activeStatus === "confirmed"}
           onClick={() => handleStatusChange("confirmed")}
         />
         <StatCard
-          label="Completed"
+          label={t("appointments.tabCompleted")}
           value={summary?.completed}
           color="bg-indigo-400"
           active={activeStatus === "completed"}
           onClick={() => handleStatusChange("completed")}
         />
         <StatCard
-          label="Cancelled"
+          label={t("appointments.tabCancelled")}
           value={summary?.cancelled}
           color="bg-rose-400"
           active={activeStatus === "cancelled"}
           onClick={() => handleStatusChange("cancelled")}
         />
         <StatCard
-          label="No-show"
+          label={t("appointments.tabNoShow")}
           value={summary?.noShow}
           color="bg-slate-400"
           active={activeStatus === "no-show"}
@@ -824,7 +826,7 @@ const Appointments = () => {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300" size={15} />
           <input
             type="text"
-            placeholder="Search by name, service..."
+            placeholder={t("appointments.search")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:border-indigo-400 focus:shadow-sm transition-all placeholder:text-slate-300"
@@ -845,13 +847,13 @@ const Appointments = () => {
           <div className="w-14 h-14 bg-rose-50 border border-rose-100 rounded-2xl flex items-center justify-center mb-4">
             <AlertCircle className="text-rose-400" size={22} />
           </div>
-          <p className="font-bold text-slate-700 dark:text-slate-200 mb-1">Something went wrong</p>
+          <p className="font-bold text-slate-700 dark:text-slate-200 mb-1">{t("appointments.somethingWrong")}</p>
           <p className="text-slate-400 text-sm mb-4">{error}</p>
           <button
             onClick={() => fetchBookings()}
             className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-700 transition-colors"
           >
-            Try Again
+            {t("appointments.tryAgain")}
           </button>
         </div>
       ) : loading && bookings.length === 0 ? (
@@ -872,11 +874,11 @@ const Appointments = () => {
           <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center justify-center mb-4">
             <CalendarCheck size={24} className="text-slate-200" />
           </div>
-          <p className="font-black text-slate-600 dark:text-slate-300 text-lg mb-1">No appointments found</p>
+          <p className="font-black text-slate-600 dark:text-slate-300 text-lg mb-1">{t("appointments.noAppointments")}</p>
           <p className="text-slate-400 text-sm">
             {searchQuery || dateFilter || activeStatus !== "all"
-              ? "Try adjusting your filters"
-              : "Bookings from your clients will appear here"}
+              ? t("appointments.adjustFilters")
+              : t("appointments.willAppear")}
           </p>
         </div>
       ) : (
@@ -947,7 +949,7 @@ const Appointments = () => {
           </button>
 
           <span className="text-xs font-bold text-slate-400 ml-2">
-            {pagination.total} total
+            {t("appointments.totalCount", { n: pagination.total })}
           </span>
         </div>
       )}

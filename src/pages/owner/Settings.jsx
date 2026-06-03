@@ -8,6 +8,7 @@ import {
   Globe, Download, ExternalLink,
 } from "lucide-react";
 import { QRCode } from "react-qr-code";
+import { useTranslation } from "react-i18next";
 import API from "../../api/config";
 import { twoFaSetup, twoFaEnable, twoFaDisable } from "../../services/authService";
 import { toast } from "react-hot-toast";
@@ -46,16 +47,17 @@ const Field = ({ label, children }) => (
 const inputClass = "w-full px-3 sm:px-5 py-2.5 sm:py-3.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-transparent rounded-2xl text-sm font-bold focus:bg-white focus:border-indigo-500 transition-all outline-none disabled:text-slate-400 disabled:cursor-not-allowed";
 
 const TABS = [
-  { id: "profile",       label: "Profile",       icon: UserCircle },
-  { id: "security",      label: "Security",       icon: ShieldCheck },
-  { id: "notifications", label: "Notifications",  icon: Bell },
-  { id: "website",       label: "QR Code",        icon: QrCode },
+  { id: "profile",       labelKey: "settings.tabProfile",       icon: UserCircle },
+  { id: "security",      labelKey: "settings.tabSecurity",       icon: ShieldCheck },
+  { id: "notifications", labelKey: "settings.tabNotifications",  icon: Bell },
+  { id: "website",       labelKey: "settings.tabQrCode",        icon: QrCode },
 ];
 
 /* ─────────────────────────────────────────────────────────────────────
    WEBSITE QR CODE PANEL
 ───────────────────────────────────────────────────────────────────── */
 const WebsiteQRPanel = ({ website, loading }) => {
+  const { t } = useTranslation();
   const [urlCopied, setUrlCopied] = useState(false);
   const qrRef = useRef(null);
 
@@ -74,16 +76,16 @@ const WebsiteQRPanel = ({ website, loading }) => {
           <Globe size={32} className="text-slate-400" />
         </div>
         <div>
-          <p className="text-lg font-black text-slate-900 dark:text-white">No Website Yet</p>
+          <p className="text-lg font-black text-slate-900 dark:text-white">{t("settings.noWebsite")}</p>
           <p className="text-sm text-slate-500 font-medium mt-1 max-w-xs">
-            Build your public booking page first — your QR code will appear here once your site is created.
+            {t("settings.noWebsiteSub")}
           </p>
         </div>
         <Link
           to="/owner/dashboard/themes"
           className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all"
         >
-          Build My Site
+          {t("settings.buildSite")}
         </Link>
       </div>
     );
@@ -142,7 +144,7 @@ const WebsiteQRPanel = ({ website, loading }) => {
         <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-2xl border border-amber-100">
           <AlertCircle size={15} className="text-amber-500 shrink-0 mt-0.5" />
           <p className="text-xs text-amber-700 font-medium">
-            Your website is not live yet. The QR code is ready to print, but customers won't be able to book until your site is approved and published.
+            {t("settings.notLive")}
           </p>
         </div>
       )}
@@ -160,7 +162,7 @@ const WebsiteQRPanel = ({ website, loading }) => {
           </div>
           <button
             onClick={copyUrl}
-            title="Copy link"
+            title={t("settings.copyLink")}
             className="p-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded-xl transition-all shrink-0"
           >
             {urlCopied ? <Check size={15} className="text-emerald-600" /> : <Copy size={15} className="text-slate-500" />}
@@ -170,7 +172,7 @@ const WebsiteQRPanel = ({ website, loading }) => {
               href={publicUrl}
               target="_blank"
               rel="noopener noreferrer"
-              title="Open booking page"
+              title={t("settings.openBooking")}
               className="p-3 bg-emerald-100 hover:bg-emerald-200 rounded-xl transition-all shrink-0"
             >
               <ExternalLink size={15} className="text-emerald-700" />
@@ -184,13 +186,13 @@ const WebsiteQRPanel = ({ website, loading }) => {
             onClick={downloadPNG}
             className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all"
           >
-            <Download size={15} /> Download PNG
+            <Download size={15} /> {t("settings.downloadPng")}
           </button>
           <button
             onClick={downloadSVG}
             className="flex items-center gap-2 px-6 py-3 bg-slate-200 text-slate-700 dark:text-slate-200 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-300 transition-all"
           >
-            <Download size={15} /> Download SVG
+            <Download size={15} /> {t("settings.downloadSvg")}
           </button>
         </div>
       </div>
@@ -199,7 +201,7 @@ const WebsiteQRPanel = ({ website, loading }) => {
       <div className="flex items-start gap-3 p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-800">
         <QrCode size={15} className="text-indigo-400 shrink-0 mt-0.5" />
         <p className="text-xs text-slate-500 font-medium">
-          Print this QR code and place it at your front desk or entrance. Customers who scan it go straight to your online booking page — no app required.
+          {t("settings.qrTip")}
         </p>
       </div>
     </div>
@@ -210,6 +212,7 @@ const WebsiteQRPanel = ({ website, loading }) => {
    2FA PANEL  (self-contained sub-component)
 ───────────────────────────────────────────────────────────────────── */
 const TwoFactorPanel = ({ enabled: initialEnabled }) => {
+  const { t } = useTranslation();
   const [enabled,   setEnabled]   = useState(initialEnabled);
   const [phase, setPhase]         = useState("idle"); // idle | scanning | confirming | disabling
   const [setupData, setSetupData] = useState(null);   // { secret, otpauthUri }
@@ -239,7 +242,7 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
       setSetupData(data.data);
       setPhase("scanning");
     } catch (err) {
-      setAlert({ type: "error", message: err.response?.data?.message || "Failed to start 2FA setup." });
+      setAlert({ type: "error", message: err.response?.data?.message || t("settings.setupFail") });
     } finally {
       setLoading(false);
     }
@@ -248,7 +251,7 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
   /* STEP 2 — confirm with first TOTP code */
   const confirmEnable = async () => {
     if (!code || code.length !== 6) {
-      setAlert({ type: "error", message: "Enter the 6-digit code from your authenticator app." });
+      setAlert({ type: "error", message: t("settings.enterCode6") });
       return;
     }
     setLoading(true);
@@ -259,9 +262,9 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
       setPhase("idle");
       setCode("");
       setSetupData(null);
-      toast.success("2FA is now active. Your account is more secure.");
+      toast.success(t("settings.twoFaActiveToast"));
     } catch (err) {
-      setAlert({ type: "error", message: err.response?.data?.message || "Invalid code. Try again." });
+      setAlert({ type: "error", message: err.response?.data?.message || t("settings.invalidCode") });
     } finally {
       setLoading(false);
     }
@@ -275,7 +278,7 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
 
     const val = usePassword ? disablePayload.password : disablePayload.totpCode;
     if (!val) {
-      setAlert({ type: "error", message: usePassword ? "Enter your account password." : "Enter your 6-digit authenticator code." });
+      setAlert({ type: "error", message: usePassword ? t("settings.enterPassword") : t("settings.enterAuthCode") });
       return;
     }
     setLoading(true);
@@ -285,9 +288,9 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
       setEnabled(false);
       setPhase("idle");
       setDisablePayload({ totpCode: "", password: "" });
-      toast.success("2FA has been disabled.");
+      toast.success(t("settings.twoFaDisabledToast"));
     } catch (err) {
-      setAlert({ type: "error", message: err.response?.data?.message || "Verification failed. 2FA was not disabled." });
+      setAlert({ type: "error", message: err.response?.data?.message || t("settings.verifyFail") });
     } finally {
       setLoading(false);
     }
@@ -309,8 +312,8 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-indigo-50 rounded-xl"><QrCode size={20} className="text-indigo-600" /></div>
             <div>
-              <p className="text-sm font-black text-slate-900 dark:text-white">Scan with your authenticator app</p>
-              <p className="text-xs text-slate-400 font-medium">Google Authenticator, Authy, or any TOTP app</p>
+              <p className="text-sm font-black text-slate-900 dark:text-white">{t("settings.scanTitle")}</p>
+              <p className="text-xs text-slate-400 font-medium">{t("settings.scanSub")}</p>
             </div>
           </div>
           <button onClick={cancel} className="p-1.5 rounded-xl hover:bg-slate-100 dark:bg-slate-800 text-slate-400"><X size={16} /></button>
@@ -327,7 +330,7 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
 
         {/* Manual entry */}
         <div className="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-4 border border-slate-100 dark:border-slate-800">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Can't scan? Enter this key manually</p>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t("settings.cantScan")}</p>
           <div className="flex items-center gap-3">
             <code className="flex-1 text-sm font-black text-indigo-700 tracking-[0.3em] break-all">
               {setupData?.secret}
@@ -346,7 +349,7 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
           onClick={() => { setPhase("confirming"); clearAlert(); }}
           className="w-full py-3.5 bg-indigo-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all"
         >
-          I've scanned it — continue
+          {t("settings.scannedContinue")}
         </button>
       </div>
     );
@@ -358,8 +361,8 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
       <div className="space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-black text-slate-900 dark:text-white">Confirm your authenticator code</p>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">Enter the 6-digit code now showing in your app.</p>
+            <p className="text-sm font-black text-slate-900 dark:text-white">{t("settings.confirmTitle")}</p>
+            <p className="text-xs text-slate-400 font-medium mt-0.5">{t("settings.confirmSub")}</p>
           </div>
           <button onClick={cancel} className="p-1.5 rounded-xl hover:bg-slate-100 dark:bg-slate-800 text-slate-400"><X size={16} /></button>
         </div>
@@ -383,7 +386,7 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
 
         <div className="flex gap-3">
           <button onClick={cancel} className="flex-1 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-slate-200 transition-all">
-            Cancel
+            {t("settings.cancel")}
           </button>
           <button
             onClick={confirmEnable}
@@ -391,7 +394,7 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
             className="flex-1 py-3.5 bg-indigo-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
           >
             {loading ? <Loader2 size={15} className="animate-spin" /> : <ShieldCheck size={15} />}
-            {loading ? "Verifying…" : "Activate 2FA"}
+            {loading ? t("settings.verifying") : t("settings.activate2fa")}
           </button>
         </div>
       </div>
@@ -404,8 +407,8 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
       <div className="space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-black text-slate-900 dark:text-white">Disable two-factor authentication</p>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">Verify your identity to turn off 2FA.</p>
+            <p className="text-sm font-black text-slate-900 dark:text-white">{t("settings.disableTitle")}</p>
+            <p className="text-xs text-slate-400 font-medium mt-0.5">{t("settings.disableSub")}</p>
           </div>
           <button onClick={cancel} className="p-1.5 rounded-xl hover:bg-slate-100 dark:bg-slate-800 text-slate-400"><X size={16} /></button>
         </div>
@@ -416,19 +419,19 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
             onClick={() => setUsePassword(false)}
             className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${!usePassword ? "bg-white dark:bg-slate-900 shadow text-indigo-600 border border-slate-200 dark:border-slate-700" : "text-slate-400"}`}
           >
-            Authenticator code
+            {t("settings.authCode")}
           </button>
           <button
             onClick={() => setUsePassword(true)}
             className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${usePassword ? "bg-white dark:bg-slate-900 shadow text-indigo-600 border border-slate-200 dark:border-slate-700" : "text-slate-400"}`}
           >
-            Use password
+            {t("settings.usePassword")}
           </button>
         </div>
 
         {!usePassword ? (
           <div>
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">6-digit TOTP code</label>
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">{t("settings.totpLabel")}</label>
             <input
               type="text"
               inputMode="numeric"
@@ -445,14 +448,14 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
           </div>
         ) : (
           <div>
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Account Password</label>
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">{t("settings.accountPassword")}</label>
             <div className="relative mt-2">
               <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type={showDisablePwd ? "text" : "password"}
                 value={disablePayload.password}
                 onChange={(e) => { setDisablePayload((p) => ({ ...p, password: e.target.value })); clearAlert(); }}
-                placeholder="Your current password"
+                placeholder={t("settings.currentPwPlaceholder")}
                 className={`${inputClass} pl-10 pr-12`}
                 autoFocus
               />
@@ -467,7 +470,7 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
 
         <div className="flex gap-3">
           <button onClick={cancel} className="flex-1 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-slate-200 transition-all">
-            Cancel
+            {t("settings.cancel")}
           </button>
           <button
             onClick={confirmDisable}
@@ -475,7 +478,7 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
             className="flex-1 py-3.5 bg-rose-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-rose-700 shadow-lg shadow-rose-100 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
           >
             {loading ? <Loader2 size={15} className="animate-spin" /> : <ShieldOff size={15} />}
-            {loading ? "Verifying…" : "Disable 2FA"}
+            {loading ? t("settings.verifying") : t("settings.disable2fa")}
           </button>
         </div>
       </div>
@@ -491,15 +494,15 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <p className="text-sm font-black text-slate-900 dark:text-white">Authenticator App (TOTP)</p>
+            <p className="text-sm font-black text-slate-900 dark:text-white">{t("settings.authApp")}</p>
             <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${enabled ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 dark:bg-slate-800 text-slate-500"}`}>
-              {enabled ? "Active" : "Off"}
+              {enabled ? t("settings.active") : t("settings.off")}
             </span>
           </div>
           <p className="text-xs text-slate-500 font-medium mt-0.5">
             {enabled
-              ? "Your account is protected with a time-based one-time password."
-              : "Add a second layer of protection beyond your password."}
+              ? t("settings.protectedDesc")
+              : t("settings.addLayerDesc")}
           </p>
         </div>
       </div>
@@ -510,7 +513,7 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
           disabled={loading}
           className="shrink-0 px-5 py-2.5 bg-rose-50 text-rose-600 border border-rose-200 font-black text-xs uppercase tracking-wider rounded-2xl hover:bg-rose-100 transition-all"
         >
-          Disable
+          {t("settings.disable")}
         </button>
       ) : (
         <button
@@ -519,7 +522,7 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
           className="shrink-0 px-5 py-2.5 bg-indigo-600 text-white font-black text-xs uppercase tracking-wider rounded-2xl hover:bg-indigo-700 shadow-md shadow-indigo-100 transition-all flex items-center gap-2 disabled:opacity-60"
         >
           {loading ? <Loader2 size={13} className="animate-spin" /> : null}
-          {loading ? "Loading…" : "Enable 2FA"}
+          {loading ? t("settings.loading") : t("settings.enable2fa")}
         </button>
       )}
     </div>
@@ -530,6 +533,7 @@ const TwoFactorPanel = ({ enabled: initialEnabled }) => {
    MAIN SETTINGS PAGE
 ───────────────────────────────────────────────────────────────────── */
 const Settings = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("profile");
   const [loading, setLoading]     = useState(true);
 
@@ -600,9 +604,9 @@ const Settings = () => {
         businessName: profile.businessName,
         phone: profile.phone,
       });
-      if (res.data?.success) setProfileAlert({ type: "success", message: "Profile updated successfully." });
+      if (res.data?.success) setProfileAlert({ type: "success", message: t("settings.profileUpdated") });
     } catch (err) {
-      setProfileAlert({ type: "error", message: err.response?.data?.message || "Failed to save changes." });
+      setProfileAlert({ type: "error", message: err.response?.data?.message || t("settings.saveFailed") });
     } finally {
       setProfileSaving(false);
     }
@@ -610,15 +614,15 @@ const Settings = () => {
 
   const changePassword = async () => {
     setPwdAlert(null);
-    if (!pwd.current || !pwd.newPwd || !pwd.confirm) { setPwdAlert({ type: "error", message: "All fields are required." }); return; }
-    if (pwd.newPwd !== pwd.confirm) { setPwdAlert({ type: "error", message: "New passwords do not match." }); return; }
-    if (pwd.newPwd.length < 8) { setPwdAlert({ type: "error", message: "New password must be at least 8 characters." }); return; }
+    if (!pwd.current || !pwd.newPwd || !pwd.confirm) { setPwdAlert({ type: "error", message: t("settings.allFieldsRequired") }); return; }
+    if (pwd.newPwd !== pwd.confirm) { setPwdAlert({ type: "error", message: t("settings.pwNoMatch") }); return; }
+    if (pwd.newPwd.length < 8) { setPwdAlert({ type: "error", message: t("settings.pwMin8") }); return; }
     setPwdSaving(true);
     try {
       const res = await API.patch("/merchant/settings/password", { currentPassword: pwd.current, newPassword: pwd.newPwd });
-      if (res.data?.success) { setPwdAlert({ type: "success", message: "Password changed. You are now more secure." }); setPwd({ current: "", newPwd: "", confirm: "" }); }
+      if (res.data?.success) { setPwdAlert({ type: "success", message: t("settings.pwChanged") }); setPwd({ current: "", newPwd: "", confirm: "" }); }
     } catch (err) {
-      setPwdAlert({ type: "error", message: err.response?.data?.message || "Failed to change password." });
+      setPwdAlert({ type: "error", message: err.response?.data?.message || t("settings.pwChangeFail") });
     } finally {
       setPwdSaving(false);
     }
@@ -629,9 +633,9 @@ const Settings = () => {
     setNotifAlert(null);
     try {
       const res = await API.patch("/merchant/settings/notifications", notifs);
-      if (res.data?.success) setNotifAlert({ type: "success", message: "Notification preferences saved." });
+      if (res.data?.success) setNotifAlert({ type: "success", message: t("settings.notifsSaved") });
     } catch {
-      setNotifAlert({ type: "error", message: "Failed to save preferences." });
+      setNotifAlert({ type: "error", message: t("settings.notifsFail") });
     } finally {
       setNotifSaving(false);
     }
@@ -649,8 +653,8 @@ const Settings = () => {
     <div className="max-w-5xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
 
       <div>
-        <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Business Settings</h2>
-        <p className="text-slate-500 font-medium mt-1">Manage your profile, password, and notification preferences.</p>
+        <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{t("settings.title")}</h2>
+        <p className="text-slate-500 font-medium mt-1">{t("settings.subtitle")}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -667,7 +671,7 @@ const Settings = () => {
                 className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${active ? "bg-white dark:bg-slate-900 shadow-md border border-slate-100 dark:border-slate-800 text-indigo-600" : "text-slate-500 hover:bg-white/60"}`}
               >
                 <div className="flex items-center gap-3 font-black text-sm uppercase tracking-widest">
-                  <Icon size={18} /> {tab.label}
+                  <Icon size={18} /> {t(tab.labelKey)}
                 </div>
                 <ChevronRight size={16} className={active ? "opacity-100" : "opacity-0"} />
               </button>
@@ -684,38 +688,38 @@ const Settings = () => {
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl"><UserCircle size={22} /></div>
                 <div>
-                  <h3 className="text-xl font-black text-slate-900 dark:text-white">Profile Information</h3>
-                  <p className="text-xs text-slate-400 font-bold mt-0.5">Update your business name and contact number.</p>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white">{t("settings.profileInfo")}</h3>
+                  <p className="text-xs text-slate-400 font-bold mt-0.5">{t("settings.profileInfoSub")}</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <Field label="Full Name">
+                <Field label={t("settings.fullName")}>
                   <div className="relative">
                     <input type="text" value={profile.fullName} disabled className={inputClass} />
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400 uppercase bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">Read-only</span>
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400 uppercase bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">{t("settings.readonly")}</span>
                   </div>
                 </Field>
-                <Field label="Email Address">
+                <Field label={t("settings.emailAddress")}>
                   <div className="relative">
                     <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input type="email" value={profile.email} disabled className={`${inputClass} pl-10`} />
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400 uppercase bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">Read-only</span>
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400 uppercase bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">{t("settings.readonly")}</span>
                   </div>
                 </Field>
-                <Field label="Business Name">
-                  <input type="text" value={profile.businessName} onChange={(e) => setProfile((p) => ({ ...p, businessName: e.target.value }))} placeholder="e.g. SmartStyle Barber" className={inputClass} />
+                <Field label={t("settings.businessName")}>
+                  <input type="text" value={profile.businessName} onChange={(e) => setProfile((p) => ({ ...p, businessName: e.target.value }))} placeholder={t("settings.bizNamePh")} className={inputClass} />
                 </Field>
-                <Field label="Phone Number">
+                <Field label={t("settings.phoneNumber")}>
                   <div className="relative">
                     <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <input type="tel" value={profile.phone} onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))} placeholder="+216 -- --- ---" className={`${inputClass} pl-10`} />
+                    <input type="tel" value={profile.phone} onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))} placeholder={t("settings.phonePh")} className={`${inputClass} pl-10`} />
                   </div>
                 </Field>
-                <Field label="Category">
+                <Field label={t("settings.category")}>
                   <input type="text" value={profile.category} disabled className={inputClass} />
                 </Field>
-                <Field label="Governorate">
+                <Field label={t("settings.governorate")}>
                   <input type="text" value={profile.ville} disabled className={inputClass} />
                 </Field>
               </div>
@@ -724,7 +728,7 @@ const Settings = () => {
               <div className="flex justify-end">
                 <button onClick={saveProfile} disabled={profileSaving} className="flex items-center gap-2 px-8 py-3.5 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.15em] hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all disabled:opacity-60">
                   {profileSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                  {profileSaving ? "Saving…" : "Save Changes"}
+                  {profileSaving ? t("settings.saving") : t("settings.saveChanges")}
                 </button>
               </div>
             </section>
@@ -739,15 +743,15 @@ const Settings = () => {
                 <div className="flex items-center gap-3 mb-2">
                   <div className="p-3 bg-violet-50 text-violet-600 rounded-2xl"><ShieldCheck size={22} /></div>
                   <div>
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white">Change Password</h3>
-                    <p className="text-xs text-slate-400 font-bold mt-0.5">Use a strong password with at least 8 characters.</p>
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white">{t("settings.changePassword")}</h3>
+                    <p className="text-xs text-slate-400 font-bold mt-0.5">{t("settings.changePasswordSub")}</p>
                   </div>
                 </div>
 
-                <Field label="Current Password">
+                <Field label={t("settings.currentPassword")}>
                   <div className="relative">
                     <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <input type={showCurrent ? "text" : "password"} value={pwd.current} onChange={(e) => setPwd((p) => ({ ...p, current: e.target.value }))} placeholder="Enter current password" className={`${inputClass} pl-10 pr-12`} />
+                    <input type={showCurrent ? "text" : "password"} value={pwd.current} onChange={(e) => setPwd((p) => ({ ...p, current: e.target.value }))} placeholder={t("settings.currentPwPlaceholder2")} className={`${inputClass} pl-10 pr-12`} />
                     <button onClick={() => setShowCurrent(v => !v)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-300">
                       {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -755,19 +759,19 @@ const Settings = () => {
                 </Field>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <Field label="New Password">
+                  <Field label={t("settings.newPassword")}>
                     <div className="relative">
                       <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                      <input type={showNew ? "text" : "password"} value={pwd.newPwd} onChange={(e) => setPwd((p) => ({ ...p, newPwd: e.target.value }))} placeholder="Min. 8 characters" className={`${inputClass} pl-10 pr-12`} />
+                      <input type={showNew ? "text" : "password"} value={pwd.newPwd} onChange={(e) => setPwd((p) => ({ ...p, newPwd: e.target.value }))} placeholder={t("settings.newPwPlaceholder")} className={`${inputClass} pl-10 pr-12`} />
                       <button onClick={() => setShowNew(v => !v)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-300">
                         {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                     </div>
                   </Field>
-                  <Field label="Confirm New Password">
+                  <Field label={t("settings.confirmNewPassword")}>
                     <div className="relative">
                       <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                      <input type={showConfirm ? "text" : "password"} value={pwd.confirm} onChange={(e) => setPwd((p) => ({ ...p, confirm: e.target.value }))} placeholder="Repeat new password" className={`${inputClass} pl-10 pr-12`} />
+                      <input type={showConfirm ? "text" : "password"} value={pwd.confirm} onChange={(e) => setPwd((p) => ({ ...p, confirm: e.target.value }))} placeholder={t("settings.confirmPwPlaceholder")} className={`${inputClass} pl-10 pr-12`} />
                       <button onClick={() => setShowConfirm(v => !v)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-300">
                         {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
@@ -783,8 +787,8 @@ const Settings = () => {
                       ))}
                     </div>
                     <p className="text-[10px] text-slate-400 font-bold">
-                      {["Too weak","Weak","Fair","Strong","Very strong"][[pwd.newPwd.length >= 8, /[A-Z]/.test(pwd.newPwd), /[0-9]/.test(pwd.newPwd), /[^A-Za-z0-9]/.test(pwd.newPwd)].filter(Boolean).length]}
-                      {" — "}8+ chars, uppercase, number, symbol
+                      {[t("settings.strTooWeak"),t("settings.strWeak"),t("settings.strFair"),t("settings.strStrong"),t("settings.strVeryStrong")][[pwd.newPwd.length >= 8, /[A-Z]/.test(pwd.newPwd), /[0-9]/.test(pwd.newPwd), /[^A-Za-z0-9]/.test(pwd.newPwd)].filter(Boolean).length]}
+                      {" — "}{t("settings.strengthHint")}
                     </p>
                   </div>
                 )}
@@ -792,7 +796,7 @@ const Settings = () => {
                 {pwd.confirm && (
                   <div className={`flex items-center gap-2 text-xs font-bold ${pwd.newPwd === pwd.confirm ? "text-emerald-600" : "text-rose-500"}`}>
                     {pwd.newPwd === pwd.confirm ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
-                    {pwd.newPwd === pwd.confirm ? "Passwords match" : "Passwords do not match"}
+                    {pwd.newPwd === pwd.confirm ? t("settings.passwordsMatch") : t("settings.passwordsNoMatch")}
                   </div>
                 )}
 
@@ -800,7 +804,7 @@ const Settings = () => {
                 <div className="flex justify-end">
                   <button onClick={changePassword} disabled={pwdSaving} className="flex items-center gap-2 px-8 py-3.5 bg-violet-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.15em] hover:bg-violet-700 shadow-lg shadow-violet-100 transition-all disabled:opacity-60">
                     {pwdSaving ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
-                    {pwdSaving ? "Updating…" : "Update Password"}
+                    {pwdSaving ? t("settings.updating") : t("settings.updatePassword")}
                   </button>
                 </div>
               </section>
@@ -810,8 +814,8 @@ const Settings = () => {
                 <div className="flex items-center gap-3 mb-2">
                   <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl"><KeyRound size={22} /></div>
                   <div>
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white">Two-Factor Authentication</h3>
-                    <p className="text-xs text-slate-400 font-bold mt-0.5">Add a second layer of protection to your account.</p>
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white">{t("settings.twoFactorAuth")}</h3>
+                    <p className="text-xs text-slate-400 font-bold mt-0.5">{t("settings.twoFactorAuthSub")}</p>
                   </div>
                 </div>
 
@@ -820,7 +824,7 @@ const Settings = () => {
                 {/* Info box */}
                 <div className="flex items-start gap-3 p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-800 text-xs text-slate-500 font-medium">
                   <ShieldCheck size={15} className="text-indigo-400 shrink-0 mt-0.5" />
-                  When 2FA is active, you will need to enter a 6-digit code from your authenticator app each time you log in, even if someone knows your password.
+                  {t("settings.twoFaInfo")}
                 </div>
               </section>
             </div>
@@ -832,15 +836,15 @@ const Settings = () => {
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl"><Bell size={22} /></div>
                 <div>
-                  <h3 className="text-xl font-black text-slate-900 dark:text-white">Email Notifications</h3>
-                  <p className="text-xs text-slate-400 font-bold mt-0.5">Choose what alerts you receive at your inbox.</p>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white">{t("settings.emailNotifications")}</h3>
+                  <p className="text-xs text-slate-400 font-bold mt-0.5">{t("settings.emailNotificationsSub")}</p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 {[
-                  { key: "newBookingEmail", icon: <BellRing size={18} className="text-indigo-600" />, bg: "bg-indigo-50", label: "New Booking Alert", desc: "Get an email instantly whenever a customer schedules an appointment.", badge: "Recommended", badgeColor: "bg-indigo-100 text-indigo-700" },
-                  { key: "cancellationEmail", icon: <BellOff size={18} className="text-rose-600" />, bg: "bg-rose-50", label: "Cancellation Alert", desc: "Get notified when a confirmed booking is cancelled.", badge: null },
+                  { key: "newBookingEmail", icon: <BellRing size={18} className="text-indigo-600" />, bg: "bg-indigo-50", label: t("settings.newBookingAlert"), desc: t("settings.newBookingAlertDesc"), badge: t("settings.recommended"), badgeColor: "bg-indigo-100 text-indigo-700" },
+                  { key: "cancellationEmail", icon: <BellOff size={18} className="text-rose-600" />, bg: "bg-rose-50", label: t("settings.cancellationAlert"), desc: t("settings.cancellationAlertDesc"), badge: null },
                 ].map((item) => (
                   <div key={item.key} className="flex items-center justify-between p-5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-800 gap-4">
                     <div className="flex items-start gap-4">
@@ -863,7 +867,7 @@ const Settings = () => {
               <div className="flex items-start gap-3 p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-800">
                 <Mail size={16} className="text-slate-400 shrink-0 mt-0.5" />
                 <p className="text-xs text-slate-500 font-medium">
-                  All emails are sent to <span className="font-black text-slate-900 dark:text-white">{profile.email}</span>. To change your email address, please contact support.
+                  {t("settings.emailsSentToPre")}<span className="font-black text-slate-900 dark:text-white">{profile.email}</span>{t("settings.emailsSentToPost")}
                 </p>
               </div>
 
@@ -871,7 +875,7 @@ const Settings = () => {
               <div className="flex justify-end">
                 <button onClick={saveNotifications} disabled={notifSaving} className="flex items-center gap-2 px-8 py-3.5 bg-amber-500 text-white rounded-2xl font-black text-xs uppercase tracking-[0.15em] hover:bg-amber-600 shadow-lg shadow-amber-100 transition-all disabled:opacity-60">
                   {notifSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                  {notifSaving ? "Saving…" : "Save Preferences"}
+                  {notifSaving ? t("settings.saving") : t("settings.savePrefs")}
                 </button>
               </div>
             </section>
@@ -883,8 +887,8 @@ const Settings = () => {
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl"><QrCode size={22} /></div>
                 <div>
-                  <h3 className="text-xl font-black text-slate-900 dark:text-white">Booking QR Code</h3>
-                  <p className="text-xs text-slate-400 font-bold mt-0.5">Let customers scan and book instantly — no link needed.</p>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white">{t("settings.bookingQrCode")}</h3>
+                  <p className="text-xs text-slate-400 font-bold mt-0.5">{t("settings.bookingQrCodeSub")}</p>
                 </div>
               </div>
               <WebsiteQRPanel website={website} loading={websiteLoading} />
